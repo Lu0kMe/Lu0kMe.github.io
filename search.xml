@@ -490,4 +490,406 @@
         <tag>Regex</tag>
       </tags>
   </entry>
+  <entry>
+    <title>Linux基础</title>
+    <url>/2021/10/03/Linux%E5%9F%BA%E7%A1%80/</url>
+    <content><![CDATA[<h1 id="常用命令"><a href="#常用命令" class="headerlink" title="常用命令"></a>常用命令</h1><p>shell是一个用户与Linux进行交互的接口程序，通常它会输出一个提示符，等待用户输入命令。如果该命令行的第一个的单词不是一个内置的shell命令，那么shell就会假设这是一个可执行文件的名字，它将加载并运行这个文件。Bash是当前Linux标准的默认shell。其他的shell包括zsh、powershell等。常用的Linux命令见附录。</p>
+<span id="more"></span>
+
+<h1 id="流、管道和重定向"><a href="#流、管道和重定向" class="headerlink" title="流、管道和重定向"></a>流、管道和重定向</h1><p>在操作系统中，流(stream)是一个很重要的概念，可以把它简单理解成一串连续的、可边读边处理的数据。其中标准流(standard stream)可以分为标准输入、标准输出和标准错误。</p>
+<p>文件描述符(file descriptor)是内核为管理已打开的文件所创建的索引，使用一个非负整数来指代被打开的文件。Linux中的一切都可看作文件，流也不例外，所以输入和输出就被当做对应文件的读写来执行。标准流的定义在头文件unistd.h中，见附录。</p>
+<p>管道(pipeline)是指一系列进程通过标准流连接在一起，前一个进程的输出(stdout)直接作为后一个进程的输入(stdin)。管道符号为”|”，例如：“ps -aux | grep bash”。常见Linux输入输出重定向见附录。</p>
+<h1 id="根目录结构"><a href="#根目录结构" class="headerlink" title="根目录结构"></a>根目录结构</h1><p>Linux中的一切都可以看成文件，所有的文件和目录被组织成一个以根节点(斜杠&#x2F;)开始的倒置的树状结构，系统中的每个文件都是根目录的直接或间接后代。</p>
+<p>Linux文件的三种基本文件类型分别如下：</p>
+<ul>
+<li>普通文件：包含文本文件(只含ASCII或Unicode字符，换行符为’\n’，即十六进制0x0A)和二进制文件(所有其他文件)。</li>
+<li>目录：包含一组链接的文件，其中每个链接都将一个文件名映射到一个文件，这个文件可能是另一个目录。</li>
+<li>特殊文件：包括块文件、符号链接、管道、套接字等。</li>
+</ul>
+<p>目录层次结构中的位置用路径名来指定，分为绝对路径名(从根节点开始)和相对路径名(从当前目录开始)两种。使用tree命令可以直观地查看目录树。</p>
+<h1 id="用户组及文件权限"><a href="#用户组及文件权限" class="headerlink" title="用户组及文件权限"></a>用户组及文件权限</h1><p>Linux是一个支持多用户的操作系统，每个用户都有User ID(UID)和Group ID(GID)，其中UID是对一个用户的单一身份标识，而GID则对应多个UID。可以使用id命令来查看。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">lu0k@LU0K:~$ id root</span><br><span class="line">uid=0(root) gid=0(root) groups=0(root)</span><br><span class="line">lu0k@LU0K:~$ id lu0k</span><br><span class="line">uid=1000(lu0k) gid=1000(lu0k) groups=1000(lu0k)</span><br></pre></td></tr></table></figure>
+
+<p>UID为0的用户具有系统的完全访问权。而UID为1000的普通用户对系统的访问权限有限。</p>
+<p>GID的关系存储在&#x2F;etc&#x2F;group文件中。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">lu0k@LU0K:~$ cat /etc/group | head</span><br><span class="line">root:x:0:</span><br><span class="line">daemon:x:1:</span><br><span class="line">bin:x:2:</span><br><span class="line">sys:x:3:</span><br><span class="line">adm:x:4:syslog,lu0k</span><br><span class="line">tty:x:5:syslog</span><br></pre></td></tr></table></figure>
+
+<p>所有用户的信息(除了密码)都保存再&#x2F;etc&#x2F;passwd文件中，加密过的用户密码则保存在&#x2F;etc&#x2F;shadow文件中，此文件的访问需要root权限。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">lu0k@LU0K:~$ cat /etc/passwd | head</span><br><span class="line">root:x:0:0:root:/root:/bin/bash</span><br><span class="line">daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin</span><br><span class="line">bin:x:2:2:bin:/bin:/usr/sbin/nologin</span><br><span class="line">sys:x:3:3:sys:/dev:/usr/sbin/nologin</span><br><span class="line">sync:x:4:65534:sync:/bin:/bin/sync</span><br><span class="line">games:x:5:60:games:/usr/games:/usr/sbin/nologin</span><br></pre></td></tr></table></figure>
+
+<p>whoami命令用于打印当前有效的用户名称，shell中普通用户以’$’开头，root用户以’#’开头。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">lu0k@LU0K:~$ whoami</span><br><span class="line">lu0k</span><br></pre></td></tr></table></figure>
+
+<p>在里Linux中，文件或目录权限的控制分别以读取、写入和执行3种一般权限来区分，另有3种特殊权限可供使用。可以使用”ls -l [file]”来查看某文件或目录的信息。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">lu0k@LU0K:~$ ls -l .bashrc</span><br><span class="line">-rw-r--r-- 1 lu0k lu0k 3771 May 31 18:05 .bashrc</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>第一栏的第一个字母代表文件类型，目录(d)、普通文件(-)、链接文件(l)。</li>
+<li>第一栏从第二个字母开始就是权限字符串，权限标志三个为一组，依次是所有者权限、组权限和其他人权限。权限对应关系见附录。</li>
+</ul>
+<p>用户可以使用chmod命令变更文件与目录的权限。权限范围被指定为所有者(u)、所属组(g)、其他人(o)和所有人(a)。chmod命令的用法如下：</p>
+<ul>
+<li>-R：递归处理，将目录下所有文件及子目录一并处理</li>
+<li>&lt;权限范围&gt; + &lt;权限设置&gt;：添加权限。</li>
+<li>&lt;权限范围&gt; - &lt;权限设置&gt;：删除权限。</li>
+<li>&lt;权限范围&gt; &#x3D; &lt;权限设置&gt;：指定权限。</li>
+</ul>
+<h1 id="环境变量"><a href="#环境变量" class="headerlink" title="环境变量"></a>环境变量</h1><p>环境变量相当于给系统或应用程序设置了一些参数，例如共享库的位置、命令行的参数等信息，对于程序的运行十分重要。环境变量字符串以”name &#x3D; value”这样的形式存在，大多数name由大写字母加下划线组成，通常把name部分称为环境变量名，value部分称为环境变量的值，其中value需要以’\0’结尾。</p>
+<p>Linux环境变量的分类方法通常有下面两种：</p>
+<ul>
+<li>按生命周期划分：</li>
+<li><ul>
+<li>永久环境变量：修改相关配置文件，永久生效。</li>
+<li>临时环境变量：通过export命令在当前终端下声明，关闭终端后失效。</li>
+</ul>
+</li>
+<li>按作用域划分：</li>
+<li><ul>
+<li>系统环境变量：对该系统中的所有用户生效，可以在”&#x2F;etc&#x2F;profile”文件中声明。</li>
+<li>用户环境变量：对特定用户生效，可以在”~&#x2F;.bashrc”文件中声明。</li>
+</ul>
+</li>
+</ul>
+<p>使用命令env可以打印出所有的环境变量，也可以对环境变量进行设置。</p>
+<p><strong>PWN常用环境变量：</strong></p>
+<ul>
+<li>LD_PRELOAD：LD_PRELOAD环境变量可以定义程序运行时优先加载的动态链接库，这就允许预加载库中的函数和符号能够覆盖掉后加载的库中的函数和符号。可以通过修改该环境变量加载一个特定的libc。需要注意的是，ELF文件的INTERP字段指定了解释器ld.so的位置，如果该路径与动态链接库的位置不匹配，则会触发错误。</li>
+<li>environ：libc中定义的全局变量environ指向内存中的环境变量表，更具体地，该表就位于栈上，因此通过泄露environ指针的地址，即可获得栈地址。</li>
+</ul>
+<h1 id="procfs文件系统"><a href="#procfs文件系统" class="headerlink" title="procfs文件系统"></a>procfs文件系统</h1><p>procfs文件系统是Linux内核提供的虚拟文件系统，为访问内核数据提供接口。它只占用内存而不占用存储。用户可以通过procfs查看有关系统硬件及当前正在运行的进程的信息，甚至可以通过修改其中的某些内容来改变内核的运行状态。</p>
+<p>每个正在运行的进程都对应&#x2F;proc下的一个目录，目录名就是进程PID，每个目录包含：</p>
+<ul>
+<li>&#x2F;proc&#x2F;PID&#x2F;cmdline：启动该进程的命令行</li>
+<li>&#x2F;proc&#x2F;PID&#x2F;cwd：当前工作目录的符号链接</li>
+<li>&#x2F;proc&#x2F;PID&#x2F;environ：影响进程的环境变量的名字和值</li>
+<li>&#x2F;proc&#x2F;PID&#x2F;exe：最初的可执行文件的符号链接, 如果它还存在的话</li>
+<li>&#x2F;proc&#x2F;PID&#x2F;fd：一个目录，包含每个打开的文件描述符的符号链接</li>
+<li>&#x2F;proc&#x2F;PID&#x2F;fdinfo：一个目录，包含每个打开的文件描述符的位置和标记</li>
+<li>&#x2F;proc&#x2F;PID&#x2F;maps：一个文本文件，包含内存映射文件与块的信息</li>
+<li>&#x2F;proc&#x2F;PID&#x2F;mem：一个二进制图像(image)表示进程的虚拟内存，只能通过ptrace化进程访问</li>
+<li>&#x2F;proc&#x2F;PID&#x2F;root：该进程所能看到的根路径的符号链接。如果没有chroot监狱，那么进程的根路径是&#x2F;</li>
+<li>&#x2F;proc&#x2F;PID&#x2F;status：包含了进程的基本信息，包括运行状态、内存使用</li>
+<li>&#x2F;proc&#x2F;PID&#x2F;task：一个目录包含了硬链接到该进程启动的任何任务</li>
+</ul>
+<h1 id="字节序"><a href="#字节序" class="headerlink" title="字节序"></a>字节序</h1><p>计算机中采用了两种字节存储机制：大端(Big-endian)和小端(Little-endian)。其中大端规定MSB(Most Significan Bit&#x2F;Byte)在存储时放在低地址，在传输时放在流的开始；LSB(Least Significan Bit&#x2F;Byte)在存储时放在高地址，在传输时放在流的末尾。小端则正好相反。常见的Intel处理器使用小端，而PowerPC系列处理器使用大端，另外，TCP&#x2F;IP协议和Java虚拟机的字节序也是大端。</p>
+<h1 id="调用约定"><a href="#调用约定" class="headerlink" title="调用约定"></a>调用约定</h1><p>函数调用约定是对函数调用时如何传递参数的一种约定。</p>
+<ul>
+<li>内核接口</li>
+<li><ul>
+<li>x86-32系统调用约定：Linux系统调用使用寄存器传递参数。eax为syscall_number，ebx、ecx、edx、esi和ebp用于将6个参数传递给系统调用。返回值保存在eax中。所有其他寄存器(包括EFLAGS)都保留在int 0x80中。</li>
+<li>x86-64系统调用约定：内核接口使用的寄存器有rdi、rsi、rdx、r10、r8和r9。系统调用通过syscall指令完成。除了rcx、r11和rax，其他的寄存器都被保留。系统调用的编号必须在rax中传递。系统调用的参数限制为6个，不直接从堆栈上传递任何参数。返回时，rax中包含了系统调用的结果，而且只有INTEGER或者MEMORY类型的值才会被传递给内核。</li>
+</ul>
+</li>
+<li>用户接口</li>
+<li><ul>
+<li>x86-32系统调用约定：参数通过栈传递。最后一个参数第一个被放进栈中，直到所有的参数都放置完毕，然后执行call指令。这也是Linux上C语言默认的方式。</li>
+<li>x86-64系统调用约定：x86-64下通过寄存器传递参数，这样做会比通过栈具有更高的效率。它避免了内存中参数的存取和额外的指令。根据参数类型的不同，会使用寄存器或传参方式。如果参数的类型是MEMORY，则在栈上传递参数。如果类型是INTEGER，则顺序使用rdi、rsi、rdx、rcx、r8和r9。所以如果有多于6个的INTEGER参数，则后面的参数在栈上传递。</li>
+</ul>
+</li>
+</ul>
+<h1 id="核心转储"><a href="#核心转储" class="headerlink" title="核心转储"></a>核心转储</h1><p>当程序运行的过程中出现异常终止或崩溃，系统就会将程序崩溃时的内存、寄存器状态、堆栈指针、内存管理信息等记录下来，保存在一个文件中，叫作核心转储(Core Dump)。</p>
+<p>会产生核心转储的信号有如下几种：</p>
+<table>
+<thead>
+<tr>
+<th align="center">信号</th>
+<th align="center">动作</th>
+<th align="center">解释</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">SIGQUIT</td>
+<td align="center">Core</td>
+<td align="center">通过键盘退出时</td>
+</tr>
+<tr>
+<td align="center">SIGILL</td>
+<td align="center">Core</td>
+<td align="center">遇到不合法的指令时</td>
+</tr>
+<tr>
+<td align="center">SIGABRT</td>
+<td align="center">Core</td>
+<td align="center">从abort中产生的信号</td>
+</tr>
+<tr>
+<td align="center">SIGSEGV</td>
+<td align="center">Core</td>
+<td align="center">无效的内存访问</td>
+</tr>
+<tr>
+<td align="center">SIGTRAP</td>
+<td align="center">Core</td>
+<td align="center">trace&#x2F;breakpoint陷阱</td>
+</tr>
+</tbody></table>
+<h1 id="系统调用"><a href="#系统调用" class="headerlink" title="系统调用"></a>系统调用</h1><p>在Linux中，系统调用是一些内核空间函数，是用户空间访问内核的唯一手段。这些函数与CPU架构有关，x86提供了358个系统调用，x86-64提供了322个系统调用。</p>
+<p>在使用汇编写程序(如Shellcode)时，常常需要使用系统调用。早在2.6及更早版本的内核都使用软中断int 0x80进行系统调用，但是由于其性能较差，在后续版本的内核中被快速系统调用指令替代，32位系统使用sysenter(对应sysexit)指令，64位系统则使用syscall(对应sysret)指令。</p>
+<p>一般情况下，应用程序通过在用户空间实现的应用编程接口(API)而不是系统调用来进行编程，而这些接口很多都是系统调用的封装。例如函数printf()的调用过程如下所示：</p>
+<center>调用printf() ==> C库中的printf() ==> C库中的write() ==> write系统调用</center>
+
+<h1 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h1><h2 id="Linux常用命令"><a href="#Linux常用命令" class="headerlink" title="Linux常用命令"></a>Linux常用命令</h2><table>
+<thead>
+<tr>
+<th align="center">标准格式：命令名称  [命令参数]  [命令对象]</th>
+<th align="center">命令功能</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">ls  [OPTION]…  [FILE]…</td>
+<td align="center">列出文件信息</td>
+</tr>
+<tr>
+<td align="center">cd  [-L|[-P  [-e]]  [-@]]  [dir]</td>
+<td align="center">切换工作目录</td>
+</tr>
+<tr>
+<td align="center">pwd  [-LP]</td>
+<td align="center">显示当前工作目录</td>
+</tr>
+<tr>
+<td align="center">uname  [OPTION]</td>
+<td align="center">打印系统信息</td>
+</tr>
+<tr>
+<td align="center">whoami  [OPTION]</td>
+<td align="center">打印用户名</td>
+</tr>
+<tr>
+<td align="center">man  [OPTION…]  [SECTION]  PAGE…</td>
+<td align="center">查询帮助信息</td>
+</tr>
+<tr>
+<td align="center">find  [options]  [path…]  [expression]</td>
+<td align="center">查找文件</td>
+</tr>
+<tr>
+<td align="center">echo  [SHORT-OPTION]…  [STRING]…</td>
+<td align="center">打印文本，参数’-e’可激活转义字符</td>
+</tr>
+<tr>
+<td align="center">cat  [OPTION]…  [FILE]</td>
+<td align="center">打印到标准输出</td>
+</tr>
+<tr>
+<td align="center">less  [options]  file…</td>
+<td align="center">分页打印文本，比more提供更丰富的功能</td>
+</tr>
+<tr>
+<td align="center">head&#x2F;tail  [OPTION]…  [FILE]</td>
+<td align="center">打印文本的前&#x2F;后N行</td>
+</tr>
+<tr>
+<td align="center">grep  [OPTION]…  PATTERN  [FILE]…</td>
+<td align="center">匹配文本模式</td>
+</tr>
+<tr>
+<td align="center">cut  OPTION…  [FILE]…</td>
+<td align="center">通过列提取文本</td>
+</tr>
+<tr>
+<td align="center">diff  [OPTION]…  FILES</td>
+<td align="center">比较文本差异</td>
+</tr>
+<tr>
+<td align="center">mv  [OPTION]…  [-T]  SOURCE  DEST</td>
+<td align="center">移动或重命名文件</td>
+</tr>
+<tr>
+<td align="center">cp  [OPTION]…  [-T]  SOURCE  DEST</td>
+<td align="center">复制文件</td>
+</tr>
+<tr>
+<td align="center">rm  [OPTION]…  [FILE]…</td>
+<td align="center">删除文件</td>
+</tr>
+<tr>
+<td align="center">ps  [options]</td>
+<td align="center">查看进程状态</td>
+</tr>
+<tr>
+<td align="center">top  [options]</td>
+<td align="center">实时查看系统运行情况</td>
+</tr>
+<tr>
+<td align="center">kill  [options]  &lt;pid&gt;  […]</td>
+<td align="center">杀死进程</td>
+</tr>
+<tr>
+<td align="center">ifconfig  [-v]  [-a]  [-s]  [interface]</td>
+<td align="center">查看或设置网络设备</td>
+</tr>
+<tr>
+<td align="center">ping  [options]  destination</td>
+<td align="center">判断网络主机是否响应</td>
+</tr>
+<tr>
+<td align="center">netstat  [options]</td>
+<td align="center">查看网络、路由器、接口等信息</td>
+</tr>
+<tr>
+<td align="center">nc  [options]</td>
+<td align="center">建立TCP&#x2F;UDP连接并监听</td>
+</tr>
+<tr>
+<td align="center">su  [options]  [username]</td>
+<td align="center">切换到用户</td>
+</tr>
+<tr>
+<td align="center">touch  [OPTION]…  FILE…</td>
+<td align="center">创建文件</td>
+</tr>
+<tr>
+<td align="center">mkdir  [OPTION]…  DIRECTORY</td>
+<td align="center">创建目录</td>
+</tr>
+<tr>
+<td align="center">chmod  [OPTION]…  MODE[,MODE]…  FILE…</td>
+<td align="center">变更文件或目录权限</td>
+</tr>
+<tr>
+<td align="center">chown  [OPTION]…  [OWNER][:[GROUP]]  FILE…</td>
+<td align="center">变更文件或目录所属者</td>
+</tr>
+<tr>
+<td align="center">nano  &#x2F;  vim  &#x2F;  emacs</td>
+<td align="center">终端文本编辑器</td>
+</tr>
+<tr>
+<td align="center">history  [-c]  [-d  offset]  [n]</td>
+<td align="center">查看”.bash_history”中的历史命令</td>
+</tr>
+<tr>
+<td align="center">exit</td>
+<td align="center">退出shell</td>
+</tr>
+</tbody></table>
+<h2 id="标准流定义"><a href="#标准流定义" class="headerlink" title="标准流定义"></a>标准流定义</h2><table>
+<thead>
+<tr>
+<th align="center">文件描述符</th>
+<th align="center">常量</th>
+<th align="center">用途</th>
+<th align="center">stdio流</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">0</td>
+<td align="center">STDIN_FILENO</td>
+<td align="center">标准输入</td>
+<td align="center">stdin</td>
+</tr>
+<tr>
+<td align="center">1</td>
+<td align="center">STDOUT_FILENO</td>
+<td align="center">标准输出</td>
+<td align="center">stdout</td>
+</tr>
+<tr>
+<td align="center">2</td>
+<td align="center">STDERR_FILENO</td>
+<td align="center">标准错误</td>
+<td align="center">stderr</td>
+</tr>
+</tbody></table>
+<h2 id="输入输出重定向"><a href="#输入输出重定向" class="headerlink" title="输入输出重定向"></a>输入输出重定向</h2><table>
+<thead>
+<tr>
+<th align="center">重定向符号</th>
+<th align="center">作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">cmd &gt; file</td>
+<td align="center">将cmd的标准输出重定向并覆盖file</td>
+</tr>
+<tr>
+<td align="center">cmd &gt;&gt; file</td>
+<td align="center">将cmd的标准输出重定向并追加到file</td>
+</tr>
+<tr>
+<td align="center">cmd &lt; file</td>
+<td align="center">将file作为cmd的标准输入</td>
+</tr>
+<tr>
+<td align="center">cmd &lt;&lt; tag</td>
+<td align="center">从标准输入中读取，直到遇到tag为止</td>
+</tr>
+<tr>
+<td align="center">cmd &lt; file1 &gt; file2</td>
+<td align="center">将file1作为cmd的标准输入并将标准输出重定向到file2</td>
+</tr>
+<tr>
+<td align="center">cmd 2 &gt; file</td>
+<td align="center">将cmd的标准错误重定向并覆盖file</td>
+</tr>
+<tr>
+<td align="center">cmd 2 &gt;&gt; file</td>
+<td align="center">将cmd的标准错误重定向并追加到file</td>
+</tr>
+<tr>
+<td align="center">2 &gt;&amp; 1</td>
+<td align="center">将标准错误和标准输出合并</td>
+</tr>
+</tbody></table>
+<h2 id="权限对应表"><a href="#权限对应表" class="headerlink" title="权限对应表"></a>权限对应表</h2><table>
+<thead>
+<tr>
+<th align="center">1</th>
+<th align="center">2</th>
+<th align="center">3</th>
+<th align="center">4</th>
+<th align="center">5</th>
+<th align="center">6</th>
+<th align="center">7</th>
+<th align="center">8</th>
+<th align="center">9</th>
+<th align="center">10</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"></td>
+<td align="center">所有</td>
+<td align="center">者</td>
+<td align="center">权限</td>
+<td align="center">组</td>
+<td align="center">权</td>
+<td align="center">限</td>
+<td align="center">其他</td>
+<td align="center">人</td>
+<td align="center">权限</td>
+</tr>
+<tr>
+<td align="center">文件权限</td>
+<td align="center">读</td>
+<td align="center">写</td>
+<td align="center">执行</td>
+<td align="center">读</td>
+<td align="center">写</td>
+<td align="center">执行</td>
+<td align="center">读</td>
+<td align="center">写</td>
+<td align="center">执行</td>
+</tr>
+<tr>
+<td align="center">d&#x2F;l&#x2F;s&#x2F;p&#x2F;c&#x2F;b&#x2F;-</td>
+<td align="center">r</td>
+<td align="center">w</td>
+<td align="center">x</td>
+<td align="center">r</td>
+<td align="center">w</td>
+<td align="center">x</td>
+<td align="center">r</td>
+<td align="center">w</td>
+<td align="center">x</td>
+</tr>
+</tbody></table>
+]]></content>
+      <categories>
+        <category>Linux</category>
+      </categories>
+      <tags>
+        <tag>Basic</tag>
+      </tags>
+  </entry>
 </search>
