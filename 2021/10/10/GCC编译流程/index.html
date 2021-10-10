@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-lu0k.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-lu0k.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-lu0k.png">
+  <link rel="mask-icon" href="/images/lu0k.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"lu0k.github.io","root":"/","images":"/images","scheme":"Gemini","version":"8.7.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+<meta name="description" content="流程简介在Linux下，当使用GCC来编译程序时，只需要使用最简单的命令(以C语言Hello World为例)： 123$ gcc hello.c$ .&#x2F;a.outHello World  1234567# include&lt;stdio.h&gt;int main()&amp;#123;    printf(&quot;Hello World\n&quot;);    return 0;&amp;#125;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="GCC编译流程">
+<meta property="og:url" content="https://lu0k.github.io/2021/10/10/GCC%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B/index.html">
+<meta property="og:site_name" content="Lu0k">
+<meta property="og:description" content="流程简介在Linux下，当使用GCC来编译程序时，只需要使用最简单的命令(以C语言Hello World为例)： 123$ gcc hello.c$ .&#x2F;a.outHello World  1234567# include&lt;stdio.h&gt;int main()&amp;#123;    printf(&quot;Hello World\n&quot;);    return 0;&amp;#125;">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-10-09T16:00:00.000Z">
+<meta property="article:modified_time" content="2021-10-10T09:56:53.078Z">
+<meta property="article:author" content="Lu0k">
+<meta property="article:tag" content="Basic">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://lu0k.github.io/2021/10/10/GCC%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://lu0k.github.io/2021/10/10/GCC%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B/","path":"2021/10/10/GCC编译流程/","title":"GCC编译流程"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>GCC编译流程 | Lu0k</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">Lu0k</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Lu0k's Blog</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%B5%81%E7%A8%8B%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">流程简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%A2%84%E5%A4%84%E7%90%86"><span class="nav-number">2.</span> <span class="nav-text">预处理</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BC%96%E8%AF%91"><span class="nav-number">3.</span> <span class="nav-text">编译</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%8D%E6%B3%95%E5%88%86%E6%9E%90"><span class="nav-number">3.1.</span> <span class="nav-text">词法分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%AD%E6%B3%95%E5%88%86%E6%9E%90"><span class="nav-number">3.2.</span> <span class="nav-text">语法分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%AD%E4%B9%89%E5%88%86%E6%9E%90"><span class="nav-number">3.3.</span> <span class="nav-text">语义分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%AD%E9%97%B4%E8%AF%AD%E8%A8%80%E7%94%9F%E6%88%90"><span class="nav-number">3.4.</span> <span class="nav-text">中间语言生成</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9B%AE%E6%A0%87%E4%BB%A3%E7%A0%81%E7%94%9F%E6%88%90%E4%B8%8E%E4%BC%98%E5%8C%96"><span class="nav-number">3.5.</span> <span class="nav-text">目标代码生成与优化</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%B1%87%E7%BC%96"><span class="nav-number">4.</span> <span class="nav-text">汇编</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%93%BE%E6%8E%A5"><span class="nav-number">5.</span> <span class="nav-text">链接</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Reference"><span class="nav-number">6.</span> <span class="nav-text">Reference</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-overview">
+            <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Lu0k"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Lu0k</p>
+  <div class="site-description" itemprop="description">谦虚学习!</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">10</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/lu0k" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;lu0k" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/Lu0kMe" title="Twitter → https:&#x2F;&#x2F;twitter.com&#x2F;Lu0kMe" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://lu0k.github.io/2021/10/10/GCC%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Lu0k">
+      <meta itemprop="description" content="谦虚学习!">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Lu0k">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          GCC编译流程
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-10-10 00:00:00" itemprop="dateCreated datePublished" datetime="2021-10-10T00:00:00+08:00">2021-10-10</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="流程简介"><a href="#流程简介" class="headerlink" title="流程简介"></a>流程简介</h1><p>在Linux下，当使用GCC来编译程序时，只需要使用最简单的命令(以C语言Hello World为例)：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> gcc hello.c</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> ./a.out</span></span><br><span class="line">Hello World</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta"># <span class="meta-keyword">include</span><span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Hello World\n&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>看上去只需要一步即可。而事实上，上述过程可以分解为四个步骤：预处理(preprocess)、编译(compile)、汇编(assemble)、链接(link)。</p>
+<span id="more"></span>
+
+<h1 id="预处理"><a href="#预处理" class="headerlink" title="预处理"></a>预处理</h1><p>预处理过程主要处理那些源代码文件中的以<code>#</code>开始的预处理指令。比如<code>#include</code>、<code>#define</code>等，主要处理规则如下：</p>
+<ul>
+<li>将所有的<code>#define</code>删除，并且展开所有的宏定义</li>
+<li>处理所有条件预处理指令，比如<code>#if</code>、<code>#ifdef</code>、<code>#elif</code>、<code>#else</code>、<code>#endif</code></li>
+<li>处理<code>#include</code>预处理指令，递归地将被包含的文件插入到该预处理指令的位置</li>
+<li>删除所有注释<code>//</code>、<code>/* */</code></li>
+<li>添加行号和文件名标识，以便于编译时编译器产生调试用的行号信息及用于编译时产生编译错误或警告时能够显示行号</li>
+<li>保留所有的<code>#pragma</code>编译器指令，因为编译器需要使用</li>
+</ul>
+<p>需要注意的是，预处理后的文件不包含任何宏定义，因此可以查看预处理后的文件确定宏定义与头文件包含是否正确。</p>
+<p>使用GCC预处理hello.c：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> gcc -E hello.c -o hello.i</span></span><br></pre></td></tr></table></figure>
+
+<p>hello.i文件的内容如下：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 1 <span class="string">&quot;hello.c&quot;</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 1 <span class="string">&quot;&lt;built-in&gt;&quot;</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 1 <span class="string">&quot;&lt;command-line&gt;&quot;</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 31 <span class="string">&quot;&lt;command-line&gt;&quot;</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 1 <span class="string">&quot;/usr/include/stdc-predef.h&quot;</span> 1 3 4</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 32 <span class="string">&quot;&lt;command-line&gt;&quot;</span> 2</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 1 <span class="string">&quot;hello.c&quot;</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 1 <span class="string">&quot;/usr/include/stdio.h&quot;</span> 1 3 4</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 27 <span class="string">&quot;/usr/include/stdio.h&quot;</span> 3 4</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 1 <span class="string">&quot;/usr/include/x86_64-linux-gnu/bits/libc-header-start.h&quot;</span> 1 3 4</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 33 <span class="string">&quot;/usr/include/x86_64-linux-gnu/bits/libc-header-start.h&quot;</span> 3 4</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 1 <span class="string">&quot;/usr/include/features.h&quot;</span> 1 3 4</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 461 <span class="string">&quot;/usr/include/features.h&quot;</span> 3 4</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 1 <span class="string">&quot;/usr/include/x86_64-linux-gnu/sys/cdefs.h&quot;</span> 1 3 4</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 452 <span class="string">&quot;/usr/include/x86_64-linux-gnu/sys/cdefs.h&quot;</span> 3 4</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 1 <span class="string">&quot;/usr/include/x86_64-linux-gnu/bits/wordsize.h&quot;</span> 1 3 4</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 453 <span class="string">&quot;/usr/include/x86_64-linux-gnu/sys/cdefs.h&quot;</span> 2 3 4</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 1 <span class="string">&quot;/usr/include/x86_64-linux-gnu/bits/long-double.h&quot;</span> 1 3 4</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 454 <span class="string">&quot;/usr/include/x86_64-linux-gnu/sys/cdefs.h&quot;</span> 2 3 4</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 462 <span class="string">&quot;/usr/include/features.h&quot;</span> 2 3 4</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 485 <span class="string">&quot;/usr/include/features.h&quot;</span> 3 4</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 1 <span class="string">&quot;/usr/include/x86_64-linux-gnu/gnu/stubs.h&quot;</span> 1 3 4</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 10 <span class="string">&quot;/usr/include/x86_64-linux-gnu/gnu/stubs.h&quot;</span> 3 4</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 1 <span class="string">&quot;/usr/include/x86_64-linux-gnu/gnu/stubs-64.h&quot;</span> 1 3 4</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 11 <span class="string">&quot;/usr/include/x86_64-linux-gnu/gnu/stubs.h&quot;</span> 2 3 4</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 486 <span class="string">&quot;/usr/include/features.h&quot;</span> 2 3 4</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 34 <span class="string">&quot;/usr/include/x86_64-linux-gnu/bits/libc-header-start.h&quot;</span> 2 3 4</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 28 <span class="string">&quot;/usr/include/stdio.h&quot;</span> 2 3 4</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 1 <span class="string">&quot;/usr/lib/gcc/x86_64-linux-gnu/10/include/stddef.h&quot;</span> 1 3 4</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 209 <span class="string">&quot;/usr/lib/gcc/x86_64-linux-gnu/10/include/stddef.h&quot;</span> 3 4</span></span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 209 <span class="string">&quot;/usr/lib/gcc/x86_64-linux-gnu/10/include/stddef.h&quot;</span> 3 4</span></span><br><span class="line">typedef long unsigned int size_t;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 34 <span class="string">&quot;/usr/include/stdio.h&quot;</span> 2 3 4</span></span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 1 <span class="string">&quot;/usr/lib/gcc/x86_64-linux-gnu/10/include/stdarg.h&quot;</span> 1 3 4</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 40 <span class="string">&quot;/usr/lib/gcc/x86_64-linux-gnu/10/include/stdarg.h&quot;</span> 3 4</span></span><br><span class="line">typedef __builtin_va_list __gnuc_va_list;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 37 <span class="string">&quot;/usr/include/stdio.h&quot;</span> 2 3 4</span></span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 1 <span class="string">&quot;/usr/include/x86_64-linux-gnu/bits/types.h&quot;</span> 1 3 4</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 27 <span class="string">&quot;/usr/include/x86_64-linux-gnu/bits/types.h&quot;</span> 3 4</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 1 <span class="string">&quot;/usr/include/x86_64-linux-gnu/bits/wordsize.h&quot;</span> 1 3 4</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 28 <span class="string">&quot;/usr/include/x86_64-linux-gnu/bits/types.h&quot;</span> 2 3 4</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 1 <span class="string">&quot;/usr/include/x86_64-linux-gnu/bits/timesize.h&quot;</span> 1 3 4</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 29 <span class="string">&quot;/usr/include/x86_64-linux-gnu/bits/types.h&quot;</span> 2 3 4</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">typedef unsigned char __u_char;</span><br><span class="line">typedef unsigned short int __u_short;</span><br><span class="line">typedef unsigned int __u_int;</span><br><span class="line">typedef unsigned long int __u_long;</span><br><span class="line"></span><br><span class="line">......</span><br><span class="line">略</span><br><span class="line">......</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 3 <span class="string">&quot;hello.c&quot;</span></span></span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line">    printf(&quot;Hello World\n&quot;);</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>C preprocessor(CPP)是C编译器常用的宏处理器(预处理器)，仅用于C、C++、Objective-C源代码的预处理。在编译器处理程序前预处理源代码，完成头文件的包含、宏扩展、条件编译、行控制等操作。</p>
+<p>CPP的详细说明位于<a target="_blank" rel="noopener" href="https://gcc.gnu.org/onlinedocs/cpp/">Top (The C Preprocessor) (gnu.org)</a>。CPP预处理器的概述如下：</p>
+<ul>
+<li>Character sets：将源代码文件转换为用于预处理的字符集，即C标准所说的源字符集。所有的预处理工作均在源字符集中执行，预处理完成后，从源字符集转换为用户定义的执行字符集。</li>
+<li>Initial processing：将文件读入内存并分行，替换三字符组和双字符组，连续行合并为一个长行，将所有注释替换为单个空格符。</li>
+<li>Tokenization：完成所有的文本转换后，输入的源代码文件被转换成一个预处理记号序列。预处理记号被分为五类(标识符、预处理数字、字符串字、标点符号、其他)。该阶段将预处理记号序列转换为编译器可识别的记号序列。<code>Each preprocessing token becomes one compiler token</code>.</li>
+<li>The preprocessing language：预处理语言包括头文件包含、宏扩展、条件编译、行控制、诊断信息定位等。预处理器的主要功能均在该部分实现。</li>
+</ul>
+<h1 id="编译"><a href="#编译" class="headerlink" title="编译"></a>编译</h1><p>编译过程就是把预处理完的文件进行一系列词法分析、语法分析、语义分析以及优化后生成相应的汇编代码文件。该过程是程序构建过程中的核心部分。</p>
+<p>使用GCC编译hello.i：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> gcc -S hello.i -o hello.s</span></span><br></pre></td></tr></table></figure>
+
+<p>hello.s文件的内容如下：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">	.file	&quot;hello.c&quot;</span><br><span class="line">	.text</span><br><span class="line">	.section	.rodata</span><br><span class="line">.LC0:</span><br><span class="line">	.string	&quot;Hello World&quot;</span><br><span class="line">	.text</span><br><span class="line">	.globl	main</span><br><span class="line">	.type	main, @function</span><br><span class="line">main:</span><br><span class="line">.LFB0:</span><br><span class="line">	.cfi_startproc</span><br><span class="line">	pushq	%rbp</span><br><span class="line">	.cfi_def_cfa_offset 16</span><br><span class="line">	.cfi_offset 6, -16</span><br><span class="line">	movq	%rsp, %rbp</span><br><span class="line">	.cfi_def_cfa_register 6</span><br><span class="line">	leaq	.LC0(%rip), %rdi</span><br><span class="line">	call	puts@PLT</span><br><span class="line">	movl	$0, %eax</span><br><span class="line">	popq	%rbp</span><br><span class="line">	.cfi_def_cfa 7, 8</span><br><span class="line">	ret</span><br><span class="line">	.cfi_endproc</span><br><span class="line">.LFE0:</span><br><span class="line">	.size	main, .-main</span><br><span class="line">	.ident	&quot;GCC: (Debian 10.2.1-6) 10.2.1 20210110&quot;</span><br><span class="line">	.section	.note.GNU-stack,&quot;&quot;,@progbits</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="词法分析"><a href="#词法分析" class="headerlink" title="词法分析"></a>词法分析</h2><p>词法分析的过程中，源代码被输入到扫描器，扫描器运用一种类似于有限状态机的算法将源代码的字符序列分割成一系列的记号(Token)。词法分析产生的记号一般可以分为以下几类：关键字、标识符、字面量、特殊符号。在识别记号的同时，扫描器同时完成不同类记号的分类存放工作，以备编译的后续步骤使用。对于一些有预处理器的语言，比如C语言，它的宏替换和文件包含等工作一般不归入编译器的范围而交给一个独立的预编译器。</p>
+<h2 id="语法分析"><a href="#语法分析" class="headerlink" title="语法分析"></a>语法分析</h2><p>语法分析器(Grammar Parser)将对扫描器产生的记号进行语法分析，从而产生语法树(Syntax Tree)。整个分析过程采用了上下文无关语法(Context-free Grammar)的分析手段。由语法分析器生成的语法树就是以表达式为节点的树。在语法分析的同时，运算符号的优先级和含义也就被确定下来了。且如果出现表达式不合法，比如括号不匹配、缺少操作符等，编译器就会报告语法分析阶段的错误。</p>
+<h2 id="语义分析"><a href="#语义分析" class="headerlink" title="语义分析"></a>语义分析</h2><p>语法分析仅仅是完成了对表达式的语法层面的分析，但是其并不了解这个语句是否真正有意义。编译器能分析的语义是静态语义，所谓静态语义是指在编译期可以确定的语义，与之对应的动态语义就是只有在运行期才能确定的语义。静态语义通常包括声明和类型的匹配，类型的转换。语义分析程序发现类型不匹配时，编译器会报错。</p>
+<p>经过语义分析后，整个语法树的表达式都被标识了类型，如果有些类型需要做隐式转换，语义分析程序会在语法树中插入相应的转换节点。同时，语义分析器还会对符号表里的符号类型做更新。</p>
+<h2 id="中间语言生成"><a href="#中间语言生成" class="headerlink" title="中间语言生成"></a>中间语言生成</h2><p>在编译过程中，有些表达式本身是可以被优化的，例如表达式(1+1)。编译器本身会有很多层次的优化，其中就包括对这种可优化表达式作优化的源代码优化。直接在语法树上作源代码优化是比较困难的，所以源代码优化器往往会将整个语法树转换成中间代码。中间代码是语法树的顺序表示，其一般与目标机器和运行时环境是无关的，比如它不包含数据的尺寸、变量地址和寄存器的名字等。中间代码有很多种类型，比较常见的有三地址码和P-代码。</p>
+<p>中间代码使得编译器可以被分为前端和后端。编译器前端负责产生机器无关的中间代码，编译器后端将中间代码转换成目标机器代码。这样对于一些跨平台编译器而言，可以针对不同的平台使用同一个前端和针对不同机器平台的数个后端。</p>
+<h2 id="目标代码生成与优化"><a href="#目标代码生成与优化" class="headerlink" title="目标代码生成与优化"></a>目标代码生成与优化</h2><p>编译器后端主要包括代码生成器和目标代码优化器。代码生成器将中间代码转换成目标机器代码，这个过程十分依赖于目标机器。最后目标代码优化器对目标代码进行优化，比如选择合适的寻址方式、使用位移代替乘法运算、删除多余指令等。</p>
+<h1 id="汇编"><a href="#汇编" class="headerlink" title="汇编"></a>汇编</h1><p>汇编器将汇编代码转换成机器可以执行的指令，每一条汇编语句几乎都对应一条机器指令。所以会汇编器的汇编过程比较简单，只需要根据汇编指令和机器指令的对照表一一翻译就行了。</p>
+<p>使用GCC汇编hello.s：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> gcc -c hello.s -o hello.o</span></span><br></pre></td></tr></table></figure>
+
+<p>hello.o文件的内容如下：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> objdump hello.o -s</span></span><br><span class="line"></span><br><span class="line">hello.o：     文件格式 elf64-x86-64</span><br><span class="line"></span><br><span class="line">Contents of section .text:</span><br><span class="line"> 0000 554889e5 488d3d00 000000e8 00000000  UH..H.=.........</span><br><span class="line"> 0010 b8000000 005dc3                      .....].         </span><br><span class="line">Contents of section .rodata:</span><br><span class="line"> 0000 48656c6c 6f20576f 726c6400           Hello World.    </span><br><span class="line">Contents of section .comment:</span><br><span class="line"> 0000 00474343 3a202844 65626961 6e203130  .GCC: (Debian 10</span><br><span class="line"> 0010 2e322e31 2d362920 31302e32 2e312032  .2.1-6) 10.2.1 2</span><br><span class="line"> 0020 30323130 31313000                    0210110.        </span><br><span class="line">Contents of section .eh_frame:</span><br><span class="line"> 0000 14000000 00000000 017a5200 01781001  .........zR..x..</span><br><span class="line"> 0010 1b0c0708 90010000 1c000000 1c000000  ................</span><br><span class="line"> 0020 00000000 17000000 00410e10 8602430d  .........A....C.</span><br><span class="line"> 0030 06520c07 08000000                    .R......        </span><br></pre></td></tr></table></figure>
+
+<h1 id="链接"><a href="#链接" class="headerlink" title="链接"></a>链接</h1><p>编译后，.o文件还不能运行，还需要与系统提供的组件结合起来才能运行。而链接就是使.o文件能够在系统中运行的关键。其主要内容是把各个模块之间相互引用的部分都处理好，使得各个模块之间能够正确地衔接。链接分为静态链接与动态链接两种。</p>
+<p>静态链接的思想是把所有的程序模块都链接成一个单独的可执行文件。静态链接过程主要包括了地址和空间分配(Address and Storage Allocation)、符号决议(Symbol Resolution)和重定位(Relocation)等步骤。</p>
+<p>动态链接的思想是把程序按照模块拆分成各个相对独立部分，在程序运行时才将它们链接在一起形成一个完整的程序。动态链接涉及运行时的链接及多个文件的装载，必需要有操作系统的支持。在Linux系统中，ELF动态链接文件被称为动态共享对象(DSO, Dynamic Shared Objects)，一般以<code>.so</code>为扩展名；而在Windows系统中动态链接文件被称为动态链接库(Dynamical Linking Library)，一般以<code>.dll</code>为扩展名。</p>
+<h1 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h1><ul>
+<li><a target="_blank" rel="noopener" href="https://gcc.gnu.org/onlinedocs/cpp/">Top (The C Preprocessor) (gnu.org)</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Basic/" rel="tag"><i class="fa fa-tag"></i> Basic</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2021/10/09/HTB-Previse/" rel="prev" title="HTB Previse">
+                  <i class="fa fa-chevron-left"></i> HTB Previse
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lu0k</span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <script size="250" alpha="0.5" zIndex="-1" src="https://cdn.jsdelivr.net/npm/ribbon.js@1.0.2/dist/ribbon.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>
