@@ -1184,8 +1184,8 @@
       </tags>
   </entry>
   <entry>
-    <title>GCC编译流程</title>
-    <url>/2021/10/10/GCC%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B/</url>
+    <title>编译流程</title>
+    <url>/2021/10/10/%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B/</url>
     <content><![CDATA[<h1 id="流程简介"><a href="#流程简介" class="headerlink" title="流程简介"></a>流程简介</h1><p>在Linux下，当使用GCC来编译程序时，只需要使用最简单的命令(以C语言Hello World为例)：</p>
 <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> gcc hello.c</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> ./a.out</span></span><br><span class="line">Hello World</span><br></pre></td></tr></table></figure>
 
@@ -1244,10 +1244,11 @@
 <p>动态链接的思想是把程序按照模块拆分成各个相对独立部分，在程序运行时才将它们链接在一起形成一个完整的程序。动态链接涉及运行时的链接及多个文件的装载，必需要有操作系统的支持。在Linux系统中，ELF动态链接文件被称为动态共享对象(DSO, Dynamic Shared Objects)，一般以<code>.so</code>为扩展名；而在Windows系统中动态链接文件被称为动态链接库(Dynamical Linking Library)，一般以<code>.dll</code>为扩展名。</p>
 <h1 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h1><ul>
 <li><a href="https://gcc.gnu.org/onlinedocs/cpp/">Top (The C Preprocessor) (gnu.org)</a></li>
+<li>《程序员的自我修养——链接、装载与库》</li>
 </ul>
 ]]></content>
       <categories>
-        <category>Linux</category>
+        <category>Linker and Loader</category>
       </categories>
       <tags>
         <tag>Basic</tag>
