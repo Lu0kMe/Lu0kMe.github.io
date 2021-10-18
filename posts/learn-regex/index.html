@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-lu0k.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-lu0k.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-lu0k.png">
+  <link rel="mask-icon" href="/images/lu0k.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"lu0k.github.io","root":"/","images":"/images","scheme":"Gemini","version":"8.7.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+<meta name="description" content="理论基础正则表达式可以用形式化语言理论的方式来表达。正则表达式由常量和算子组成，它们分别表示字符串的集合和在这些集合上的运算。 给定有限字母表Σ定义了下列常量：  空集Ø表示集合Ø。 空串ε表示仅包含一个不含任何字符、长度为0的字符串的集合。 文本字符α∈Σ表示仅包含一个元素α的集合{α}。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="正则表达式">
+<meta property="og:url" content="https://lu0k.github.io/posts/learn-regex/index.html">
+<meta property="og:site_name" content="Lu0k">
+<meta property="og:description" content="理论基础正则表达式可以用形式化语言理论的方式来表达。正则表达式由常量和算子组成，它们分别表示字符串的集合和在这些集合上的运算。 给定有限字母表Σ定义了下列常量：  空集Ø表示集合Ø。 空串ε表示仅包含一个不含任何字符、长度为0的字符串的集合。 文本字符α∈Σ表示仅包含一个元素α的集合{α}。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-10-01T16:00:00.000Z">
+<meta property="article:modified_time" content="2021-10-18T09:54:49.062Z">
+<meta property="article:author" content="Lu0k">
+<meta property="article:tag" content="Regex">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://lu0k.github.io/posts/learn-regex/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://lu0k.github.io/posts/learn-regex/","path":"posts/learn-regex/","title":"正则表达式"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>正则表达式 | Lu0k</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">Lu0k</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Lu0k's Blog</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80"><span class="nav-number">1.</span> <span class="nav-text">理论基础</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E8%AF%AD%E6%B3%95"><span class="nav-number">2.</span> <span class="nav-text">基本语法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%80%89%E6%8B%A9"><span class="nav-number">2.1.</span> <span class="nav-text">选择</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B0%E9%87%8F"><span class="nav-number">2.2.</span> <span class="nav-text">数量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8C%B9%E9%85%8D"><span class="nav-number">2.3.</span> <span class="nav-text">匹配</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%AF%AD%E6%B3%95%E6%B5%81%E6%B4%BE"><span class="nav-number">3.</span> <span class="nav-text">语法流派</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#POSIX%E6%B5%81%E6%B4%BE"><span class="nav-number">3.1.</span> <span class="nav-text">POSIX流派</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PCRE%E6%B5%81%E6%B4%BE"><span class="nav-number">3.2.</span> <span class="nav-text">PCRE流派</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%80%BB%E7%BB%93"><span class="nav-number">4.</span> <span class="nav-text">表达式总结</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Unicode"><span class="nav-number">5.</span> <span class="nav-text">Unicode</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%99%84%E5%BD%95"><span class="nav-number">6.</span> <span class="nav-text">附录</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#POSIX%E5%AD%97%E7%AC%A6%E7%BB%84"><span class="nav-number">6.1.</span> <span class="nav-text">POSIX字符组</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BC%98%E5%85%88%E7%BA%A7"><span class="nav-number">6.2.</span> <span class="nav-text">优先级</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Reference"><span class="nav-number">7.</span> <span class="nav-text">Reference</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-overview">
+            <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Lu0k"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Lu0k</p>
+  <div class="site-description" itemprop="description">谦虚学习!</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">18</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/lu0k" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;lu0k" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/Lu0kMe" title="Twitter → https:&#x2F;&#x2F;twitter.com&#x2F;Lu0kMe" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://lu0k.github.io/posts/learn-regex/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Lu0k">
+      <meta itemprop="description" content="谦虚学习!">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Lu0k">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          正则表达式
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-10-02 00:00:00" itemprop="dateCreated datePublished" datetime="2021-10-02T00:00:00+08:00">2021-10-02</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Misc/" itemprop="url" rel="index"><span itemprop="name">Misc</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="理论基础"><a href="#理论基础" class="headerlink" title="理论基础"></a>理论基础</h1><p>正则表达式可以用形式化语言理论的方式来表达。正则表达式由常量和算子组成，它们分别表示字符串的集合和在这些集合上的运算。</p>
+<p>给定有限字母表Σ定义了下列常量：</p>
+<ul>
+<li>空集Ø表示集合Ø。</li>
+<li>空串ε表示仅包含一个<code>不含任何字符、长度为0的字符串</code>的集合。</li>
+<li>文本字符α∈Σ表示仅包含一个元素α的集合{α}。</li>
+</ul>
+<span id="more"></span>
+
+<p>定义了下列运算：</p>
+<ul>
+<li>串接RS表示集合{αβ|α∈R,β∈S}，这里的αβ表示将α和β两个字符串按顺序连接。例如{ab,c}{d,ef} &#x3D; {abd,,abef,cd,cef}。</li>
+<li>选择R|S表示R与S的并集。例如{ab,c}|{ab,d,ef} &#x3D; {ab,c,d,ef}。</li>
+<li>克莱尼(Kleene)星号R*表示包含ε且在字符串串接运算下闭合的R的最小超集。这是可以通过R中0或有限个字符串的串接得到的所有字符的集合。例如{ab,c}* &#x3D; {ε,ab,c,abab,abc,cab,……}。</li>
+</ul>
+<h1 id="基本语法"><a href="#基本语法" class="headerlink" title="基本语法"></a>基本语法</h1><p>一个正则表达式通常被称为一个模式(pattern)，为用来描述或者匹配一系列匹配某个句法规则的字符串。大部分正则表达式的形式都有如下的结构：</p>
+<h2 id="选择"><a href="#选择" class="headerlink" title="选择"></a>选择</h2><ul>
+<li>竖线 | 代表选择(即或集)，具有最低优先级。例如：lu0k|luck可以匹配lu0k或luck。</li>
+</ul>
+<h2 id="数量"><a href="#数量" class="headerlink" title="数量"></a>数量</h2><p>某个字符后的数量限定符用来限定前面这个字符允许出现的个数。最常见的数量限定符包括 + 、 ? 和 * (不加数量限定则代表出现且仅出现一次)。</p>
+<ul>
+<li>加号 + 代表前面的字符必须至少出现一次。例如：lu0+k可以匹配lu0k、lu00k、lu000k等。</li>
+<li>问号 ? 代表前面的字符最多只可以出现一次。例如：lu0?k可以匹配luk或lu0k。</li>
+<li>星号 * 代表前面的字符可以不出现，也可以出现一次或多次。例如：lu0*k可以匹配luk、lu0k、lu00k、lu000k等。</li>
+</ul>
+<h2 id="匹配"><a href="#匹配" class="headerlink" title="匹配"></a>匹配</h2><ul>
+<li>圆括号 () 可以用来定义操作符的范围和优先度。例如：lu(0|c)k等价于lu0k|luck，(lu)?0k匹配0k和lu0k。</li>
+</ul>
+<p>上述的这些构造都可以自由组合，且精确的语法可能因不同的工具或程序而异。</p>
+<h1 id="语法流派"><a href="#语法流派" class="headerlink" title="语法流派"></a>语法流派</h1><p>目前正则表达式主要有两大流派(flavor)：POSIX流派和PCRE流派。</p>
+<h2 id="POSIX流派"><a href="#POSIX流派" class="headerlink" title="POSIX流派"></a>POSIX流派</h2><p>正则表达式的POSIX规范，分为基本型正则表达式(Basic Regular Expression，BRE)和扩展型正则表达式(Extended Regular Express，ERE)两种标准。POSIX流派的正则表达式主要用在Unix或类Unix系统中，如grep、vi、sed、egrep、awk等。</p>
+<p>早期BRE与ERE的区别如下表：</p>
+<table>
+<thead>
+<tr>
+<th align="center">正则表达式特性</th>
+<th align="center">BRE标准</th>
+<th align="center">ERE标准</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">.   ^   $   […]   [^…]</td>
+<td align="center">支持</td>
+<td align="center">支持</td>
+</tr>
+<tr>
+<td align="center">任意数目量词*</td>
+<td align="center">支持</td>
+<td align="center">支持</td>
+</tr>
+<tr>
+<td align="center">+ 和 ? 量词</td>
+<td align="center">不支持(GNU扩展)</td>
+<td align="center">支持</td>
+</tr>
+<tr>
+<td align="center">区间量词</td>
+<td align="center">\{min,max\}</td>
+<td align="center">{min,max}</td>
+</tr>
+<tr>
+<td align="center">圆括号分组</td>
+<td align="center">\{…\}</td>
+<td align="center">{…}</td>
+</tr>
+<tr>
+<td align="center">量词限定圆括号分组</td>
+<td align="center">支持</td>
+<td align="center">支持</td>
+</tr>
+<tr>
+<td align="center">捕获文本引用</td>
+<td align="center">\1到\9</td>
+<td align="center">不支持(GNU扩展)</td>
+</tr>
+<tr>
+<td align="center">多选分支结构</td>
+<td align="center">不支持(GNU扩展)</td>
+<td align="center">支持</td>
+</tr>
+</tbody></table>
+<p>现代GNU在实现POSIX时，对两种标准均做了一定的扩展，使得GNU BRE与GNU ERE的功能特性并没有太大区别，区别在于语法层面上，一些字符要不要转义。</p>
+<p>POSIX流派还有一个特殊的地方就是有自己的字符组，叫做POSIX字符组。(见附录)</p>
+<h2 id="PCRE流派"><a href="#PCRE流派" class="headerlink" title="PCRE流派"></a>PCRE流派</h2><p>PCRE流派是由Perl的正则表达式衍化而来的一个正则表达式流派。</p>
+<p>PCRE流派的核心是PCRE库，PCRE库由Philip Hazel用C语言编写。与POSIX相比，PCRE的语法更加强大，更加灵活。而且虽然PCRE源于Perl的正则表达式功能，但随着两者的发展，在语法上产生了一些细微的差异。PCRE被广泛使用在许多开源项目中，包括Apache，PHP，KDE、Nmap等。许多编程语言的正则表达式功能多参考借鉴了PCRE，因此PCRE的语法在这些语言中同样适用。</p>
+<h1 id="表达式总结"><a href="#表达式总结" class="headerlink" title="表达式总结"></a>表达式总结</h1><p>PCRE表达式是相对而言更能代表正则表达式的表达式集合，适用于多种编程语言，且POSIX流派的表达式大多包含在PCRE表达式中，因此总结PCRE表达式。</p>
+<table>
+<thead>
+<tr>
+<th align="center">字符</th>
+<th align="center">描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">\</td>
+<td align="center">将下一个字符标记为一个特殊字符、或一个原义子符、或一个向后引用、或一个八进制转义符</td>
+</tr>
+<tr>
+<td align="center">^</td>
+<td align="center">匹配输入字符串的开始位置。</td>
+</tr>
+<tr>
+<td align="center">$</td>
+<td align="center">匹配输入字符串的结束位置。</td>
+</tr>
+<tr>
+<td align="center">*</td>
+<td align="center">匹配前面的子表达式零次或多次。</td>
+</tr>
+<tr>
+<td align="center">+</td>
+<td align="center">匹配前面的子表达式一次或多次。</td>
+</tr>
+<tr>
+<td align="center">?</td>
+<td align="center">匹配前面的子表达式零次或一次。</td>
+</tr>
+<tr>
+<td align="center">{n}</td>
+<td align="center">n是一个非负整数。匹配确定的n次。</td>
+</tr>
+<tr>
+<td align="center">{n,}</td>
+<td align="center">n是一个非负整数。至少匹配n次。</td>
+</tr>
+<tr>
+<td align="center">{n,m}</td>
+<td align="center">m和n均为非负整数，其中n&lt;&#x3D;m。最少匹配n次且最多匹配m次。</td>
+</tr>
+<tr>
+<td align="center">?</td>
+<td align="center">非贪心量化：当该字符紧跟在任何一个其他重复修饰符(*,+,?,{n},{n,},{n,m})后面时，匹配模式是非贪婪的。非贪婪模式尽可能少的匹配所搜索的字符串，而默认的贪婪模式则尽可能多的匹配所搜索的字符串。</td>
+</tr>
+<tr>
+<td align="center">.</td>
+<td align="center">匹配除<code>\\r</code>，<code>\\n</code>之外的任何单个字符。</td>
+</tr>
+<tr>
+<td align="center">(pattern)</td>
+<td align="center">匹配pattern并获取这一匹配的子字符串。该子字符串用于向后引用。</td>
+</tr>
+<tr>
+<td align="center">(?:pattern)</td>
+<td align="center">匹配pattern但不获取匹配的子字符串，也就是说这是一个非获取匹配，不存储匹配的子字符串用于向后引用。</td>
+</tr>
+<tr>
+<td align="center">(?&#x3D;pattern)</td>
+<td align="center">正向肯定预查，在任何匹配pattern的字符串开始处匹配查找字符串。这是一个非获取匹配，也就是说，该匹配不需要获取供以后使用。预查不消耗字符，也就是说，在一个匹配发生后，在最后一次匹配之后立即开始下一次匹配的搜索，而不是从包含预查的字符之后开始。</td>
+</tr>
+<tr>
+<td align="center">(?!pattern)</td>
+<td align="center">正向否定预查，在任何不匹配pattern的字符串开始处匹配查找字符串。这是一个非获取匹配，也就是说，该匹配不需要获取供以后使用。预查不消耗字符，也就是说，在一个匹配发生后，在最后一次匹配之后立即开始下一次匹配的搜索，而不是从包含预查的字符之后开始。</td>
+</tr>
+<tr>
+<td align="center">(?&lt;&#x3D;pattern)</td>
+<td align="center">反向预查，与正向肯定预查类似，只是方向相反。</td>
+</tr>
+<tr>
+<td align="center">(?&lt;!pattern)</td>
+<td align="center">反向否定预查，与正向否定预查类似，只是方向相反。</td>
+</tr>
+<tr>
+<td align="center">x|y</td>
+<td align="center">没有包围在()里，其范围是整个正则表达式。</td>
+</tr>
+<tr>
+<td align="center">[xyz]</td>
+<td align="center">字符集合。匹配所包含的任意一个字符。</td>
+</tr>
+<tr>
+<td align="center">[^xyz]</td>
+<td align="center">排除型字符集合。匹配未列出的任意字符。</td>
+</tr>
+<tr>
+<td align="center">[a-z]</td>
+<td align="center">字符范围。匹配指定范围内的任意字符。</td>
+</tr>
+<tr>
+<td align="center">[^a-z]</td>
+<td align="center">排除型的字符范围。匹配任何不在指定范围内的任意字符。</td>
+</tr>
+<tr>
+<td align="center">[:name:]</td>
+<td align="center">增加命名字符类中的字符到表达式。只能用于方括号表达式。</td>
+</tr>
+<tr>
+<td align="center">[&#x3D;elt&#x3D;]</td>
+<td align="center">增加当前locale下排序等价于字符<code>elt</code>的元素。只能用于方括号表达式。</td>
+</tr>
+<tr>
+<td align="center">[.elt.]</td>
+<td align="center">增加排序元素<code>elt</code>到表达式中。只能用于方括号表达式。</td>
+</tr>
+<tr>
+<td align="center">\b</td>
+<td align="center">匹配一个单词边界，也就是指单词和空格间的位置。</td>
+</tr>
+<tr>
+<td align="center">\B</td>
+<td align="center">匹配非单词边界。</td>
+</tr>
+<tr>
+<td align="center">\cx</td>
+<td align="center">匹配由x指明的控制字符。x的值必须为A-Z或a-z之一。否则，将c视为一个原义的<code>c</code>字符。控制字符的值等于x的值最低5比特。</td>
+</tr>
+<tr>
+<td align="center">\d</td>
+<td align="center">匹配一个数字字符。等价于[0-9]。注意Unicode正则表达式会匹配全角数字字符。</td>
+</tr>
+<tr>
+<td align="center">\D</td>
+<td align="center">匹配一个非数字字符。等价于[^0-9]。</td>
+</tr>
+<tr>
+<td align="center">\f</td>
+<td align="center">匹配一个换页符。等价于\x0c和\cL。</td>
+</tr>
+<tr>
+<td align="center">\n</td>
+<td align="center">匹配一个换行符。等价于\x0a和\cJ。</td>
+</tr>
+<tr>
+<td align="center">\r</td>
+<td align="center">匹配一个回车符。等价于\x0d和\cM。</td>
+</tr>
+<tr>
+<td align="center">\s</td>
+<td align="center">匹配任何空白字符，包括空格、制表符、换页符等等。等价于[ \f\n\r\t\v]。注意Unicode正则表达式会匹配全角空格符。</td>
+</tr>
+<tr>
+<td align="center">\S</td>
+<td align="center">匹配任何非空白字符。等价于[^ \f\n\r\t\v]。</td>
+</tr>
+<tr>
+<td align="center">\t</td>
+<td align="center">匹配一个制表符。等价于\x09和\cI。</td>
+</tr>
+<tr>
+<td align="center">\v</td>
+<td align="center">匹配一个垂直制表符。等价于\x0b和\cK。</td>
+</tr>
+<tr>
+<td align="center">\w</td>
+<td align="center">匹配包括下划线的任何单词字符。等价于<code>[A-Za-z0-9_]</code>。注意Unicode正则表达式会匹配中文字符。</td>
+</tr>
+<tr>
+<td align="center">\W</td>
+<td align="center">匹配任何非单词字符。等价于<code>\[^A-Za-z0-9_]</code>。</td>
+</tr>
+<tr>
+<td align="center">\xnn</td>
+<td align="center">十六进制转义字符序列。匹配两个十六进制数字nn表示的字符。正则表达式中可以使用ASCII编码。</td>
+</tr>
+<tr>
+<td align="center">\num</td>
+<td align="center">向后引用一个子字符串，该子字符串与正则表达式的第num个用括号围起来的捕捉群子表达式匹配。其中num是从1开始的十进制正整数，其上限可能是9、31、99甚至无限。</td>
+</tr>
+<tr>
+<td align="center">\n</td>
+<td align="center">标识一个八进制转义值或一个向后引用。如果\n之前至少n个获取的子表达式，则n为向后引用。如果n为八进制数字(0-7)，则n为一个八进制转义值。</td>
+</tr>
+<tr>
+<td align="center">\nm</td>
+<td align="center">3位八进制数字，标识一个八进制转义值或一个向后引用。如果\nm之前至少有nm个获得子表达式，则nm为向后引用。如果\nm之前至少有n个获取，则n为一个后跟文字m的向后引用。如果前面的条件都不满足，若n和m均为八进制数字(0-7)，则\nm将匹配八进制转义值nm。</td>
+</tr>
+<tr>
+<td align="center">\nml</td>
+<td align="center">如果n为八进制数字(0-3)，且m和l均为八进制数字(0-7)，则匹配八进制转义值nml。</td>
+</tr>
+<tr>
+<td align="center">\un</td>
+<td align="center">Unicode转义字符序列。其中n是一个用四个十六进制数字表示的Unicode字符。</td>
+</tr>
+</tbody></table>
+<h1 id="Unicode"><a href="#Unicode" class="headerlink" title="Unicode"></a>Unicode</h1><p>在.NET、Java、Python等编程语言的正则表达式中，可以用\uXXXX表示一个Unicode字符，其中XXXX为四位16进制数字。</p>
+<p>Unicode字符的三种性质：</p>
+<ul>
+<li><p>Unicode Property：字符属于标点、空格、字母等等。每个Unicode字符只能属于唯一Unicode Property。</p>
+<ul>
+<li>字符\p{L}<ul>
+<li>\p{Ll}或\p{Lowercase_Letter}：小写字符(必须有大写的形式)。</li>
+<li>\p{Lu}或\p{Uppercase_Letter}：大写字符(必须有小写的形式)。</li>
+<li>\p{Lt}或\p{Titlecase_Letter}：全词首字母大写的字符。</li>
+<li>\p{L&amp;}或\p{Cased_Letter}：存在大小写形式的字符(Ll, Lu, Lt的组合)。</li>
+<li>\p{Lm}或\p{Modifier_Letter}：音标修饰字符。</li>
+<li>\p{Lo}或\p{Other_Letter}：不具有大小写的字符或字形。</li>
+</ul>
+</li>
+<li>附加符号\p{M}<ul>
+<li>\p{Mn}或\p{Non_Spacing_Mark}：与其他字符结合，不额外占用空间的字符，例如日耳曼语元音变音。</li>
+<li>\p{Mc}或\p{Spacing_Combining_Mark}：与其他字符结合，额外占用空间的字符，例如马拉雅拉姆文#元音字母及附标。</li>
+<li>\p{Me}或\p{Enclosing_Mark}：包含其他字符的字符，例如圆圈、方块。</li>
+</ul>
+</li>
+<li>分隔符p{Z}<ul>
+<li>\p{Zs}或\p{Space_Separator}：不显示但占用空间的空白字符。</li>
+<li>\p{Zl}或\p{Line_Separator}：行分隔符U+2028。</li>
+<li>\p{Zp}或\p{Paragraph_Separator}：段落分隔符U+2029。</li>
+</ul>
+</li>
+<li>符号\p{S}<ul>
+<li>\p{Sm}或\p{Math_Symbol}：数学符号。</li>
+<li>\p{Sc}或\p{Currency_Symbol}：通货符号。</li>
+<li>\p{Sk}或\p{Modifier_Symbol}：组合为其他字符的符号。</li>
+<li>\p{So}或\p{Other_Symbol}：其他符号。</li>
+</ul>
+</li>
+<li>数值字符\p{N}<ul>
+<li>\p{Nd}或\p{Decimal_Digit_Number}：所有文本中的数字0至9字符，不含形意符号。</li>
+<li>\p{Nl}或\p{Letter_Number}：看起来像字母的符号，包含罗马数字。</li>
+<li>\p{No}或\p{Other_Number}：上角标或下角标数字，或者其他不属于0至9的数字。不含形意符号。</li>
+</ul>
+</li>
+<li>标点符号\p{P}<ul>
+<li>\p{Pd}或\p{Dash_Punctuation}：任何种类的连字号或连接号。</li>
+<li>\p{Ps}或\p{Open_Punctuation}：任何种类开括号。</li>
+<li>\p{Pe}或\p{Close_Punctuation}：任何种类闭括号。</li>
+<li>\p{Pi}或\p{Initial_Punctuation}：任何种类开引号。</li>
+<li>\p{Pf}或\p{Final_Punctuation}：任何种类闭引号。</li>
+<li>\p{Pc}或\p{Connector_Punctuation}：连接词的标点符号，如下划线。</li>
+<li>\p{Po}或\p{Other_Punctuation}：其他标点符号。</li>
+</ul>
+</li>
+<li>其它符号\p{C}(包括不可见控制字符与未用码位)<ul>
+<li>\p{Cc}或\p{Control}：ASCII或Latin-1控制字符0x00-0x1F与0x7F-0x9F。</li>
+<li>\p{Cf}或\p{Format}：不可见的格式化指示字符。</li>
+<li>\p{Co}或\p{Private_Use}：私用码位。</li>
+<li>\p{Cs}或\p{Surrogate}：UTF-16编码的代理对的一半。</li>
+<li>\p{Cn}或\p{Unassigned}：未被使用的码位。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>Unicode Block：按照编码区间划分Unicode字符，每个Unicode Block中的字符编码属于一个编码区间。例如Java语言\p{ InCJK_Compatibility_Ideographs }。</p>
+</li>
+<li><p>Unicode Script：按照字符所属的书写系统来划分Unicode字符。例如\p{Han}表示汉字(中文字符)。</p>
+</li>
+</ul>
+<p>这三种Unicode性质对应的字符组补集是将开头的\p改为\P，其他不变。</p>
+<h1 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h1><h2 id="POSIX字符组"><a href="#POSIX字符组" class="headerlink" title="POSIX字符组"></a>POSIX字符组</h2><table>
+<thead>
+<tr>
+<th align="center">POSIX字符组</th>
+<th align="center">说明</th>
+<th align="center">ASCII环境</th>
+<th align="center">Unicode环境</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">[:alnum:]</td>
+<td align="center">字母字符和数字字符</td>
+<td align="center">[a-zA-Z0-9]</td>
+<td align="center">[\p{L&amp;}\p{Nd}]</td>
+</tr>
+<tr>
+<td align="center">[:alpha:]</td>
+<td align="center">字母</td>
+<td align="center">[a-zA-Z]</td>
+<td align="center">\p{L&amp;}</td>
+</tr>
+<tr>
+<td align="center">[:ascii:]</td>
+<td align="center">ASCII字符</td>
+<td align="center">[\x00-\x7F]</td>
+<td align="center">\p{InBasicLatin}</td>
+</tr>
+<tr>
+<td align="center">[:blank:]</td>
+<td align="center">空格字符和制表符</td>
+<td align="center">[ \t]</td>
+<td align="center">[\p{Zs}\t]</td>
+</tr>
+<tr>
+<td align="center">[:cntrl:]</td>
+<td align="center">控制字符</td>
+<td align="center">[\x00-\x1F\x7F]</td>
+<td align="center">\p{Cc}</td>
+</tr>
+<tr>
+<td align="center">[:digit:]</td>
+<td align="center">数字字符</td>
+<td align="center">[0-9]</td>
+<td align="center">\p{Nd}</td>
+</tr>
+<tr>
+<td align="center">[:graph:]</td>
+<td align="center">空白字符外的字符</td>
+<td align="center">[\x21-\x7E]</td>
+<td align="center">[^\p{Z}\p{C}]</td>
+</tr>
+<tr>
+<td align="center">[:lower:]</td>
+<td align="center">小写字母字符</td>
+<td align="center">[a-z]</td>
+<td align="center">\p{Ll}</td>
+</tr>
+<tr>
+<td align="center">[:print:]</td>
+<td align="center">类似[:graph:]但包含空白字符</td>
+<td align="center">[\x20-\x7E]</td>
+<td align="center">\P{C}</td>
+</tr>
+<tr>
+<td align="center">[:punct:]</td>
+<td align="center">标点符号</td>
+<td align="center">[][!&#96;#$%&amp;’()*+,.&#x2F;:;&lt;&#x3D;&gt;?@^_{|}~-]</td>
+<td align="center">[\p{P}\p{S}]</td>
+</tr>
+<tr>
+<td align="center">[:space:]</td>
+<td align="center">空白字符</td>
+<td align="center">[ \t\r\n\v\f]</td>
+<td align="center">[\p{Z}\t\r\n\v\f]</td>
+</tr>
+<tr>
+<td align="center">[:upper:]</td>
+<td align="center">大写字母字符</td>
+<td align="center">[A-Z]</td>
+<td align="center">\p{Lu}</td>
+</tr>
+<tr>
+<td align="center">[:word:]</td>
+<td align="center">字母字符</td>
+<td align="center">[A-Za-z0-9_]</td>
+<td align="center">[\p{L}\p{N}\p{Pc}]</td>
+</tr>
+<tr>
+<td align="center">[:xdigit:]</td>
+<td align="center">十六进制字符</td>
+<td align="center">[A-Fa-f0-9]</td>
+<td align="center">[A-Fa-f0-9]</td>
+</tr>
+</tbody></table>
+<h2 id="优先级"><a href="#优先级" class="headerlink" title="优先级"></a>优先级</h2><table>
+<thead>
+<tr>
+<th align="center">优先权</th>
+<th align="center">符号</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">最高</td>
+<td align="center">\</td>
+</tr>
+<tr>
+<td align="center">高</td>
+<td align="center">()   (?:)   (?&#x3D;)   []</td>
+</tr>
+<tr>
+<td align="center">中</td>
+<td align="center">*   +   ?   {n}   {n,}   {n,m}</td>
+</tr>
+<tr>
+<td align="center">低</td>
+<td align="center">^   $   中介字符</td>
+</tr>
+<tr>
+<td align="center">更低</td>
+<td align="center">串接</td>
+</tr>
+<tr>
+<td align="center">最低</td>
+<td align="center">|</td>
+</tr>
+</tbody></table>
+<h1 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h1><p><a target="_blank" rel="noopener" href="https://regexr.com/">RegExr: Learn, Build, &amp; Test RegEx</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.gnu.org/software/sed/manual/html_node/BRE-vs-ERE.html">BRE vs ERE (sed, a stream editor) (gnu.org)</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.pcre.org/">PCRE - Perl Compatible Regular Expressions</a></p>
+<p><a target="_blank" rel="noopener" href="https://docs.python.org/zh-cn/3/library/re.html">re — 正则表达式操作 — Python 3.9.5 文档</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Regex/" rel="tag"><i class="fa fa-tag"></i> Regex</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/hello-world/" rel="prev" title="Hello World">
+                  <i class="fa fa-chevron-left"></i> Hello World
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/linux-basic/" rel="next" title="Linux基础">
+                  Linux基础 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lu0k</span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <script size="250" alpha="0.5" zIndex="-1" src="https://cdn.jsdelivr.net/npm/ribbon.js@1.0.2/dist/ribbon.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>
