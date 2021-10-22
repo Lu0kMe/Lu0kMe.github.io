@@ -1148,7 +1148,6 @@
       </categories>
       <tags>
         <tag>XXE</tag>
-        <tag>LFI</tag>
         <tag>Sudo</tag>
       </tags>
   </entry>
