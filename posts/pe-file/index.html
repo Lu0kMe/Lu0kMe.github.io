@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-lu0k.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-lu0k.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-lu0k.png">
+  <link rel="mask-icon" href="/images/lu0k.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"lu0k.github.io","root":"/","images":"/images","scheme":"Gemini","version":"8.7.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+<meta name="description" content="二进制文件PE在32位Windows平台下，微软引入了一种名为PE(Protable Executable)的可执行格式。作为Win32平台的标准可执行文件格式，PE有着跟ELF一样良好的平台扩展性和灵活性。PE文件格式事实上与ELF同根同源，都是由COFF(Common Object File Format)格式发展而来的，更加具体地讲是来源于当时著名的DEC(Digital Equipment">
+<meta property="og:type" content="article">
+<meta property="og:title" content="PE文件简析">
+<meta property="og:url" content="https://lu0k.github.io/posts/pe-file/index.html">
+<meta property="og:site_name" content="Lu0k">
+<meta property="og:description" content="二进制文件PE在32位Windows平台下，微软引入了一种名为PE(Protable Executable)的可执行格式。作为Win32平台的标准可执行文件格式，PE有着跟ELF一样良好的平台扩展性和灵活性。PE文件格式事实上与ELF同根同源，都是由COFF(Common Object File Format)格式发展而来的，更加具体地讲是来源于当时著名的DEC(Digital Equipment">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-10-23T16:00:00.000Z">
+<meta property="article:modified_time" content="2021-10-24T11:23:18.069Z">
+<meta property="article:author" content="Lu0k">
+<meta property="article:tag" content="Basic">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://lu0k.github.io/posts/pe-file/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://lu0k.github.io/posts/pe-file/","path":"posts/pe-file/","title":"PE文件简析"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>PE文件简析 | Lu0k</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">Lu0k</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Lu0k's Blog</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BA%8C%E8%BF%9B%E5%88%B6%E6%96%87%E4%BB%B6PE"><span class="nav-number">1.</span> <span class="nav-text">二进制文件PE</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#PE%E7%9A%84%E5%89%8D%E8%BA%ABCOFF"><span class="nav-number">2.</span> <span class="nav-text">PE的前身COFF</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%85%B6%E4%BB%96%E6%AE%B5%E4%BF%A1%E6%81%AF"><span class="nav-number">3.</span> <span class="nav-text">其他段信息</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%93%BE%E6%8E%A5%E6%8C%87%E7%A4%BA"><span class="nav-number">3.1.</span> <span class="nav-text">链接指示</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B0%83%E8%AF%95%E4%BF%A1%E6%81%AF"><span class="nav-number">3.2.</span> <span class="nav-text">调试信息</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%A6%E5%8F%B7%E8%A1%A8"><span class="nav-number">3.3.</span> <span class="nav-text">符号表</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#PE%E6%96%87%E4%BB%B6%E7%BB%93%E6%9E%84"><span class="nav-number">4.</span> <span class="nav-text">PE文件结构</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#PE%E6%95%B0%E6%8D%AE%E7%9B%AE%E5%BD%95"><span class="nav-number">4.1.</span> <span class="nav-text">PE数据目录</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Reference"><span class="nav-number">5.</span> <span class="nav-text">Reference</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-overview">
+            <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Lu0k"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Lu0k</p>
+  <div class="site-description" itemprop="description">谦虚学习!</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">24</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">23</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/lu0k" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;lu0k" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/Lu0kMe" title="Twitter → https:&#x2F;&#x2F;twitter.com&#x2F;Lu0kMe" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://lu0k.github.io/posts/pe-file/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Lu0k">
+      <meta itemprop="description" content="谦虚学习!">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Lu0k">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          PE文件简析
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-10-24 00:00:00" itemprop="dateCreated datePublished" datetime="2021-10-24T00:00:00+08:00">2021-10-24</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Linker-and-Loader/" itemprop="url" rel="index"><span itemprop="name">Linker and Loader</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="二进制文件PE"><a href="#二进制文件PE" class="headerlink" title="二进制文件PE"></a>二进制文件PE</h1><p>在32位Windows平台下，微软引入了一种名为PE<code>(Protable Executable)</code>的可执行格式。作为Win32平台的标准可执行文件格式，PE有着跟ELF一样良好的平台扩展性和灵活性。PE文件格式事实上与ELF同根同源，都是由COFF<code>(Common Object File Format)</code>格式发展而来的，更加具体地讲是来源于当时著名的DEC<code>(Digital Equipment Corporation)</code>的VAX&#x2F;VMS上的COFF格式。</p>
+<span id="more"></span>
+
+<p>需要注意的是，Windows平台下的可执行文件采用PE格式，而Visual C++编译器产生的目标文件仍然使用COFF格式。由于PE是COFF的一种扩展，所以它们的结构在很大程度上相同，甚至跟ELF文件的基本结构也相同，都是基于段的结构。64位Windows发布后，微软对64位Windows平台上的PE文件结构稍微做了一些修改，这个新的文件格式叫做PE32+。新的PE32+并没有添加任何结构，最大的变化就是把原来那些32位的字段变成了64位。绝大部分情况下，PE32+与PE32的格式一致，可以将其视为一般的PE文件。</p>
+<p>与ELF文件相同，PE&#x2F;COFF格式也是采用了基于段的格式。一个段可以包含代码、数据或其他信息。在PE&#x2F;COFF文件中，至少包含一个代码段，这个代码段的名字往往叫做<code>.code</code>，数据段往往叫做<code>.data</code>。具体的段名与编译器有关。</p>
+<h1 id="PE的前身COFF"><a href="#PE的前身COFF" class="headerlink" title="PE的前身COFF"></a>PE的前身COFF</h1><p>几乎与ELF文件一样，COFF也是由文件头及后面的若干个段组成，再加上文件末尾的符号表、调试信息的内容，就构成了COFF文件的基本结构。COFF文件的文件头部包括了两部分，一部分是描述文件总体结构和属性的映像头<code>(Image Header)</code>，另外一部分是描述该文件中包含的段属性的段表<code>(Section Table)</code>。文件头后面紧跟着的就是文件的段，包括代码段、数据段等，最后还有符号表等。整体结构如下：</p>
+<table>
+<thead>
+<tr>
+<th align="center">COFF目标文件格式</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">Image Header(IMAGE_FILE_HEADER)</td>
+</tr>
+<tr>
+<td align="center">Section Table(IMAGE_SECTION_HEADER[])</td>
+</tr>
+<tr>
+<td align="center">.text</td>
+</tr>
+<tr>
+<td align="center">.data</td>
+</tr>
+<tr>
+<td align="center">.drectve</td>
+</tr>
+<tr>
+<td align="center">……</td>
+</tr>
+<tr>
+<td align="center">Symbol Table</td>
+</tr>
+</tbody></table>
+<p>文件头里描述COFF文件总体属性的映像头是一个<code>IMAGE_FILE_HEADER</code>的结构，很明显，它跟ELF中的<code>Elf32_Ehdr</code>结构的作用相同。这个结构及相关常数被定义在<code>VC\PlatformSDK\include\WinNT.h</code>里面：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> _<span class="title">IMAGE_FILE_HEADER</span> &#123;</span></span><br><span class="line">  WORD  Machine;</span><br><span class="line">  WORD  NumberOfSections;</span><br><span class="line">  DWORD TimeDateStamp;</span><br><span class="line">  DWORD PointerToSymbolTable;</span><br><span class="line">  DWORD NumberOfSymbols;</span><br><span class="line">  WORD  SizeOfOptionalHeader;</span><br><span class="line">  WORD  Characteristics;</span><br><span class="line">&#125; IMAGE_FILE_HEADER, *PIMAGE_FILE_HEADER;</span><br></pre></td></tr></table></figure>
+
+<p>结构体成员含义如下：</p>
+<ul>
+<li>Machine：CPU架构类型</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th align="center">值</th>
+<th align="center">含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">IMAGE_FILE_MACHINE_I386<br />0x014c</td>
+<td align="center">x86</td>
+</tr>
+<tr>
+<td align="center">IMAGE_FILE_MACHINE_IA64<br />0x0200</td>
+<td align="center">Intel Itanium</td>
+</tr>
+<tr>
+<td align="center">IMAGE_FILE_MACHINE_AMD64<br />0x8664</td>
+<td align="center">x64</td>
+</tr>
+</tbody></table>
+<ul>
+<li>NumberofSections：该PE中段的数量</li>
+<li>TimeDateStamp：PE创建时的时间戳</li>
+<li>PointerToSymbolTable：符号表在PE中的位置</li>
+<li>NumberOfSymbols：符号表中符号的数目</li>
+<li>SizeOfOptionalHeader：OptionalHeader的大小</li>
+<li>Characteristics：文件属性，可以是一个或多个以下值</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th align="center">值</th>
+<th align="center">含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">IMAGE_FILE_RELOCS_STRIPPED<br />0x0001</td>
+<td align="center">重定位信息已从文件中删除。</td>
+</tr>
+<tr>
+<td align="center">IMAGE_FILE_EXECUTABLE_IMAGE<br />0x0002</td>
+<td align="center">该文件可执行(没有为解析的外部引用)</td>
+</tr>
+<tr>
+<td align="center">IMAGE_FILE_LINE_NUMS_STRIPPED<br />0x0004</td>
+<td align="center">COFF行号已从文件中删除</td>
+</tr>
+<tr>
+<td align="center">IMAGE_FILE_LOCAL_NUMS_STRIPPED<br />0x0008</td>
+<td align="center">COFF符号表条目已从文件中删除</td>
+</tr>
+<tr>
+<td align="center">…….</td>
+<td align="center">……</td>
+</tr>
+</tbody></table>
+<p>映像头后面紧跟的就是COFF文件的段表，它是一个类型为<code>IMAGE_SECTION_HEADER</code>结构的数组。数组里面每个元素代表一个段，这个结构跟ELF文件中的<code>Elf32_Shdr</code>很相似。这个数组的元素个数刚好是COFF文件所包含的段的数量，也就是映像头里的<code>NumberofSections</code>。这个结构是用来描述每个段的属性的，同样被定义在<code>VC\PlatformSDK\include\WinNT.h</code>里面：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> _<span class="title">IMAGE_SECTION_HEADER</span> &#123;</span></span><br><span class="line">  BYTE  Name[IMAGE_SIZEOF_SHORT_NAME];</span><br><span class="line">  <span class="class"><span class="keyword">union</span> &#123;</span></span><br><span class="line">    DWORD PhysicalAddress;</span><br><span class="line">    DWORD VirtualSize;</span><br><span class="line">  &#125; Misc;</span><br><span class="line">  DWORD VirtualAddress;</span><br><span class="line">  DWORD SizeOfRawData;</span><br><span class="line">  DWORD PointerToRawData;</span><br><span class="line">  DWORD PointerToRelocations;</span><br><span class="line">  DWORD PointerToLinenumbers;</span><br><span class="line">  WORD  NumberOfRelocations;</span><br><span class="line">  WORD  NumberOfLinenumbers;</span><br><span class="line">  DWORD Characteristics;</span><br><span class="line">&#125; IMAGE_SECTION_HEADER, *PIMAGE_SECTION_HEADER;</span><br></pre></td></tr></table></figure>
+
+<p>结构体成员含义如下：</p>
+<ul>
+<li>Name：段名</li>
+<li>Misc.PhysicalAddress：物理地址</li>
+<li>Misc.VirtualSize：加载到内存中的字节总大小</li>
+<li>VirtualAddress：虚拟地址</li>
+<li>SizeOfRawData：原始数据的大小</li>
+<li>PointerToRawData：段在文件中的位置</li>
+<li>PointerToRelocations：重定位表在文件中的位置</li>
+<li>PointerToLinenumbers：行号表在文件中的位置</li>
+<li>NumberOfRelocations：重定位表数目</li>
+<li>NumberOfLinenumbers：行号表数目</li>
+<li>Characteristics：文件属性</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th align="center">值</th>
+<th align="center">含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">IMAGE_SCN_CNT_CODE<br />0x00000020</td>
+<td align="center">该段包含可执行代码</td>
+</tr>
+<tr>
+<td align="center">IMAGE_SCN_CNT_INITIALIZED_DATA<br />0x00000040</td>
+<td align="center">该段包含初始化数据</td>
+</tr>
+<tr>
+<td align="center">IMAGE_SCN_CNT_UNINITIALIZED_DATA<br />0x00000080</td>
+<td align="center">该段包含未初始化数据</td>
+</tr>
+<tr>
+<td align="center">IMAGE_SCN_LNK_INFO<br />0x00000200</td>
+<td align="center">该段包含注释或其他信息</td>
+</tr>
+<tr>
+<td align="center">……</td>
+<td align="center">……</td>
+</tr>
+</tbody></table>
+<p>段表以后就是各个段的实际内容了，代码段、数据段、BSS段的内容及存储方式与ELF文件类似。下面介绍在ELF文件中不存在的两个段，<code>.drectve</code>和<code>.debug$S</code>段。</p>
+<h1 id="其他段信息"><a href="#其他段信息" class="headerlink" title="其他段信息"></a>其他段信息</h1><h2 id="链接指示"><a href="#链接指示" class="headerlink" title="链接指示"></a>链接指示</h2><p><code>.drectve</code>段实际上是<code>Directive</code>的缩写，它的内容是编译器传递给链接器的指令<code>(Directive)</code>，即编译器希望告诉链接器应该怎样链接这个目标文件。段名后面就是段的属性，包括地址、长度、位置等，最后一个属性是标志位<code>flags</code>，即<code>IMAGE_SECTION_HEADERS</code>里面的<code>Characteristics</code>成员。<code>.drectve</code>段的标志位为<code>0x100A00</code>，它是如下标志位的组合：</p>
+<table>
+<thead>
+<tr>
+<th align="center">标志位</th>
+<th align="center">宏定义</th>
+<th align="center">意义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">0x00100000</td>
+<td align="center">IMAGE_SCN_ALIGN_1BYTES</td>
+<td align="center">1个字节对齐，相当于不对齐</td>
+</tr>
+<tr>
+<td align="center">0x00000800</td>
+<td align="center">IMAGE_SCN_LNK_REMOVE</td>
+<td align="center">最终链接成映像文件时抛弃错误</td>
+</tr>
+<tr>
+<td align="center">0x00000200</td>
+<td align="center">IMAGE_SCN_LNK_INFO</td>
+<td align="center">该段包含的是注释和其他信息</td>
+</tr>
+</tbody></table>
+<p>该段的内容解析后为编译器希望传给链接器的链接指令。例如<code>/DEFAULTLIB:&#39;LIBCMT&#39;</code>表示编译器告诉链接器，该目标文件需要<code>LIBCMT(Library C Multithreaded, 静态链接的多线程C库)</code>这个默认库。</p>
+<h2 id="调试信息"><a href="#调试信息" class="headerlink" title="调试信息"></a>调试信息</h2><p>COFF文件中所有以<code>.debug</code>开始的段都包含着调试信息。比如<code>.debug$S</code>表示包含符号<code>(Symbol)</code>相关的调试信息段；<code>.debug$P</code>表示包含预编译头文件<code>(Precomplied Header Files)</code>相关的调试信息段；<code>.debug$T</code>表示包含类型<code>(Type)</code>相关的调试信息段。调试信息段的具体格式被定义在PE格式文件标准中。</p>
+<h2 id="符号表"><a href="#符号表" class="headerlink" title="符号表"></a>符号表</h2><p>COFF文件的符号表包含的内容几乎与ELF文件的符号表一样，主要就是符号名、符号的类型、所在的位置等。</p>
+<h1 id="PE文件结构"><a href="#PE文件结构" class="headerlink" title="PE文件结构"></a>PE文件结构</h1><p>PE文件是基于COFF的扩展，它比COFF文件多了几个结构。最主要的变化有两个：第一个是文件最开始的部分不是COFF文件头，而是DOS MZ可执行文件格式的文件头和桩代码<code>(DOS MZ File Header and Stub)</code>；第二个变化是原来的COFF文件头中的<code>IMAGE_FILE_HEADER</code>部分扩展成了PE文件头结构<code>IMAGE_NT_HEADERS</code>，这个结构包括了原来的<code>Image Header</code>及新增的PE扩展头部结构<code>(PE Optional Header)</code>。PE文件结构如下：</p>
+<table>
+<thead>
+<tr>
+<th align="center">PE文件结构</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">Image DOS Header(IMAGE_DOS_HEADER)</td>
+</tr>
+<tr>
+<td align="center">Image DOS Stub</td>
+</tr>
+<tr>
+<td align="center">PE File Header(IMAGE_NT_HEADERS)<br />包含Image Header(IMAGE_FILE_HEADER)<br />包含Image Optional Header(IMAGE_OPTIONALHEADER32)</td>
+</tr>
+<tr>
+<td align="center">Section Table(IMAGE_SECTION_HEADER[])</td>
+</tr>
+<tr>
+<td align="center">.text</td>
+</tr>
+<tr>
+<td align="center">.data</td>
+</tr>
+<tr>
+<td align="center">……</td>
+</tr>
+<tr>
+<td align="center">Symbol Table</td>
+</tr>
+</tbody></table>
+<p>DOS下的可执行文件的扩展名与Windows下的可执行文件扩展名一样，都是<code>.exe</code>，但是DOS下的可执行文件格式是<code>MZ</code>格式，与Windows下的PE格式完全不同，虽然它们使用相同的扩展名。PE文件中的<code>Image DOS Header</code>和<code>DOS Stub</code>两个结构就是为了兼容DOS系统而设计的，其中<code>IMAGE_DOS_HEADER</code>结构其实跟DOS的<code>MZ</code>可执行结构的头部完全一样。<code>IMAGE_DOS_HEADER</code>的结构中有的前两个字节是<code>e_magic</code>结构，它里面包含了<code>MZ</code>这两个字母的ASCII码；<code>e_cs</code>和<code>e_ip</code>两个成员指向程序的入口地址。而在PE文件中，<code>e_cs</code>和<code>e_ip</code>两个成员并不指向程序真正入口的地址，而是指向文件中的<code>DOS Stub</code>。<code>DOS Stub</code>是一小段可以在DOS下运行的代码，这段代码的唯一作用是向终端输出一行字：<code>This program cannot be run in DOS</code>，然后退出程序，表示该程序不能在DOS下运行。</p>
+<p><code>IMAGE_DOS_HEADER</code>结构被定义在<code>WinNT.h</code>里面，其中有一个成员为<code>e_lfanew</code>，这个成员表明了PE文件头在PE文件中的偏移，用于定位PE文件头。当Windows开始执行一个后缀名为<code>.exe</code>的文件时，它会判断<code>e_lfanew</code>成员是否为0。如果为0，则该<code>.exe</code>文件是一个DOS<code>MZ</code>文件，Windows会启动DOS子系统来执行它；如果它不为0，那么它就是一个Windows的PE可执行文件。</p>
+<p><code>IMAGE_NT_HEADERS</code>是真正的PE文件头，它包含了一个标记<code>(Signature)</code>和两个结构体。标记是一个常量，对于一个合法的PE文件头来说，它的值为<code>0x00004550</code>，按照小端序，其对应<code>PE\0\0</code>四个字符的ASCII码。文件头结构如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> _<span class="title">IMAGE_NT_HEADERS</span> &#123;</span></span><br><span class="line">  DWORD                   Signature;</span><br><span class="line">  IMAGE_FILE_HEADER       FileHeader;</span><br><span class="line">  IMAGE_OPTIONAL_HEADER32 OptionalHeader;</span><br><span class="line">&#125; IMAGE_NT_HEADERS32, *PIMAGE_NT_HEADERS32;</span><br></pre></td></tr></table></figure>
+
+<p>结构体成员含义如下：</p>
+<ul>
+<li><p>Signature：标记，值为<code>0x00004550</code></p>
+</li>
+<li><p>FileHeader：映像头，即COFF文件的映像头</p>
+</li>
+<li><p>OptionalHeader：PE扩展头部结构，其中包含许多重要信息。</p>
+</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> _<span class="title">IMAGE_OPTIONAL_HEADER</span> &#123;</span></span><br><span class="line">  WORD                 Magic;</span><br><span class="line">  BYTE                 MajorLinkerVersion;</span><br><span class="line">  BYTE                 MinorLinkerVersion;</span><br><span class="line">  DWORD                SizeOfCode;</span><br><span class="line">  DWORD                SizeOfInitializedData;</span><br><span class="line">  DWORD                SizeOfUninitializedData;</span><br><span class="line">  DWORD                AddressOfEntryPoint;</span><br><span class="line">  DWORD                BaseOfCode;</span><br><span class="line">  DWORD                BaseOfData;</span><br><span class="line">  DWORD                ImageBase;</span><br><span class="line">  DWORD                SectionAlignment;</span><br><span class="line">  DWORD                FileAlignment;</span><br><span class="line">  WORD                 MajorOperatingSystemVersion;</span><br><span class="line">  WORD                 MinorOperatingSystemVersion;</span><br><span class="line">  WORD                 MajorImageVersion;</span><br><span class="line">  WORD                 MinorImageVersion;</span><br><span class="line">  WORD                 MajorSubsystemVersion;</span><br><span class="line">  WORD                 MinorSubsystemVersion;</span><br><span class="line">  DWORD                Win32VersionValue;</span><br><span class="line">  DWORD                SizeOfImage;</span><br><span class="line">  DWORD                SizeOfHeaders;</span><br><span class="line">  DWORD                CheckSum;</span><br><span class="line">  WORD                 Subsystem;</span><br><span class="line">  WORD                 DllCharacteristics;</span><br><span class="line">  DWORD                SizeOfStackReserve;</span><br><span class="line">  DWORD                SizeOfStackCommit;</span><br><span class="line">  DWORD                SizeOfHeapReserve;</span><br><span class="line">  DWORD                SizeOfHeapCommit;</span><br><span class="line">  DWORD                LoaderFlags;</span><br><span class="line">  DWORD                NumberOfRvaAndSizes;</span><br><span class="line">  IMAGE_DATA_DIRECTORY DataDirectory[IMAGE_NUMBEROF_DIRECTORY_ENTRIES];</span><br><span class="line">&#125; IMAGE_OPTIONAL_HEADER32, *PIMAGE_OPTIONAL_HEADER32;</span><br></pre></td></tr></table></figure>
+
+<p>结构体成员的详细介绍见：<a target="_blank" rel="noopener" href="https://docs.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-image_optional_header32">IMAGE_OPTIONAL_HEADER32 (winnt.h) - Win32 apps | Microsoft Docs</a>。</p>
+<h2 id="PE数据目录"><a href="#PE数据目录" class="headerlink" title="PE数据目录"></a>PE数据目录</h2><p>在Windows系统装载PE可执行文件时，往往需要很快地找到一些装载所需要的数据结构，比如导入表、导出表、资源、重定位等。这些常用的数据的位置和长度都被保存在了一个名为数据目录<code>(Data Directory)</code>的结构里面，其实它就是前面<code>IMAGE_DATA_DIRECTORY</code>的结构数组，定义如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> _<span class="title">IMAGE_DATA_DIRECTORY</span> &#123;</span></span><br><span class="line">  DWORD VirtualAddress;</span><br><span class="line">  DWORD Size;</span><br><span class="line">&#125; IMAGE_DATA_DIRECTORY, *PIMAGE_DATA_DIRECTORY;</span><br></pre></td></tr></table></figure>
+
+<p>两个成员分别是虚拟地址和长度。DataDirectory数组里面每一个元素都对应一个包含一定含义的表。该数组中包含导出表、导入表、资源表、异常表、重定位表、调试信息表、线程私有存储<code>(TLS)</code>等的地址和长度，这些表多数与装载和DLL动态链接有关。</p>
+<h1 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h1><ul>
+<li><a target="_blank" rel="noopener" href="https://docs.microsoft.com/zh-cn/windows/win32/api/winnt/">Winnt.h header - Win32 apps | Microsoft Docs</a></li>
+<li>《程序员的自我修养——链接、装载与库》</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Basic/" rel="tag"><i class="fa fa-tag"></i> Basic</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/htb-pikaboo/" rel="prev" title="HTB Pikaboo">
+                  <i class="fa fa-chevron-left"></i> HTB Pikaboo
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lu0k</span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <script size="250" alpha="0.5" zIndex="-1" src="https://cdn.jsdelivr.net/npm/ribbon.js@1.0.2/dist/ribbon.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>
