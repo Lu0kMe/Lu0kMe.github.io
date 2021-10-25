@@ -478,10 +478,16 @@
 <td align="center">|</td>
 </tr>
 </tbody></table>
-<h1 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h1><p><a href="https://regexr.com/">RegExr: Learn, Build, &amp; Test RegEx</a></p>
-<p><a href="https://www.gnu.org/software/sed/manual/html_node/BRE-vs-ERE.html">BRE vs ERE (sed, a stream editor) (gnu.org)</a></p>
-<p><a href="https://www.pcre.org/">PCRE - Perl Compatible Regular Expressions</a></p>
-<p><a href="https://docs.python.org/zh-cn/3/library/re.html">re — 正则表达式操作 — Python 3.9.5 文档</a></p>
+<h1 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h1><ul>
+<li><p><a href="https://regexr.com/">RegExr: Learn, Build, &amp; Test RegEx</a></p>
+</li>
+<li><p><a href="https://www.gnu.org/software/sed/manual/html_node/BRE-vs-ERE.html">BRE vs ERE (sed, a stream editor) (gnu.org)</a></p>
+</li>
+<li><p><a href="https://www.pcre.org/">PCRE - Perl Compatible Regular Expressions</a></p>
+</li>
+<li><p><a href="https://docs.python.org/zh-cn/3/library/re.html">re — 正则表达式操作 — Python 3.9.5 文档</a></p>
+</li>
+</ul>
 ]]></content>
       <categories>
         <category>Misc</category>
