@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-lu0k.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-lu0k.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-lu0k.png">
+  <link rel="mask-icon" href="/images/lu0k.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"lu0k.github.io","root":"/","images":"/images","scheme":"Gemini","version":"8.7.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+<meta name="description" content="虚拟地址空间程序是一个静态的概念，是指一些预先编译好的指令和数据集合的一个文件；进程则是一个动态的概念，是指程序运行时的一个过程。每一个程序运行起来后，都拥有自己独立的虚拟地址空间(Virtual Address Space)，这个虚拟地址空间的大小由计算机的硬件平台决定，具体地说是由CPU的位数决定。硬件决定了地址空间的最大理论上限，即硬件的寻址空间大小，比如32位的硬件平台决定了虚拟地址空间的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="装载与进程">
+<meta property="og:url" content="https://lu0k.github.io/posts/load-proc/index.html">
+<meta property="og:site_name" content="Lu0k">
+<meta property="og:description" content="虚拟地址空间程序是一个静态的概念，是指一些预先编译好的指令和数据集合的一个文件；进程则是一个动态的概念，是指程序运行时的一个过程。每一个程序运行起来后，都拥有自己独立的虚拟地址空间(Virtual Address Space)，这个虚拟地址空间的大小由计算机的硬件平台决定，具体地说是由CPU的位数决定。硬件决定了地址空间的最大理论上限，即硬件的寻址空间大小，比如32位的硬件平台决定了虚拟地址空间的">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-10-24T16:00:00.000Z">
+<meta property="article:modified_time" content="2021-10-25T15:17:50.059Z">
+<meta property="article:author" content="Lu0k">
+<meta property="article:tag" content="Basic">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://lu0k.github.io/posts/load-proc/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://lu0k.github.io/posts/load-proc/","path":"posts/load-proc/","title":"装载与进程"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>装载与进程 | Lu0k</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">Lu0k</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Lu0k's Blog</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%99%9A%E6%8B%9F%E5%9C%B0%E5%9D%80%E7%A9%BA%E9%97%B4"><span class="nav-number">1.</span> <span class="nav-text">虚拟地址空间</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%A8%8B%E5%BA%8F%E8%A3%85%E8%BD%BD%E6%96%B9%E5%BC%8F"><span class="nav-number">2.</span> <span class="nav-text">程序装载方式</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A6%86%E7%9B%96%E8%A3%85%E8%BD%BD"><span class="nav-number">2.1.</span> <span class="nav-text">覆盖装载</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%A1%B5%E6%98%A0%E5%B0%84"><span class="nav-number">2.2.</span> <span class="nav-text">页映射</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%B3%BB%E7%BB%9F%E8%A3%85%E8%BD%BD%E7%A8%8B%E5%BA%8F"><span class="nav-number">3.</span> <span class="nav-text">系统装载程序</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%9B%E7%A8%8B%E7%9A%84%E5%BB%BA%E7%AB%8B"><span class="nav-number">3.1.</span> <span class="nav-text">进程的建立</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%A1%B5%E9%94%99%E8%AF%AF"><span class="nav-number">3.2.</span> <span class="nav-text">页错误</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E7%A9%BA%E9%97%B4"><span class="nav-number">4.</span> <span class="nav-text">虚拟内存空间</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#ELF%E6%89%A7%E8%A1%8C%E8%A7%86%E5%9B%BE"><span class="nav-number">4.1.</span> <span class="nav-text">ELF执行视图</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A0%86%E5%92%8C%E6%A0%88"><span class="nav-number">4.2.</span> <span class="nav-text">堆和栈</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AE%B5%E5%9C%B0%E5%9D%80%E5%AF%B9%E9%BD%90"><span class="nav-number">4.3.</span> <span class="nav-text">段地址对齐</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%9B%E7%A8%8B%E6%A0%88%E5%88%9D%E5%A7%8B%E5%8C%96"><span class="nav-number">4.4.</span> <span class="nav-text">进程栈初始化</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Reference"><span class="nav-number">5.</span> <span class="nav-text">Reference</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-overview">
+            <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Lu0k"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Lu0k</p>
+  <div class="site-description" itemprop="description">谦虚学习!</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">25</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">23</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/lu0k" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;lu0k" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/Lu0kMe" title="Twitter → https:&#x2F;&#x2F;twitter.com&#x2F;Lu0kMe" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://lu0k.github.io/posts/load-proc/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Lu0k">
+      <meta itemprop="description" content="谦虚学习!">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Lu0k">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          装载与进程
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-10-25 00:00:00" itemprop="dateCreated datePublished" datetime="2021-10-25T00:00:00+08:00">2021-10-25</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Linker-and-Loader/" itemprop="url" rel="index"><span itemprop="name">Linker and Loader</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="虚拟地址空间"><a href="#虚拟地址空间" class="headerlink" title="虚拟地址空间"></a>虚拟地址空间</h1><p>程序是一个静态的概念，是指一些预先编译好的指令和数据集合的一个文件；进程则是一个动态的概念，是指程序运行时的一个过程。每一个程序运行起来后，都拥有自己独立的虚拟地址空间<code>(Virtual Address Space)</code>，这个虚拟地址空间的大小由计算机的硬件平台决定，具体地说是由CPU的位数决定。硬件决定了地址空间的最大理论上限，即硬件的寻址空间大小，比如32位的硬件平台决定了虚拟地址空间的地址为0到2<sup>32</sup>-1；而64位的硬件平台具有64位寻址能力，虚拟地址空间的地址为0到2<sup>64</sup>-1。</p>
+<span id="more"></span>
+
+<p>从程序的角度看，可以通过C语言程序中指针所占的空间来计算虚拟地址空间的大小。一般来说，C语言指针大小的位数与虚拟地址空间的位数相同，如32位平台下的指针为32位，即4字节；64位平台下的指针为64位，即8字节。</p>
+<p>程序能够使用的虚拟地址空间是由操作系统决定的。操作系统为了达到监控程序运行等一系列目的，进程的虚拟地址空间都在操作系统的掌控中。进程只能使用那些操作系统分配给进程的地址，如果要访问未经允许的地址空间，那么操作系统就会捕捉到这些访问，将进程的这种访问视为非法操作并强制结束进程。</p>
+<p>一般来说，操作系统会将虚拟地址空间划分为两部分，一部分用于操作系统自身使用，另一部分留给进程使用。在32位硬件平台上，Linux系统会将<code>0xC0000000~0xFFFFFFFF</code>共1GB划分给系统自身使用，其余<code>0x00000000~0xC0000000</code>共3GB划分给进程使用；Windows的虚拟地址划分为2GB给系统自身使用，2GB给进程使用(可以通过启动参数修改划分大小)。</p>
+<h1 id="程序装载方式"><a href="#程序装载方式" class="headerlink" title="程序装载方式"></a>程序装载方式</h1><p>程序执行时所需要的指令和数据必须在内存中才能够正常运行。程序的装载方式可以分为两种，一种为静态装载，即将程序运行所需要的所有指令和数据都装入内存中；另一种为动态装载，即利用程序的局部性原理将程序最常用的部分驻留在内存中，而将一些不太常用的数据存放在磁盘当中。静态装载需要更多的物理内存，与磁盘相比，内存更加昂贵。因此目前采用的程序装载方式都是动态的。典型的动态装载方式有覆盖装载<code>(Overlay)</code>与页映射<code>(Paging)</code>。</p>
+<h2 id="覆盖装载"><a href="#覆盖装载" class="headerlink" title="覆盖装载"></a>覆盖装载</h2><p>覆盖装载的方法把挖掘内存潜力的任务交给了程序员，程序员在编写程序的时候必须手工将程序分割成若干块，然后编写一个小的辅助代码来管理这些模块何时应该驻留内存而何时应该被替换掉。这个小的辅助代码就是所谓的覆盖管理器<code>(Overlay Manager)</code>。由于程序的结构一般比较复杂，一个程序往往有多个模块，模块之间的调用关系往往也比较复杂，程序员需要手工将模块按照它们之间的调用依赖关系组织成树状结构。值得注意的是，覆盖管理器需要保证以下两点：</p>
+<ul>
+<li>树状结构中从任何一个模块到树的根模块都叫调用路径。当该模块被调用时，整个调用路径上的模块必须都在内存中。</li>
+<li>禁止跨树间调用。任意一个模块不允许跨过树状结构进行调用。覆盖管理器不能够保证跨树间的模块能够存在于内存中。</li>
+</ul>
+<h2 id="页映射"><a href="#页映射" class="headerlink" title="页映射"></a>页映射</h2><p>页映射是虚拟存储机制的一部分，它随着虚拟存储的发明而诞生。与覆盖装载的原理相似，页映射也不是一下子就把程序的所有数据和指令都装入内存，而是将内存和所有磁盘中的数据和指令以页为单位划分成若干个页，以后所有装载和操作的单位就是页。</p>
+<p>假设系统的内存为16KB，每个页的大小为4KB，则内存可以分为4个页，要运行一个30KB的程序，那么程序被分为8个页，编号为P0-P7。假设程序入口在P0，系统发现P0不在内存中，于是将P0装入内存的第一个页；运行一段时间后，系统发现程序需要P3，系统就把P3装入内存的第二个页；接着P4，P5被装入内存的第三个，第四个页；此时，系统发现程序需要P2，而已经没有内存装入P2，因此系统需要做出抉择，从P0、P3、P4、P5所在的内存页中选择一个来装入P2。有多种算法来实现这个选择的过程，比如先进先出算法、最少使用算法等。</p>
+<h1 id="系统装载程序"><a href="#系统装载程序" class="headerlink" title="系统装载程序"></a>系统装载程序</h1><p>从页映射装载的过程中可以发现，如果程序使用物理地址直接进行操作，那么每次页被装入时都需要进行重定位。在虚拟存储机制中，现代的MMU都提供地址转换的功能。有了硬件的地址转换和页映射机制，操作系统动态装载可执行文件的方式跟静态加载有了很大的区别。从操作系统的角度来看，可执行文件的装载与运行离不开进程的建立以及页错误。</p>
+<h2 id="进程的建立"><a href="#进程的建立" class="headerlink" title="进程的建立"></a>进程的建立</h2><p>从操作系统的角度来看，一个进程最关键的特征是它拥有独立的虚拟地址空间。很多时候一个程序被执行同时都伴随着一个新的进程的创建。进程的建立一般需要三步：</p>
+<ul>
+<li>创建一个独立的虚拟地址空间</li>
+<li>读取可执行文件头，并且建立虚拟地址空间与可执行文件的映射关系</li>
+<li>将CPU的指令寄存器设置成可执行文件的入口地址，启动运行</li>
+</ul>
+<p>首先是创建虚拟地址空间。我们知道一个虚拟地址空间由一组页映射函数将虚拟地址空间的各个页映射至相应的物理地址空间，那么创建一个虚拟地址空间实际上并不是创建空间而是创建映射函数所需要的相应的数据结构，在i386的Linux下，创建虚拟地址空间实际上只是分配一个页目录<code>(Page Directory)</code>就可以了，甚至不设置页映射关系，这些映射关系等到后面程序发生页错误的时候再进行设置。</p>
+<p>第二步是读取可执行文件头，并且建立虚拟地址空间与可执行文件的映射关系。上面那一步的页映射关系函数是虚拟地址空间到物理内存的映射关系，这一步所做的是虚拟地址空间与可执行文件的映射关系。当程序执行发生页错误时，操作系统将从物理内存中分配一个物理页，然后将该<code>缺页</code>从磁盘中读取到内存中，再设置缺页的虚拟页和物理页的映射关系，这样程序才得以正常运行。</p>
+<p>需要注意的是，当操作系统捕获到缺页错误时，它应知道程序当前所需要的页在可执行文件中的哪一个位置。这就是虚拟地址空间与可执行文件之间的映射关系。这种映射关系只是保存在操作系统内部的一个数据结构。Linux中将进程虚拟地址空间中的一个段叫做虚拟内存区域<code>(VMA, Virtual Memory Area)</code>；在Windows中将这个叫做虚拟段<code>(Virtual Section)</code>。</p>
+<p>第三步是将CPU指令寄存器设置成可执行文件入口，启动运行。操作系统通过设置CPU的指令寄存器将控制权转交给进程，由此进程开始执行。这一步看似简单，实际上涉及到操作系统层面的内核堆栈和用户堆栈的切换、CPU运行权限的切换。从进程的角度来看，可以简单地认为操作系统执行了一条跳转指令，直接跳转到可执行文件的入口地址。</p>
+<h2 id="页错误"><a href="#页错误" class="headerlink" title="页错误"></a>页错误</h2><p>完成进程的建立后，可执行文件的真正指令和数据都没有被装入内存中。操作系统只是通过可执行文件头部的信息建立起可执行文件和进程虚拟内存之间的映射关系。当CPU开始打算执行入口地址的指令时，发现为空页面，于是产生了一个页错误<code>(Page Fault)</code>。CPU将控制权交给操作系统，操作系统有专门的页错误处理例程来处理这种情况。操作系统将查询描述虚拟地址空间与可执行文件之间映射关系的数据结构，然后找到空页面所在的VMA，计算出相应的页面在可执行文件中的偏移，然后在物理内存中分配一个物理页面，将进程中该虚拟页与分配的物理页之间建立映射关系，然后把控制权再还回给进程，进程从刚才页错误的位置重新开始执行。随着进程的执行，页错误不断地产生，操作系统也会为进程分配相应的物理页面来满足进程执行的需求。操作系统通过虚拟存储管理精心组织和分配物理内存，满足进程的内存需求。</p>
+<h1 id="虚拟内存空间"><a href="#虚拟内存空间" class="headerlink" title="虚拟内存空间"></a>虚拟内存空间</h1><h2 id="ELF执行视图"><a href="#ELF执行视图" class="headerlink" title="ELF执行视图"></a>ELF执行视图</h2><p>一个ELF可执行文件往往有十几个段，如果每个段在映射时的长度都是系统页长度的整数倍，将会浪费很多内存。从操作系统的角度来看，可以发现操作系统并不关心可执行文件各个段所包含的实际内容，操作系统只关心一些跟装载相关的问题，最主要的是段的权限<code>(可读、可写、可执行)</code>。ELF文件中，段的权限基本上可以分为三种：</p>
+<ul>
+<li>以代码段为代表的权限为可读可执行的段</li>
+<li>以数据段和BSS段为代表的权限为可读可写的段</li>
+<li>以只读数据段为代表的权限为只读的段</li>
+</ul>
+<p>一个简单的方案是：对于相同权限的段，把它们合并到一起当作一个段进行映射。</p>
+<p>ELF可执行文件引入了一个概念叫做<code>Segment</code>，一个<code>Segment</code>包含一个或多个属性类似的<code>Section</code>。<code>Segment</code>的概念实际上是从装载的角度重新划分了ELF的各个段。在将目标文件链接成可执行文件的时候，链接器会尽量把相同权限属性的段分配在同一<code>Segment</code>，并且映射到同一个VMA。<code>Section</code>和<code>Segment</code>从不同角度来划分同一个ELF文件，这在ELF中被称为不同的视图<code>View</code>。从<code>Section</code>的角度来看ELF文件就是链接视图<code>(Linking View)</code>，从<code>Segment</code>的角度来看就是执行视图<code>(Execution View)</code>。</p>
+<p>描述<code>Segment</code>的结构叫程序头<code>(Program Header)</code>，它描述了ELF文件该如何被操作系统映射到进程的虚拟地址空间。ELF可执行文件有一个专门的数据结构叫做程序头表<code>(Program Header Table)</code>用来保存<code>Segment</code>的信息。跟段表结构一样，程序头表也是一个结构体数组：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">elf32_phdr</span>&#123;</span></span><br><span class="line">  Elf32_Word	p_type;</span><br><span class="line">  Elf32_Off		p_offset;</span><br><span class="line">  Elf32_Addr	p_vaddr;</span><br><span class="line">  Elf32_Addr	p_paddr;</span><br><span class="line">  Elf32_Word	p_filesz;</span><br><span class="line">  Elf32_Word	p_memsz;</span><br><span class="line">  Elf32_Word	p_flags;</span><br><span class="line">  Elf32_Word	p_align;</span><br><span class="line">&#125; Elf32_Phdr;</span><br></pre></td></tr></table></figure>
+
+<p>结构体成员含义如下：</p>
+<ul>
+<li>p_type：类型</li>
+<li>p_offset：在文件中的偏移</li>
+<li>p_vaddr：第一个字节在进程虚拟地址空间的起始位置</li>
+<li>p_paddr：物理装载地址</li>
+<li>p_filesz：在ELF文件中所占空间的长度</li>
+<li>p_memsz：在进程虚拟地址空间中所占用的长度</li>
+<li>p_flags：权限属性</li>
+<li>p_align：对齐属性</li>
+</ul>
+<h2 id="堆和栈"><a href="#堆和栈" class="headerlink" title="堆和栈"></a>堆和栈</h2><p>操作系统通过给进程空间划分出一个个VMA来管理进程的虚拟地址空间；基本原则是将相同权限属性的、有相同映像文件的映射成一个VMA；一个进程基本上可以分为如下几种VMA区域：</p>
+<ul>
+<li>代码VMA，权限只读、可执行；有映像文件</li>
+<li>数据VMA，权限可读写、可执行；有映像文件</li>
+<li>堆VMA，权限可读写、可执行；无映像文件，匿名，可向上扩展</li>
+<li>栈VMA，权限可读写、不可执行；无映像文件，匿名，可向下扩展</li>
+</ul>
+<h2 id="段地址对齐"><a href="#段地址对齐" class="headerlink" title="段地址对齐"></a>段地址对齐</h2><p>可执行文件最终是要被操作系统装载运行的，这个装载的过程一般是通过虚拟内存的页映射机制完成的。在映射过程中，页是映射的最小单位。对于Intel 80x86系列处理器来说，默认页的大小为4096字节，也就是说，我们要映射将一段物理内存和进程虚拟地址空间之间建立映射关系，这段内存空间的长度必须是4096的整数倍，并且这段空间在物理内存和进程虚拟地址空间中的起始地址必须是4096的整数倍。由于有这长度和起始地址的限制，对于可执行文件来说，它应该尽量地优化自己的空间和地址的安排，以节省空间。</p>
+<p>一种最简单的映射办法就是每个段分开映射，对于长度不足一个页的部分则占一个页。这种对齐方式在文件段的内部会有很多内部碎片，浪费磁盘空间。</p>
+<p>另一种映射办法是让那些各个段接壤部分共享一个物理页面，然后将该物理页面分别映射两次，并且将ELF的文件头也看作是系统的一个段，将其映射到进程的地址空间。从某种角度来看，好像是整个ELF文件从文件最开始到某个点结束，被逻辑上分成了以4096字节为单位的若干个块，每个块都被装载到物理内存中，对于那些位于两个段中间的块，它们将会被映射两次。因为段地址对齐的关系，各个段的虚拟地址往往就不是系统页面长度的整数倍了。有一条规律是：在ELF文件中，对于任何一个可装载的<code>Segment</code>，它的p_vaddr除以对齐属性的余数等于p_offset除以对齐属性的余数。</p>
+<h2 id="进程栈初始化"><a href="#进程栈初始化" class="headerlink" title="进程栈初始化"></a>进程栈初始化</h2><p>进程刚开始启动的时候，需要知道一些进程运行的环境，最基本的就是系统环境变量和进程的运行参数。常见的一种做法是操作系统在进程启动前将这些信息提前保存到进程的虚拟地址空间的栈中<code>(也就是VMA中的Stack VMA)</code>。进程在启动以后，程序的库部分会把堆栈里的初始化信息中的参数信息传递给<code>main()</code>函数，也就是<code>main()</code>函数的两个<code>argc</code>和<code>argv</code>两个参数，这两个参数分别对应这里的命令行参数数量和命令行参数字符串指针数组。</p>
+<h1 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h1><ul>
+<li><a target="_blank" rel="noopener" href="https://refspecs.linuxfoundation.org/elf/elf.pdf">elf.pdf (linuxfoundation.org)</a></li>
+<li>《程序员的自我修养——链接、装载与库》</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Basic/" rel="tag"><i class="fa fa-tag"></i> Basic</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/pe-file/" rel="prev" title="PE文件简析">
+                  <i class="fa fa-chevron-left"></i> PE文件简析
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lu0k</span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <script size="250" alpha="0.5" zIndex="-1" src="https://cdn.jsdelivr.net/npm/ribbon.js@1.0.2/dist/ribbon.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>
