@@ -2561,4 +2561,209 @@
         <tag>Crypto</tag>
       </tags>
   </entry>
+  <entry>
+    <title>动态链接简析</title>
+    <url>/posts/dynamic-link/</url>
+    <content><![CDATA[<h1 id="动态链接简介"><a href="#动态链接简介" class="headerlink" title="动态链接简介"></a>动态链接简介</h1><p>静态链接虽然在原理上很简单，但是实现起来却十分困难。一方面，静态链接对于计算机内存和磁盘的空间浪费非常严重；另一方面，静态链接对于程序的更新、部署和发布也会带来很多麻烦。解决这两个问题的方法就是把程序的模块相互分割开来，形成独立的文件，而不再将它们静态地链接在一起。也就是说，把链接的过程推迟到程序运行时再进行，这就是动态链接。</p>
+<span id="more"></span>
+
+<p>动态链接的基本思想是把程序按照模块拆分成各个相对独立部分，在程序运行时才将它们链接在一起形成一个完整的程序。动态链接涉及运行时的链接及多个文件的装载，必须要有操作系统的支持。因为动态链接的情况下，进程的虚拟地址空间分布会比静态链接情况下更加复杂，还有一些存储管理、内存共享、进程线程机制在动态链接下也会有一些微妙的变化。</p>
+<p>目前主流的操作系统几乎都支持动态链接这种方式，在Linux系统中，ELF动态链接文件被称为动态共享对象<code>(DSO, Dynamic Shared Objects)</code>，简称共享对象，一般是以<code>.so</code>为扩展名的文件；而在Windows系统中，动态链接文件被称为动态链接库<code>(Dynamical Linking Library)</code>，一般是以<code>.dll</code>为扩展名的文件。当使用动态链接的程序被装载的时候，系统的动态链接器会将程序所需要的所有动态链接库装载到进程的地址空间，并且将程序中所有未决议的符号绑定到相应的动态链接库中，并进行重定位工作。</p>
+<h1 id="地址无关"><a href="#地址无关" class="headerlink" title="地址无关"></a>地址无关</h1><p>对于静态链接的可执行文件来说，整个进程只有一个文件要被映射，那就是可执行文件本身；而对于动态链接的可执行文件来说，除了可执行文件本身外，还有它所依赖的共享目标文件。在装载的过程中，可执行文件基本可以确定自己在进程虚拟地址空间中的地址，而共享目标文件同样需要确定自己在进程虚拟地址空间中的地址。假设共享目标文件在进程虚拟地址空间中的地址是确定分配的，由于程序本身的复杂性，这种分配将会极其繁琐、而且易产生冲突、不便于共享目标文件的升级。因此，共享对象在编译时不能假设自己在进程虚拟地址空间中的位置，也就是说，共享对象可以在任意地址装载。</p>
+<h2 id="装载时重定位"><a href="#装载时重定位" class="headerlink" title="装载时重定位"></a>装载时重定位</h2><p>为了使共享对象能够在任意地址装载，我们首先能够想到的方法就是静态链接中的重定位。这个想法的基本思路是，在链接时，对所有绝对地址的引用不作重定位，而把这一步推迟到装载时再完成。一旦模块装载地址确定，即目标地址确定，那么系统就对程序中所有的绝对地址引用进行重定位。这种重定位经常被称为装载时重定位<code>(Load Time Relocation)</code>，在Windows中，这种装载时重定位又被叫做基址重置<code>(Rebasing)</code>。</p>
+<p>但是装载时重定位的方法并不适合用来解决共享对象在任意地址装载的问题。可以想象，动态链接模块被装载映射至虚拟地址空间后，指令部分是在多个进程之间共享的，由于装载时重定位需要修改指令，所以没有办法做到同一份指令被多个进程共享，因为指令被重定位后对于每个进程来说是不同的。当然，动态链接库中的可修改数据部分对于不同的进程来说有多个副本，所以它们可以采用装载时重定位方法来解决。</p>
+<h2 id="地址无关代码"><a href="#地址无关代码" class="headerlink" title="地址无关代码"></a>地址无关代码</h2><p>装载时重定位是解决动态模块中有绝对地址引用的方法之一，但是它有一个很大的缺点是指令部分无法在多个进程之间共享，这样就失去了动态链接节省内存的一大优势。因此需要一种更好的方法解决共享对象中对绝对地址的重定位问题。其实我们只是希望程序模块中共享的指令部分在装载时不需要因为装载地址的改变而改变，所以实现的基本思想就是把指令中需要被修改的部分分离出来，跟数据部分放在一起，这样指令部分就可以保持不变，而数据部分可以在每个进程中拥有一个副本。这种方案被称为地址无关代码<code>(PIC, Position-independent Code)</code>。</p>
+<p>对于现代的机器来说，产生地址无关的代码并不麻烦。把共享对象模块中的地址引用按照是否跨模块分成两类：模块内部引用和模块外部引用；按照不同的引用方式分为两类：指令引用和数据访问。因此模块中地址引用方式可以分为以下四类：</p>
+<ul>
+<li>模块内数据访问：指令中不能直接包含数据的绝对地址，所以只能采用相对寻址。由于任何一条指令与它需要访问的模块内部数据之间的相对位置是固定的，所以相对于当前指令加上固定的偏移量即可实现</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"># 例子 (32位平台)</span><br><span class="line">0000044c &lt;bar&gt;:</span><br><span class="line">44c:	55                      push    %ebp</span><br><span class="line">44d:	89 e5                   mov     %esp,%ebp</span><br><span class="line">44f:	e8 40 00 00 00          call    494 &lt;__i686.get_pc_thunk.cx&gt;</span><br><span class="line">454:	81 c1 8c 11 00 00       add     $0x118c,%ecx	;加上偏移量0x118c</span><br><span class="line">45a:	c7 81 28 00 00 00 01    movl    $0x1,0x28(%ecx)	;加上偏移量0x28后为该地址的变量a赋值1</span><br><span class="line">461:	00 00 00</span><br><span class="line">464:	5d                      pop     %ebp</span><br><span class="line">465:	c3                      ret</span><br><span class="line">......</span><br><span class="line">00000494 &lt;__i686.get_pc_thunk.cx&gt;:</span><br><span class="line">494:	8b 0c 24                mov     (%esp),%ecx 	;获取pc值(0x10000000+0x454)到寄存器ecx</span><br><span class="line">497:	c3                      ret</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>模块内调用或跳转：被调用的函数与调用者都处于同一模块，它们之间的相对位置是固定的。可以使用相对地址调用或者是基于寄存器的相对调用，一般不需要重定位，存在共享对象全局符号介入<code>(Global Symbol Interposition)</code>时需要重定位</p>
+</li>
+<li><p>模块间数据访问：模块间的数据访问目标地址要等到装载时才决定。ELF的做法是在数据段里面建立一个指向这些变量的指针数组，也被称为全局偏移表<code>(GOT, Global Offset Table)</code>，当代码需要引用该全局变量时，可以通过<code>GOT</code>中相对应的项间接引用。当指令要访问变量时，程序会先找到<code>GOT</code>，然后根据<code>GOT</code>中变量所对应的项找到变量的目标地址。每个变量都对应一个地址，链接器在装载模块时会查找每个变量所在的地址，然后填充<code>GOT</code>中的各个项，以确保每个指针所指向的地址正确。<code>GOT</code>本身是放在数据段的，所以可以在模块装载时更改。模块在编译时可以确定模块内部变量相对于当前指令的偏移，也可以确定<code>GOT</code>相对于当前指令的偏移。确定<code>GOT</code>的方式与模块内数据访问的方式基本一样，通过<code>PC</code>值加上一个偏移量，就可以得到<code>GOT</code>的位置</p>
+</li>
+<li><p>模块间调用或跳转：与模块间数据访问类似，不同的是，<code>GOT</code>中相应的项保存的是目标函数的地址，当模块要调用目标函数时，可以通过<code>GOT</code>中的项进行间接跳转</p>
+</li>
+</ul>
+<p>总结如下表：</p>
+<table>
+<thead>
+<tr>
+<th align="center"></th>
+<th align="center">指令跳转、调用</th>
+<th align="center">数据访问</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">模块外部</td>
+<td align="center">相对跳转和调用</td>
+<td align="center">相对地址访问</td>
+</tr>
+<tr>
+<td align="center">模块内部</td>
+<td align="center">间接跳转和调用(GOT)</td>
+<td align="center">间接访问(GOT)</td>
+</tr>
+</tbody></table>
+<p>使用<code>GCC</code>产生地址无关代码只需要使用<code>-fPIC</code>或<code>-fpic</code>参数，区别在于<code>-fPIC</code>产生的代码要大，而<code>-fpic</code>产生的代码相对较小，而且较快。但是<code>-fpic</code>在某些平台上会有一些限制，比如全局符号的数量或者代码的长度等，一般使用<code>-fPIC</code>。</p>
+<p>地址无关代码技术除了可以用在共享对象上面，还可以用于可执行文件，一个以地址无关方式编译的可执行文件被称作地址无关可执行文件<code>(PIE, Position-Independent Executable)</code>，<code>GCC</code>参数为<code>-fPIE</code>或<code>-fpie</code>。</p>
+<h2 id="共享模块的全局变量"><a href="#共享模块的全局变量" class="headerlink" title="共享模块的全局变量"></a>共享模块的全局变量</h2><p>需要注意的是，上述情况并没有考虑到定义在模块内部的全局变量的情况。实际上，模块内部的全局变量和静态变量的地址都可以通过上面所列出的类型两种方法来解决。但是当一个模块引用了一个定义在共享对象的全局变量的时候，编译器无法根据上下文判断该全局变量是定义在同一个模块的其他目标文件还是定义在另一个共享对象中，即无法判断是否为跨模块间的调用。由于可执行文件在运行时并不进行代码重定位，所以变量的地址必须在链接过程中确定下来。为了能够使得链接过程正常进行，链接器会在创建可执行文件时，在它的<code>.bss</code>段创建一个变量的副本。此时该变量同时存在于多个位置中，这在实际运行过程中是不可行的。</p>
+<p>解决方法只有一个，就是所有的使用这个变量的指令都指向可执行文件中的那个副本。ELF共享库在编译时，默认都把定义在模块内部的全局变量当作定义在其他模块的全局变量，也就是通过<code>GOT</code>来实现变量的访问。当共享模块被装载时，如果某个全局变量在可执行文件中拥有副本，那么动态链接器就会把<code>GOT</code>中的相应地址指向该副本，这样该变量在运行时实际上最终就只有一个实例。</p>
+<h2 id="数据段的地址无关性"><a href="#数据段的地址无关性" class="headerlink" title="数据段的地址无关性"></a>数据段的地址无关性</h2><p> 通过上面的方法，能够保证共享对象中的代码部分地址无关，但是数据部分有时也存在绝对地址引用的问题。如下代码：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">int</span> a;</span><br><span class="line"><span class="keyword">static</span> <span class="keyword">int</span>* p = &amp;a;</span><br></pre></td></tr></table></figure>
+
+<p>指针p的地址是一个绝对地址，它指向变量a，而变量a的地址会随着共享对象的装载地址改变而改变。</p>
+<p>对于数据段来说，它在每个进程都有一份独立的副本，所以并不担心被进程改变，所以我们可以选择装载时链接的方法来解决数据段中绝对地址引用问题。对于共享对象来说，如果数据段中有绝对地址引用，那么编译器和链接器会产生一个重定位表，这个重定位表里面包含了<code>R_386_RELATIVE</code>类型的重定位入口，用于解决上述问题。当动态链接器装载共享对象时，如果发现该共享对象有这样的重定位入口，那么动态链接器就会对该共享对象进行重定位。</p>
+<h1 id="延迟绑定"><a href="#延迟绑定" class="headerlink" title="延迟绑定"></a>延迟绑定</h1><p>动态链接的确有很多优势，比静态链接要灵活得多，但它是以牺牲一部分性能为代价的。据统计ELF程序在静态链接下要比动态库要稍微快点，大约1%~5%，当然这取决于程序本身的特性及运行环境等。动态链接比静态链接慢的主要原因是动态链接下对于全局和静态的数据访问都要进行复杂的<code>GOT</code>定位，然后间接寻址；对于模块间的调用也要先定位<code>GOT</code>，然后再进行间接跳转。另外一个原因是动态链接的链接工作在运行时完成，即程序开始执行时，动态链接器都要进行一次链接工作。这是影响动态链接性能的两个主要问题。</p>
+<p>在动态链接下，程序模块之间包含了大量的函数引用<code>(全局变量往往比较少，因为大量的全局变量会导致模块之间耦合度变大)</code>，所以程序开始执行前，动态链接会耗费不少时间用于解决模块之间的函数引用的符号查找以及重定位。但是，在一个程序运行过程中，可能很多函数在程序执行完成时都不会被用到，比如一些错误处理函数或者是一些用户很少用到的功能模块等，实际上这是一种浪费。因此ELF采用了一种叫做延迟绑定<code>(Lazy Binding)</code>的做法，基本的思想就是当函数第一次被用到时才进行绑定<code>(符号查找、重定位等)</code>，如果没有用到则不进行绑定。所以程序开始执行时，模块间的函数调用都有没有进行绑定，而是需要用到时才由动态链接器来负责绑定。</p>
+<p>ELF使用PLT<code>(Procedure Linkage Table)</code>的方法来实现。当我们调用某个外部模块的函数时，如果按照通常的做法应该是通过<code>GOT</code>中相应的项进行间接跳转。<code>PLT</code>为了实现延迟绑定，在这个过程中间又增加了一层间接跳转。调用函数并不直接通过<code>GOT</code>跳转，而是通过一个叫作<code>PLT</code>项的结构来进行跳转。</p>
+<p>假设一个函数<code>foo()</code>，将其在<code>PLT</code>项中的地址称为<code>foo@plt</code>：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">foo@plt:</span><br><span class="line">jmp     *(foo@GOT)</span><br><span class="line">push    n</span><br><span class="line">push    moduleID</span><br><span class="line">jump    _dl_runtime_resolve</span><br></pre></td></tr></table></figure>
+
+<p>第一条指令是一条通过<code>GOT</code>间接跳转的指令。<code>foo@GOT</code>表示<code>GOT</code>中保存的<code>foo()</code>这个函数相应的项。为了实现延迟绑定，链接器在初始化阶段中并不将<code>foo()</code>的地址填入到<code>foo@GOT</code>中，而是将<code>push n</code>指令的地址填入其中。当函数<code>foo()</code>第一次调用时，<code>jmp *(foo@GOT)</code>指令跳转到<code>push n</code>指令，<code>n</code>是<code>foo</code>这个符号引用在重定位表<code>.rel.plt</code>中的下标，被压入堆栈。接着<code>push moduleID</code>指令将模块的<code>ID</code>压入堆栈，然后跳转到<code>_dl_runtime_resolve</code>。<code>_dl_runtime_resolve()</code>函数使用参数<code>n</code>和<code>moduleID</code>将<code>foo()</code>的真正地址填入<code>foo@GOT</code>中。当第二次调用<code>foo()</code>函数时，<code>jmp *(foo@GOT)</code>指令直接跳转到<code>foo()</code>函数中。</p>
+<p>ELF将<code>GOT</code>拆分成了两个表叫做<code>.got</code>和<code>.got.plt</code>。其中<code>.got</code>用来保存全局变量引用的地址，<code>.got.plt</code>用来保存函数引用的地址，也就是说，所有对于外部函数的引用全部被分离出来放到了<code>.got.plt</code>中。另外<code>.got.plt</code>还有一个特殊的地方是它的前三项是有特殊意义的，分别含义如下：</p>
+<ul>
+<li>第一项是<code>.dynamic</code>段的地址，这个段描述了本模块动态链接相关的信息</li>
+<li>第二项是本模块的<code>ID</code></li>
+<li>第三项是<code>_dl_runtime_resolve()</code>的地址</li>
+</ul>
+<p>其中第二项和第三项由动态链接器在装载共享模块的时候负责将它们初始化。<code>.got.plt</code>其余项分别对应每个外部函数的引用。</p>
+<p><code>PLT</code>在ELF文件中以独立的段存放，段名通常叫做<code>.plt</code>，因为它本身是一些地址无关的代码，所以可以跟代码段等一起合并成同一个可读可执行的<code>Segment</code>被装载入内存。</p>
+<h1 id="相关结构"><a href="#相关结构" class="headerlink" title="相关结构"></a>相关结构</h1><p>动态链接情况下，可执行文件的装载与静态链接情况基本一样。首先操作系统会读取可执行文件的头部，检查文件的合法性，然后从头部中的<code>Program Header</code>中读取每个<code>Segment</code>的虚拟地址、文件地址和属性，并将它们映射到进程虚拟地址空间的相应位置，这些步骤跟前面的静态链接情况下的装载基本无异。在静态链接情况下，操作系统将控制权交给可执行文件的入口地址，然后程序开始执行；而在动态链接情况下，操作系统会先启动一个动态链接器<code>(Dynamic Linker)</code>。</p>
+<p>在Linux下，动态链接器<code>ld.so</code>实际上是一个共享对象，操作系统同样通过映射的方式将它加载到进程的地址空间中。动态链接器得到控制权后，它开始执行一系列自身的初始化操作，然后根据当前的环境参数，开始对可执行文件进行动态链接工作。</p>
+<h2 id="interp段"><a href="#interp段" class="headerlink" title=".interp段"></a>.interp段</h2><p>在ELF可执行文件中，有一个专门的段叫做<code>.interp</code>段，其内容很简单，就是一个字符串。这个字符串就是可执行文件所需要的动态链接器的路径，在Linux下，可执行文件所需要的动态链接器的路径几乎都是<code>/lib/ld-linux.so.2</code>，<code>/lib/ld-linux.so.2</code>通常是一个软链接，指向<code>/lib/ld-2.6.1.so</code>等真正的动态链接器。动态链接器在Linux下是<code>Glibc</code>的一部分，也就是属于系统库级别的，它的版本号往往跟系统中的<code>Glibc</code>库版本号是一样的。当系统中的<code>Glibc</code>库更新或者安装其他版本的时候，<code>/lib/ld-linux.so.2</code>这个软链接就会指向新的动态链接器，而可执行文件本身不需要修改<code>.interp</code>中的动态链接器路径来适应系统的升级。</p>
+<h2 id="dynamic段"><a href="#dynamic段" class="headerlink" title=".dynamic段"></a>.dynamic段</h2><p>动态链接ELF中最重要的结构应该是<code>.dynamic</code>段，这个段里保存了动态链接器所需要的基本信息，比如依赖于哪些共享对象、动态链接符号表的位置、动态链接重定位表的位置、共享对象初始化代码的地址等。其结构数组的结构体如下：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">dynamic</span>&#123;</span></span><br><span class="line">  Elf32_Sword d_tag;</span><br><span class="line">  <span class="class"><span class="keyword">union</span>&#123;</span></span><br><span class="line">    Elf32_Sword	d_val;</span><br><span class="line">    Elf32_Addr	d_ptr;</span><br><span class="line">  &#125; d_un;</span><br><span class="line">&#125; Elf32_Dyn;</span><br></pre></td></tr></table></figure>
+
+<p><code>Elf32_Dyn</code>结构由一个类型值加上一个附加的数值或指针，对于不同的类型，后面附加的数值或者指针有着不同的含义。比较常见的如下表：</p>
+<table>
+<thead>
+<tr>
+<th align="center">d_tag类型</th>
+<th align="center">d_un的含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">DT_SYMTAB</td>
+<td align="center">动态链接符号表的地址，d_str表示<code>.dynsym</code>的地址</td>
+</tr>
+<tr>
+<td align="center">DT_STRTAB</td>
+<td align="center">动态链接字符串表地址，d_str表示<code>.dynstr</code>的地址</td>
+</tr>
+<tr>
+<td align="center">DT_STRSZ</td>
+<td align="center">动态链接字符串表的大小，d_val表示大小</td>
+</tr>
+<tr>
+<td align="center">DT_HASH</td>
+<td align="center">动态链接哈希表地址，d_ptr表示<code>.hash</code>的地址</td>
+</tr>
+<tr>
+<td align="center">DT_SONAME</td>
+<td align="center">本共享对象的<code>SO-NAME</code></td>
+</tr>
+<tr>
+<td align="center">DT_RPATH</td>
+<td align="center">动态链接共享对象搜索路径</td>
+</tr>
+<tr>
+<td align="center">DT_INIT</td>
+<td align="center">初始化代码地址</td>
+</tr>
+<tr>
+<td align="center">DT_FINIT</td>
+<td align="center">结束代码地址</td>
+</tr>
+<tr>
+<td align="center">DT_NEEDED</td>
+<td align="center">依赖的共享对象文件，d_str表示所依赖的共享对象文件名</td>
+</tr>
+<tr>
+<td align="center">DT_REL<br />DT_RELA</td>
+<td align="center">动态链接重定位表地址</td>
+</tr>
+<tr>
+<td align="center">DT_RELENT<br />DT_RELAENT</td>
+<td align="center">动态重读位表入口数量</td>
+</tr>
+</tbody></table>
+<h2 id="动态符号表"><a href="#动态符号表" class="headerlink" title="动态符号表"></a>动态符号表</h2><p>为了表示动态链接这些模块之间的符号导入导出关系，ELF专门有一个叫做动态符号表<code>(Dynamic Symbol Table)</code>的段用来保存这些信息，这个段的段名通常叫做<code>.dynsym(Dynamic Symbol)</code>。与<code>.symtab</code>不同的是，<code>.dynsym</code>只保存了与动态链接相关的符号，对于那些模块内部的符号，比如模块私有变量则不保存。很多时候动态链接的模块同时拥有<code>.symtab</code>和<code>.dynsym</code>两个表，<code>.symtab</code>中往往保存了所有符号，包括<code>.dynsym</code>中的符号。</p>
+<p>与<code>.symtab</code>类似，<code>.dynsym</code>也需要一些辅助的表，比如用于保存符号名的字符串表。静态链接是叫<code>.strtab</code>，动态链接叫<code>.dynstr</code>；由于动态链接下，需要在程序运行时查找符号，为了加快符号的查找过程，往往还有辅助的符号哈希表<code>(.hash)</code>。</p>
+<h2 id="动态链接重定位表"><a href="#动态链接重定位表" class="headerlink" title="动态链接重定位表"></a>动态链接重定位表</h2><p>共享对象需要重定位的主要原因是导入符号的存在。动态链接下，无论是可执行文件或共享对象，一旦它依赖于其他共享对象，也就是有导入的符号时，那么它的代码或数据中就会有对于导入符号的引用。在动态链接中，导入符号的地址在运行时才确定，所以需要在运行时将这些导入符号的引用修正，即需要重定位。对于使用<code>PIC</code>技术的可执行文件或共享对象来说，虽然它们的代码段不需要重定位<code>(因为地址无关)</code>，但是数据段还包含了绝对地址的引用，因为代码段中绝对地址相关的部分被分离了出来，变成了<code>GOT</code>，而<code>GOT</code>实际上是数据段的一部分。除了<code>GOT</code>以外，数据段还可能包含绝对地址引用。</p>
+<p>动态链接的文件中，也有名为<code>.rel.dyn</code>和<code>.rel.plt</code>的重定位表。<code>.rel.dyn</code>实际上是对数据引用的修正，它所修正的位置位于<code>.got</code>以及数据段；而<code>.rel.plt</code>是对函数引用的修正，它所修正的位置位于<code>.got.plt</code>。如果某个ELF文件是以<code>PIC</code>模式编译的，并调用类一个函数<code>foo</code>，那么<code>foo</code>会出现在<code>.rel.plt</code>中；如果不是以<code>PIC</code>模式编译的，那么<code>foo</code>将出现在<code>.rel.dyn</code>中。</p>
+<h2 id="进程堆栈信息初始化"><a href="#进程堆栈信息初始化" class="headerlink" title="进程堆栈信息初始化"></a>进程堆栈信息初始化</h2><p>进程初始化时，堆栈里面保存了关于进程执行环境和命令行参数等信息。事实上，堆栈里面还保存了动态链接器所需要的一些辅助信息数组<code>(Auxiliary Vector)</code>。辅助信息的格式也是一个结构数组，它的结构被定义在<code>elf.h</code>：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="keyword">uint32_t</span> a_type;</span><br><span class="line">    <span class="class"><span class="keyword">union</span></span></span><br><span class="line"><span class="class">    &#123;</span></span><br><span class="line">        <span class="keyword">uint32_t</span> a_val;</span><br><span class="line">    &#125; a_un;</span><br><span class="line">&#125; Elf32_auxv_t;</span><br></pre></td></tr></table></figure>
+
+<p>常见类型值如下：</p>
+<table>
+<thead>
+<tr>
+<th align="center">a_type定义</th>
+<th align="center">a_type值</th>
+<th align="center">a_val的含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">AT_NULL</td>
+<td align="center">0</td>
+<td align="center">表示辅助信息数组结束</td>
+</tr>
+<tr>
+<td align="center">AT_EXEFD</td>
+<td align="center">2</td>
+<td align="center">表示可执行文件的文件句柄</td>
+</tr>
+<tr>
+<td align="center">AT_PHDR</td>
+<td align="center">3</td>
+<td align="center">可执行文件中程序头表在进程中的地址</td>
+</tr>
+<tr>
+<td align="center">AT_PHENT</td>
+<td align="center">4</td>
+<td align="center">可执行文件头中程序头表中每一个入口的大小</td>
+</tr>
+<tr>
+<td align="center">AT_PHNUM</td>
+<td align="center">5</td>
+<td align="center">可执行文件头中程序头表中入口的数量</td>
+</tr>
+<tr>
+<td align="center">AT_BASE</td>
+<td align="center">7</td>
+<td align="center">表示动态链接器本身的装载地址</td>
+</tr>
+<tr>
+<td align="center">AT_ENTRY</td>
+<td align="center">9</td>
+<td align="center">可执行文件入口地址，即启动地址</td>
+</tr>
+</tbody></table>
+<h1 id="步骤与实现"><a href="#步骤与实现" class="headerlink" title="步骤与实现"></a>步骤与实现</h1><p>动态链接基本分为3步：先是启动动态链接器本身，然后装载所有需要的共享对象，最后是重定位和初始化。</p>
+<h2 id="动态链接器自举"><a href="#动态链接器自举" class="headerlink" title="动态链接器自举"></a>动态链接器自举</h2><p>动态链接器本身也是一个共享对象，但是其不能依赖其他任何共享对象，且重定位工作由它自身完成。对于第一个条件，可以人为地控制，在编写动态链接器时保证不使用任何系统库、运行库；对于第二个条件，动态链接器必须在启动时有一段非常精巧的代码可以完成这项艰巨的工作而同时又不能用到全局和静态变量。这种具有一定限制条件的启动代码往往被称为自举<code>(Bootstrap)</code>。</p>
+<p>动态链接器的入口即是自举代码的入口，当操作系统将进程控制权交给动态链接器时，动态链接器的自举代码即开始执行。自举代码首先会找到自己的<code>GOT</code>，而<code>GOT</code>的第一个入口保存的即是<code>.dynamic</code>段的偏移地址，由此找到了动态链接器本身的<code>.dynamic</code>段。从而得到动态链接器本身的重定位入口，先将它们全部重定位。从这一步开始，动态链接器代码中才可以开始使用自己的全局变量和静态变量。</p>
+<p>实际上在动态链接器的自举代码中，除了不可以使用全局变量和静态变量之外，甚至不能调用函数，即动态链接器本身的函数也不能调用。实际上使用<code>PIC</code>模式编译的共享对象，对于模块内部的函数调用也是采用跟模块外部函数调用一样的方式，即使用<code>GOT/PLT</code>的方式，所以在<code>GOT/PLT</code>没有被重定位之前，自举代码不可以使用任何全局变量，也不可以调用函数。</p>
+<h2 id="装载共享对象"><a href="#装载共享对象" class="headerlink" title="装载共享对象"></a>装载共享对象</h2><p>完成基本自举以后，动态链接器将可执行文件和链接器本身的符号表都合并到一个符号表当中，称之为全局符号表<code>(Global Symbol Table)</code>。然后链接器开始寻找可执行文件所依赖的共享对象，也就是<code>.dynamic</code>段中类型为<code>DT_NEEDED</code>的入口，其指出的是该可执行文件<code>(或共享对象)</code>所依赖的共享对象。由此，链接器可以列出可执行文件所需要的所有共享对象，并将这些共享对象的名字放入到一个装载集合中。然后链接器开始从集合里取一个所需要的共享对象的名字，找到相应的文件后打开该文件，读取相应的ELF文件头和<code>.dynamic</code>段，然后将它相应的代码段和数据段映射到进程空间中。如果该共享对象还依赖于其他共享对象，那么将所依赖的共享对象的名字放入装载集合中。循环直至所有依赖的共享对象都被装载进来为止。</p>
+<p>链接器可能会选择使用深度优先或者广度优先或者其他顺序来遍历整个图，这取决于链接器，比较常见的算法一般都是广度优先的。当一个新的共享对象被装载进来的时候，它的符号表会被合并到全局符号表中，所以当所有共享对象都被装载进来的时候，全局符号表里面将包含进程中所有的动态链接所需要的符号。</p>
+<p>在动态链接器装载共享对象的过程中，会出现一种一个共享对象里面的全局符号被另一个共享对象的同名全局符号覆盖的现象，称为共享对象的全局符号介入<code>(Global Symbol Interpose)</code>。实际上Linux下的动态链接器是这样处理的：它定义了一个规则，那就是当一个符号需要被加入全局符号表时，如果相同的符号名已经存在，则后加入的符号被忽略。因此当程序使用大量共享对象时应该非常小心符号的重名问题，如果两个符号重名又执行不同的功能，那么程序运行时可能会将所有该符号名的引用解析到第一个被加入全局符号表的使用该符号名的符号，导致莫名其妙的错误。</p>
+<h2 id="重定位和初始化"><a href="#重定位和初始化" class="headerlink" title="重定位和初始化"></a>重定位和初始化</h2><p>完成上面的步骤后，链接器重新开始遍历可执行文件和每个共享对象的重定位表，将它们的<code>GOT/PLT</code>中的每个需要重定位的位置进行修正。由于动态链接器已经拥有了进程的全局符号表，所以这个修正过程也显得比较容易。</p>
+<p>重定位完成后，如果某个共享对象有<code>.init</code>段，那么动态链接器会执行<code>.init</code>段中的代码，用以实现共享对象特有的初始化过程，比如，共享对象中的<code>C++</code>的全局&#x2F;静态变量的构造就需要通过<code>.init</code>来初始化。相应地，还可能有<code>.finit</code>段，当进程退出时会执行<code>.finit</code>段中的代码，可以用来实现类似<code>C++</code>全局对象析构之类的操作。如果进程的可执行文件也有<code>.init</code>段，那么动态链接器不会执行它，因为可执行文件中的<code>.init</code>段和<code>.finit</code>段由程序初始化部分代码负责执行。</p>
+<p>当完成了重定位和初始化之后，所有的准备工作就完成了，所需要的共享对象也都已经装载并且链接完成了，动态链接器就可以将进程的控制权转交给程序的入口并且开始执行。</p>
+<h1 id="显示运行时链接"><a href="#显示运行时链接" class="headerlink" title="显示运行时链接"></a>显示运行时链接</h1><p>支持动态链接的系统往往都支持一种更加灵活的模块加载方式，叫做显示运行时链接<code>(Explicit Run-time Linking)</code>，有时也叫做运行时加载。也就是让程序自己在运行时控制加载指定的模块，并且可以在不需要该模块时将其卸载。这种运行时加载在理论上很容易实现，而且一般的共享对象不需要进行任何修改就可以进行运行时装载，这种共享对象往往被叫做动态装载库<code>(Dynamic Loading Library)</code>，其实本质上它跟一般的共享对象没什么区别，只是程序开发者使用它的角度不同。</p>
+<p>这种运行时加载使得程序的模块组织变得很灵活，可以用来实现一些诸如插件、驱动等功能。当程序需要用到某个插件或者驱动的时候，才将相应的模块装载进来，而不需要从一开始就将它们全部装载进来，从而减少了程序启动时间和内存使用。并且程序可以在运行的时候重新加载某个模块，这样使得程序本身不必重新启动而实现模块的增加、删除、更新等。</p>
+<p>在Linux中，从文件本身的格式上来看，动态库实际上跟一般的共享对象没有区别。主要的区别是共享对象是由动态链接器在程序启动之前负责装载和链接的；而动态库的装载则是通过一系列由动态链接器提供的<code>API</code>，具体地讲有4个函数：打开动态库<code>(dlopen)</code>、查找符号<code>(dlsym)</code>、错误处理<code>(dlerror)</code>、以及关闭动态库<code>(dlclose)</code>。这几个<code>API</code>的实现是在<code>/lib/libdl.so.2</code>里面，它们的声明和相关常量被定义在系统标准头文件<code>&lt;dlfcn.h&gt;</code>。</p>
+<h1 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h1><ul>
+<li>《程序员的自我修养——链接、装载与库》</li>
+</ul>
+]]></content>
+      <categories>
+        <category>Linker and Loader</category>
+      </categories>
+      <tags>
+        <tag>Basic</tag>
+      </tags>
+  </entry>
 </search>
