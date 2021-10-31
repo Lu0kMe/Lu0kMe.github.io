@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-lu0k.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-lu0k.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-lu0k.png">
+  <link rel="mask-icon" href="/images/lu0k.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"lu0k.github.io","root":"/","images":"/images","scheme":"Gemini","version":"8.7.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+<meta name="description" content="共享库简介由于动态链接的诸多优点，大量的程序开始使用动态链接机制，导致系统中存在数量庞大的共享对象。如果没有很好的方法将这些共享对象组织起来，整个系统中的共享对象文件则会散落在各个目录下，给长期的维护、升级造成了很大的问题。操作系统一般会对共享对象的目录组织和使用方法有一定的规则，Linux下使用共享库(Shared Library)的概念来组织共享库。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux共享库">
+<meta property="og:url" content="https://lu0k.github.io/posts/linux-so/index.html">
+<meta property="og:site_name" content="Lu0k">
+<meta property="og:description" content="共享库简介由于动态链接的诸多优点，大量的程序开始使用动态链接机制，导致系统中存在数量庞大的共享对象。如果没有很好的方法将这些共享对象组织起来，整个系统中的共享对象文件则会散落在各个目录下，给长期的维护、升级造成了很大的问题。操作系统一般会对共享对象的目录组织和使用方法有一定的规则，Linux下使用共享库(Shared Library)的概念来组织共享库。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-10-30T16:00:00.000Z">
+<meta property="article:modified_time" content="2021-10-31T14:51:33.078Z">
+<meta property="article:author" content="Lu0k">
+<meta property="article:tag" content="Basic">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://lu0k.github.io/posts/linux-so/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://lu0k.github.io/posts/linux-so/","path":"posts/linux-so/","title":"Linux共享库"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Linux共享库 | Lu0k</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">Lu0k</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Lu0k's Blog</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%85%B1%E4%BA%AB%E5%BA%93%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">共享库简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%85%B1%E4%BA%AB%E5%BA%93%E7%89%88%E6%9C%AC"><span class="nav-number">2.</span> <span class="nav-text">共享库版本</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B1%E4%BA%AB%E5%BA%93%E5%85%BC%E5%AE%B9%E6%80%A7"><span class="nav-number">2.1.</span> <span class="nav-text">共享库兼容性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B1%E4%BA%AB%E5%BA%93%E7%89%88%E6%9C%AC%E5%91%BD%E5%90%8D"><span class="nav-number">2.2.</span> <span class="nav-text">共享库版本命名</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SO-NAME"><span class="nav-number">2.3.</span> <span class="nav-text">SO-NAME</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AC%A6%E5%8F%B7%E7%89%88%E6%9C%AC"><span class="nav-number">3.</span> <span class="nav-text">符号版本</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E%E7%AC%A6%E5%8F%B7%E7%9A%84%E7%89%88%E6%9C%AC%E6%9C%BA%E5%88%B6"><span class="nav-number">3.1.</span> <span class="nav-text">基于符号的版本机制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Solaris%E4%B8%AD%E7%9A%84%E7%AC%A6%E5%8F%B7%E7%89%88%E6%9C%AC"><span class="nav-number">3.2.</span> <span class="nav-text">Solaris中的符号版本</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Linux%E4%B8%AD%E7%9A%84%E7%AC%A6%E5%8F%B7%E7%89%88%E6%9C%AC"><span class="nav-number">3.3.</span> <span class="nav-text">Linux中的符号版本</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%85%B1%E4%BA%AB%E5%BA%93%E8%B7%AF%E5%BE%84"><span class="nav-number">4.</span> <span class="nav-text">共享库路径</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%85%B1%E4%BA%AB%E5%BA%93%E6%9F%A5%E6%89%BE"><span class="nav-number">5.</span> <span class="nav-text">共享库查找</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%9B%B8%E5%85%B3%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F"><span class="nav-number">6.</span> <span class="nav-text">相关环境变量</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#LD-LIBRARY-PATH"><span class="nav-number">6.1.</span> <span class="nav-text">LD_LIBRARY_PATH</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#LD-PRELOAD"><span class="nav-number">6.2.</span> <span class="nav-text">LD_PRELOAD</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#LD-DEBUG"><span class="nav-number">6.3.</span> <span class="nav-text">LD_DEBUG</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%85%B1%E4%BA%AB%E5%BA%93%E7%9A%84%E5%88%9B%E5%BB%BA%E4%B8%8E%E5%AE%89%E8%A3%85"><span class="nav-number">7.</span> <span class="nav-text">共享库的创建与安装</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B1%E4%BA%AB%E5%BA%93%E7%9A%84%E5%88%9B%E5%BB%BA"><span class="nav-number">7.1.</span> <span class="nav-text">共享库的创建</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B8%85%E6%A5%9A%E7%AC%A6%E5%8F%B7%E4%BF%A1%E6%81%AF"><span class="nav-number">7.2.</span> <span class="nav-text">清楚符号信息</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B1%E4%BA%AB%E5%BA%93%E7%9A%84%E5%AE%89%E8%A3%85"><span class="nav-number">7.3.</span> <span class="nav-text">共享库的安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B1%E4%BA%AB%E5%BA%93%E6%9E%84%E9%80%A0%E5%92%8C%E6%9E%90%E6%9E%84%E5%87%BD%E6%95%B0"><span class="nav-number">7.4.</span> <span class="nav-text">共享库构造和析构函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B1%E4%BA%AB%E5%BA%93%E8%84%9A%E6%9C%AC"><span class="nav-number">7.5.</span> <span class="nav-text">共享库脚本</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Reference"><span class="nav-number">8.</span> <span class="nav-text">Reference</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-overview">
+            <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Lu0k"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Lu0k</p>
+  <div class="site-description" itemprop="description">谦虚学习!</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">31</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">27</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/lu0k" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;lu0k" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/Lu0kMe" title="Twitter → https:&#x2F;&#x2F;twitter.com&#x2F;Lu0kMe" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://lu0k.github.io/posts/linux-so/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Lu0k">
+      <meta itemprop="description" content="谦虚学习!">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Lu0k">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Linux共享库
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-10-31 00:00:00" itemprop="dateCreated datePublished" datetime="2021-10-31T00:00:00+08:00">2021-10-31</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Linker-and-Loader/" itemprop="url" rel="index"><span itemprop="name">Linker and Loader</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="共享库简介"><a href="#共享库简介" class="headerlink" title="共享库简介"></a>共享库简介</h1><p>由于动态链接的诸多优点，大量的程序开始使用动态链接机制，导致系统中存在数量庞大的共享对象。如果没有很好的方法将这些共享对象组织起来，整个系统中的共享对象文件则会散落在各个目录下，给长期的维护、升级造成了很大的问题。操作系统一般会对共享对象的目录组织和使用方法有一定的规则，Linux下使用共享库<code>(Shared Library)</code>的概念来组织共享库。</p>
+<span id="more"></span>
+
+<h1 id="共享库版本"><a href="#共享库版本" class="headerlink" title="共享库版本"></a>共享库版本</h1><h2 id="共享库兼容性"><a href="#共享库兼容性" class="headerlink" title="共享库兼容性"></a>共享库兼容性</h2><p>共享库的开发者会不停地更新共享库的版本，以修正原有的<code>Bug</code>、增加新的功能或改进性能等。由于动态链接的灵活性，使得程序本身和程序所依赖的共享库可以分别独立开发和更新。但是共享库版本的更新可能会导致接口的更改和删除，这可能导致依赖于该共享库的程序无法正常运行。最简单的情况下，共享库的更新可以被分为两类：</p>
+<ul>
+<li>兼容更新：所有的更新只是在原有的共享库基础上添加一些内容，所有原有的接口都保持不变</li>
+<li>不兼容更新：共享库更新改变了原有的接口，使用该共享库原有接口的程序可能不能运行或运行不正常</li>
+</ul>
+<p>这里的接口指的是二进制接口<code>(ABI, Application Binary Interface)</code>。共享库的<code>ABI</code>跟程序语言有着很大的关系，不同的语言对于接口的兼容性要求不同。<code>ABI</code>对于不同的语言来说，主要包括一些诸如函数调用的堆栈结构、符号命名、参数规则、数据结构的分布等方面的规则。导致C语言的共享库<code>ABI</code>改变的行为主要有如下4个：</p>
+<ul>
+<li>导出函数的行为发生改变，也就是说调用这个函数以后产生的结果与以前不一样，不再满足旧版本规定的函数行为准则</li>
+<li>导出函数被删除</li>
+<li>导出数据的结构发生变化，比如共享库定义的结构体变量发生改变：结构成员删除、顺序改变或其他引起结构体内存布局变化的行为<code>(通常来讲，往结构体的尾部添加成员不会导致不兼容，当然这个结构体必须是共享库内部分配的，如果是外部分配的，在分配该结构体时必须考虑成员添加的情况)</code></li>
+<li>导出函数的接口发生变化，如函数返回值、参数被更改</li>
+</ul>
+<p>如果能够保证上述4种情况不发生，那么绝大部分情况下，C语言的共享库将会保持<code>ABI</code>兼容。需要注意的是，仅仅是绝大部分情况下，很多因素会导致<code>ABI</code>的不兼容，比如不同版本的编译器、操作系统和硬件平台等，使得<code>ABI</code>兼容尤为困难。使用不同版本的编译器或者系统库可能会导致结构体的成员对齐方式不一致，从而导致了<code>ABI</code>的变化。这种<code>ABI</code>不兼容往往会导致一些难以定位的问题。</p>
+<h2 id="共享库版本命名"><a href="#共享库版本命名" class="headerlink" title="共享库版本命名"></a>共享库版本命名</h2><p>由于共享库存在兼容性问题，那么保持共享库在系统中的兼容性、保证依赖于它们的应用程序能够正常运行是必须要解决的问题。有几种办法可用于解决共享库的兼容性问题，有效办法之一是使用共享库版本的方法。Linux有一套规则来命名系统中的每一个共享库，它规定共享库的文件命名规则必须如下：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">libname.so.x.y.z</span><br></pre></td></tr></table></figure>
+
+<p>最前面使用前缀<code>lib</code>、中间是库的名字和后缀<code>.so</code>，最后是三个数字组成的版本号。<code>x</code>表示主版本号<code>(Major Version Number)</code>，<code>y</code>表示次版本号<code>(Minor Version Number)</code>，<code>z</code>表示发布版本号<code>(Release Version Number)</code>。</p>
+<p>主版本号表示库的重大升级，不同主版本号的库之间是不兼容的，依赖于旧的主版本号的程序要改动相应的部分，并且重新编译，才可以在新版的共享库中运行；或者，系统必须保留旧版的共享库，使得那些依赖于旧版共享库的程序能够正常运行。</p>
+<p>次版本号表示库的增量升级，即增加一些新的接口符号，且保持原来的符号不变。在主版本号相同的情况下，高的次版本号的库向后兼容低的次版本号的库。一个依赖于旧的次版本号共享库的程序，可以在新的次版本号共享库中运行，因为新版中保留了原来所有的接口，并且不改变它们的定义和含义。</p>
+<p>发布版本号表示库的一些错误修正、性能的改进等，并不添加任何新的接口，也不对接口进行更改。相同的主版本号、次版本号的共享库，不同的发布版本号之间完全兼容，依赖于某个发布版本号的程序可以在任何一个其他发布版本号中正常运行，而无需做任何更改。</p>
+<p>现在Linux中也存在不少不遵守上述规定的库，比如C语言库<code>Clibc</code>就不使用这种规则，它的基本C语言库以及许多其它组件都使用<code>libc-x.y.z.so</code>的命名方式。</p>
+<h2 id="SO-NAME"><a href="#SO-NAME" class="headerlink" title="SO-NAME"></a>SO-NAME</h2><p>可以说，共享库的主版本号和次版本号决定了一个共享库的接口。在运行时，动态链接器需要知道程序依赖哪些共享库以及它们的版本。可以肯定的是，程序中必须包含被依赖的共享库的名字和主版本号。由于不同主版本号之间的共享库是完全不兼容的，所以程序保存一个诸如<code>libfoo.so.2</code>的记录，以防止动态链接器在运行时意外地将程序与<code>libfoo.so.1</code>或<code>libfoo.so.3</code>链接到一起。因此，如果在系统中运行旧的应用程序，就需要在系统中保留旧应用程序所需要的旧的主版本号的共享库。</p>
+<p>对于Solaris和Linux等操作系统来说，普遍采用一种叫做<code>SO-NAME</code>的命名机制来记录共享库的依赖关系。每个共享库都有一个对应的<code>SO-NAME</code>，这个<code>SO-NAME</code>即共享库的文件名去掉次版本号和发布版本号，保留主版本号。<code>SO-NAME</code>规定了共享库的接口，<code>SO-NAME</code>的两个相同共享库，次版本号大的兼容次版本号小的。在Linux系统中，系统会为每个共享库在它所在的目录创建一个跟<code>SO-NAME</code>相同的并且指向它的软链接<code>(Symbol Link)</code>。以<code>SO-NAME</code>为名字的软链接会指向目录中主版本号相同、次版本号和发布版本最新的共享库。这样就保证了所有的以<code>SO-NAME</code>为名的软链接都指向系统中最新的共享库。</p>
+<p>建立以<code>SO-NAME</code>为名字的软链接的目的是使得所有依赖某个共享库的模块，在编译、链接和运行时，都使用共享库的<code>SO-NAME</code>，而不是用详细的版本号。编译输出ELF文件时，只需将被依赖共享库的<code>SO-NAME</code>保存到<code>.dynamic</code>中，动态链接器进行共享库依赖文件查找时，就会根据系统中各种共享库目录中的<code>SO-NAME</code>软链接自动定向到最新版本的共享库。</p>
+<p>当共享库进行升级时，如果只是进行增量升级，即保持主版本不变，只改变次版本号或发布版本号，那么可以直接将新版的共享库替换掉旧版，并且修改<code>SO-NAME</code>的软链接指向新版本共享库，即可实现升级；当共享库的主版本号升级时，系统中就会存在多个<code>SO-NAME</code>，由于这些<code>SO-NAME</code>并不相同，所以已有的程序并不会受影响。</p>
+<h1 id="符号版本"><a href="#符号版本" class="headerlink" title="符号版本"></a>符号版本</h1><p>动态链接器在查找共享库过程中，如果找到的共享库的次版本号高于或等于依赖列表中的版本，那么链接器就默认共享库满足要求，因为更高次版本号的共享库肯定包含所有需要的符号；如果找到的共享库次版本号低于所需要版本，一般有两种处理策略，一种是发出警告信息但继续运行，另一种是禁止运行，由此就产生了次版本号交会问题<code>(Minor-revision Rendezvous Problem)</code>。</p>
+<p>动态链接器在进行动态链接时，只进行主版本号的判断，即只判断<code>SO-NAME</code>，如果某个被依赖的共享库<code>SO-NAME</code>与系统中存在的实际共享库<code>SO-NAME</code>一致，那么系统就认为接口兼容，而不再进行兼容性检查。由于次版本号只保证向后兼容，并不保证向前兼容，当某个程序依赖于较高的次版本号的共享库，而运行于较低次版本号的共享库系统时，就可能产生缺少某些符号的错误。<code>SO-NAME</code>的存在并不能使次版本号交会问题得到改善，现代的系统通过符号版本机制来解决此问题。</p>
+<h2 id="基于符号的版本机制"><a href="#基于符号的版本机制" class="headerlink" title="基于符号的版本机制"></a>基于符号的版本机制</h2><p>Linux下的<code>Glibc</code>从版本2.1之后开始支持一种叫做基于符号的版本机制<code>(Symbol Versioning)</code>的方案。这个方案的基本思路是让每个导出和导入的符号都有一个相关联的版本号，它的实际做法类似于名称修饰的方法。采用这种方案，要求共享库每一次次版本号升级时，都给那些在新的次版本号中添加的符号打上相应的标记，就可以清楚地看到共享库中的每个符号都拥有相应的标签。</p>
+<h2 id="Solaris中的符号版本"><a href="#Solaris中的符号版本" class="headerlink" title="Solaris中的符号版本"></a>Solaris中的符号版本</h2><p>基于符号的版本机制方案最早是<code>Sun</code>在1995年的Solaris 2.5中实现的，在这个新的机制中，Solaris的<code>ld</code>链接器为共享库新增了版本机制<code>(Versioning)</code>和范围机制<code>(Scoping)</code>。</p>
+<p>版本机制的想法很简单，也就是定义一些符号的集合，这些集合本身都有名字，比如叫<code>VERS_1.1</code>，<code>VERS_1.2</code>等，每个集合都包含一些指定的符号，除了可以拥有符号以外，一个集合还可以包含另外一个集合。在Solaris中，程序员可以在链接共享库时编写一种叫做符号版本脚本的文件，在这个文件中指定这些符号与集合之间及集合与集合之间的继承依赖关系。链接器在链接时根据符号版本脚本中指定的关系来产生共享库，并且设置符号的集合与它们之间的关系。</p>
+<p>假设有个名为<code>libstack.so.1</code>的共享库编写的符号版本脚本文件如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">SUNW_1<span class="number">.1</span>&#123;</span><br><span class="line">    global:</span><br><span class="line">    pop;</span><br><span class="line">    push;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">SUNWprivate&#123;</span><br><span class="line">    global:</span><br><span class="line">    __pop;</span><br><span class="line">    __push;</span><br><span class="line">    local:</span><br><span class="line">    *;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个脚本文件中，可以看到它定义了两个符号集合，第一个包含了两个全局符号，第二个包含了两个全局符号。第二个集合中的<code>local:*;</code>表示除了上述被表示为全局符号的符号外，共享库中其他的本来是全局的符号都将成为共享库局部的符号，也就是说链接器会把原先是全局的符号全部变成局部的，这样一来，共享库外部的应用程序或其他的共享库将无法访问这些符号。这种方式可以用于保护那些在共享库内部的公用但共享库的作者不希望共享库的使用者能够访问的实用函数。这种方法又称为范围机制<code>(Scoping)</code>。</p>
+<p>当共享库的符号都有了版本集合之后，在构建<code>(编译和链接)</code>应用程序的时候，链接器可以在程序的最终输出文件中记录下它所用到的版本符号集合。值得注意的是，程序里面记录的不是构建时共享库中版本最新的符号集合，而是程序所依赖的集合中版本号最小的那个<code>(那些)</code>。当程序运行时，动态链接器会通过程序内记录的它所依赖的所有共享库的符号集合版本信息，然后判定当前系统共享库中的符号集合版本是否满足这些被依赖的符号集合。通过这样的机制，就可以保证那些在高此版本共享库的系统中编译的程序在低次版本共享库中运行。</p>
+<h2 id="Linux中的符号版本"><a href="#Linux中的符号版本" class="headerlink" title="Linux中的符号版本"></a>Linux中的符号版本</h2><p>Linux系统下共享库的符号版本机制并没有被广泛应用，主要使用共享库符号版本机制的是<code>Glibc</code>软件包中所提供的20多个共享库。这些共享库比较有效地利用了符号版本机制来表示符号的版本演化及利用范围机制来屏蔽一些不希望暴露给共享库使用者的符号。比如<code>Glibc</code>库中以<code>GCC_</code>为前缀及<code>GLIBC_PRIVATE</code>这样的符号版本，分别用于<code>GCC</code>编译器和<code>GLIBC</code>内部。</p>
+<p><code>GCC</code>在Solaris系统中的符号版本机制的基础上还提供了两个扩展。第一个扩展是，除了可以在符号版本脚本中指定符号的版本之外，还允许使用名为<code>.symver</code>的汇编宏指令来指定符号的版本，这个汇编宏指令可以被用在<code>GAS</code>汇编中，也可以在<code>GCC</code>的<code>C/C++</code>源代码中以嵌入汇编的模式使用。Linux下的符号版本机制比Solaris要先进一些，它允许同一个名称的符号存在多个版本，而Solaris不允许多个版本的同一个函数名存在，只允许该函数的某个版本存在。</p>
+<h1 id="共享库路径"><a href="#共享库路径" class="headerlink" title="共享库路径"></a>共享库路径</h1><p>目前大多数包括Linux在内的开源操作系统都遵守一个叫做FHS<code>(File Hierarchy Standard)</code>的标准，这个标准规定了一个系统中的系统文件应该如何存放，包括各个目录的结构、组织和作用，这有利于促进各个开源操作系统之间的兼容性。共享库作为系统中重要的文件，它们的存放方式也被FHS列入了规定范围。FHS规定，一个系统中主要有3个存放共享库的位置，它们分别如下：</p>
+<ul>
+<li><code>/lib</code>，这个位置主要存放系统最关键和基础的共享库，比如动态链接器、C语言运行库、数据库等，这些库主要是那些<code>/bin</code>和<code>/sbin</code>下的程序所要用到的库，还有系统启动时需要的库</li>
+<li><code>/usr/lib</code>，这个目录下主要保存的是一些非系统运行时所需要的关键性的共享库，主要是一些开发时用到的共享库，这些共享库一般不会被用户的程序或<code>shell</code>脚本直接用到。这个目录下面还包含了开发时可能会用到的静态库、目标文件等</li>
+<li><code>/usr/local/lib</code>，这个目录用来放置一些跟操作系统本身并不十分相关的库，主要是一些第三方的应用程序的库。GNU的标准推荐第三方的程序应该默认将库安装到<code>/usr/local/lib</code>下</li>
+</ul>
+<p>总体来看，<code>/bin</code>和<code>/usr/bin</code>是一些很常用的、成熟的，一般是系统本身所需要的库；而<code>/usr/lcoal/bin</code>是非系统所需的第三方程序的共享库。</p>
+<h1 id="共享库查找"><a href="#共享库查找" class="headerlink" title="共享库查找"></a>共享库查找</h1><p>在开源系统中，包括所有的Linux系统在内的很多系统都是基于<code>Glibc</code>的。在这些系统中，动态链接的ELF可执行文件在启动时同时会启动动态链接器。动态链接器对于模块的查找有一定的规则：如果<code>DT_NEEDED</code>里面保存的是绝对路径，那么动态链接器就按照这个路径去查找；如果<code>DT_NEEDED</code>里面保存的是相对路径，那么动态链接器会在<code>/bin</code>、<code>/usr/bin</code>和由<code>/etc/ld.so.conf</code>配置文件指定的目录中查找共享库。为了程序的可移植性和兼容性，共享库的路径往往是相对的。</p>
+<p><code>ld.so.conf</code>是一个文本配置文件，它可能包含其他的配置文件，这些配置文件中存放着目录信息。Linux系统中都有一个叫做<code>ldconfig</code>的程序，这个程序的作用是为共享库目录下的各个共享库创建、删除或更新相应的<code>SO-NAME(即相应的符号链接)</code>，这样每个共享库的<code>SO-NAME</code>就能够指向正确的共享库文件；并且这个程序还会将这些<code>SO-NAME</code>收集起来，集中存放到<code>/etc/ld.so.cache</code>文件里面，并建立一个<code>SO-NAME</code>的缓存。当动态链接器要查找共享库时，可以直接从<code>/etc/ld.so.cache</code>里面查找。而<code>/etc/ld.so.cache</code>的结构是经过特殊设计的，非常适合查找，大大加快了共享库的查找过程。</p>
+<p>如果<code>/etc/ld.so.cache</code>里面没有找到所需要的共享库，那么它还会遍历<code>/lib</code>和<code>/usr/lib</code>这两个目录，如果还是没找到，就会报错。</p>
+<h1 id="相关环境变量"><a href="#相关环境变量" class="headerlink" title="相关环境变量"></a>相关环境变量</h1><h2 id="LD-LIBRARY-PATH"><a href="#LD-LIBRARY-PATH" class="headerlink" title="LD_LIBRARY_PATH"></a>LD_LIBRARY_PATH</h2><p>改变共享库查找路径最简单的方法是使用<code>LD_LIBRARY_PATH</code>环境变量，这个方法可以临时改变某个应用程序的共享库查找路径，而不会影响系统中的其他程序。在Linux系统中，<code>LD_LIBRARY_PATH</code>是一个由若干个路径组成的环境变量，每个路径之间由冒号隔开。默认情况下，<code>LD_LIBRARY_PATH</code>为空。如果我们为某个进程设置了<code>LD_LIBRARY_PATH</code>，那么进程在启动时，动态链接器在查找共享库时，会首先查找由<code>LD_LIBRARY_PATH</code>指定的目录。这个环境变量可以很方便地测试新的共享库或使用非标准的共享库。例如想要使用动态库<code>libc.so.6</code>，可以将此文件放入目录<code>/home/user</code>中，然后指定<code>LD_LIBRARY_PATH</code>：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> LD_LIBRARY_PATH=/home/user /bin/ls</span></span><br></pre></td></tr></table></figure>
+
+<p>Linux中还有一种方法可以实现与<code>LD_LIBRARY_PATH</code>类似的功能，那就是直接运行动态链接器来启动程序，比如：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> /lib/ld-linux.so.2 -library-path /home/user /bin/ls</span></span><br></pre></td></tr></table></figure>
+
+<p>有了<code>LD_LIBRARY_PATH</code>之后，动态链接器会按如下顺序依次装载或查找共享对象<code>(目标文件)</code>：</p>
+<ul>
+<li>由环境变量<code>LD_LIBRARY_PATH</code>指定的路径</li>
+<li>由路径缓存文件<code>/etc/ld.so.cache</code>指定的路径</li>
+<li>默认共享库目录，先<code>/usr/lib</code>，然后<code>/lib</code></li>
+</ul>
+<p><code>LD_LIBRARY_PATH</code>对于共享库的开发和测试来说十分方便，但是不应滥用它。随意修改<code>LD_LIBRARY_PATH</code>并且将其导出至全局范围，将可能引起其他应用程序运行出现问题；<code>LD_LIBRARY_PATH</code>也会影响<code>GCC</code>编译时查找库的路径，它里面包含的目录相当于链接时<code>GCC</code>的<code>-L</code>参数。</p>
+<h2 id="LD-PRELOAD"><a href="#LD-PRELOAD" class="headerlink" title="LD_PRELOAD"></a>LD_PRELOAD</h2><p>在<code>LD_PRELOAD</code>里面指定的文件会在动态链接器按照固定规则搜索共享库之前装载，它比<code>LD_LIBRARY_PATH</code>里面所指定的目录中的共享库还要优先。无论程序是否依赖它们，<code>LD_PRELOAD</code>里面指定的共享库或目标文件都会被装载。由于全局符号介入这个机制的存在，<code>LD_PRELOAD</code>里面指定的共享库或目标文件中的全局符号就会覆盖后面加载的同名全局符号，可以很方便地做到改写标准C库中的某个或某几个函数而不影响其他函数，对于程序的调试或测试非常有用。与<code>LD_LIBRARY_PATH</code>一样，正常情况下应该尽量避免使用<code>LD_PRELOAD</code>。</p>
+<p>除了设置<code>LD_PRELOAD</code>环境变量以外，还有一个系统配置文件<code>/etc/ld.so.preload</code>，这个文件里面记录的共享库或者目标文件的效果跟<code>LD_PRELOAD</code>里面指定的一样，也会被提前装载。</p>
+<h2 id="LD-DEBUG"><a href="#LD-DEBUG" class="headerlink" title="LD_DEBUG"></a>LD_DEBUG</h2><p><code>LD_DEBUG</code>这个环境变量可以打开动态链接器的调试功能，当设置这个变量时，动态链接器会在运行时打印出各种有用的信息，可取值如下：</p>
+<ul>
+<li>files：显示程序与其所依赖的共享库的装载与初始化步骤</li>
+<li>bindings：显示动态链接的符号绑定过程</li>
+<li>libs：显示共享库的查找过程</li>
+<li>versions：显示符号的版本依赖关系</li>
+<li>reloc：显示重定位过程</li>
+<li>symbols：显示符号表查找过程</li>
+<li>statistics：显示动态链接过程中的各种统计信息</li>
+<li>all：显示以上所有信息</li>
+<li>help：显示上面的各种可选值的帮助信息</li>
+</ul>
+<h1 id="共享库的创建与安装"><a href="#共享库的创建与安装" class="headerlink" title="共享库的创建与安装"></a>共享库的创建与安装</h1><h2 id="共享库的创建"><a href="#共享库的创建" class="headerlink" title="共享库的创建"></a>共享库的创建</h2><p>创建共享库的过程最关键的是使用<code>GCC</code>的两个参数，即<code>-shared</code>和<code>-fPIC</code>。<code>-shared</code>表示输出结果是共享库类型的，<code>-fPIC</code>表示使用地址无关代码<code>(PIC, Position-Independent Code)</code>技术来生产输出文件。另外还有一个参数是<code>-Wl</code>，这个参数可以将指定的参数传递给链接器，比如使用<code>-Wl,-soname my_soname</code>传递参数给链接器，来指定输出共享库的<code>SO-NAME</code>。需要注意的是：</p>
+<ul>
+<li>不要把输出共享库中的符号和调试信息去掉，也不要使用<code>GCC</code>的<code>-formit-frame-pointer</code>选项，调试完成后可以去除</li>
+<li>在开发过程中，可能需要测试新的共享库，可以使用<code>LD_LIBRARY_PATH</code>，也可以使用链接器的<code>-rpath</code>选项<code>(GCC的-Wl,-rpath)</code></li>
+<li>默认情况下，链接器在产生可执行文件时，只会将那些链接时被其他共享模块引用到的符号放到动态符号表，这样可以减少动态符号表的大小。但是当程序使用<code>dlopen()</code>动态加载某个共享模块，而该共享模块需反向引用主模块中的符号时，有可能主模块的某些符号因为在链接时没有被其他共享模块引用而没有被放到动态符号表里面，导致反向引用失败。可以使用<code>ld</code>链接器的<code>-export-dynamic</code>参数将所有全局符号导出到动态符号表</li>
+</ul>
+<h2 id="清楚符号信息"><a href="#清楚符号信息" class="headerlink" title="清楚符号信息"></a>清楚符号信息</h2><p>正常情况下编译出来的共享库或可执行文件里面带有符号信息和调试信息，这些信息对于调试非常有用，但是对于最终发布的版本来说，这些符号信息用处不大，并使文件尺寸变大。可以使用<code>strip</code>消除所有符号和调试信息，或者使用<code>ld</code>的<code>-S</code>或<code>-s</code>参数，区别是<code>-S</code>消除调试符号信息，<code>-s</code>消除所有符号信息。</p>
+<h2 id="共享库的安装"><a href="#共享库的安装" class="headerlink" title="共享库的安装"></a>共享库的安装</h2><p>最简单的办法是将共享库复制到某个标准的共享目录，如<code>/lib</code>、<code>/usr/lib</code>等。然后运行<code>ldconfig</code>即可。也可以通过建立相应的<code>SO-NAME</code>软链接，并告诉编译器和程序如何查找该共享库。在编译程序时，也可以使用<code>GCC</code>的两个参数<code>-L</code>和<code>-l</code>，分别用于指定共享库搜索目录和共享库的路径。</p>
+<h2 id="共享库构造和析构函数"><a href="#共享库构造和析构函数" class="headerlink" title="共享库构造和析构函数"></a>共享库构造和析构函数</h2><p><code>GCC</code>提供了一种共享库的构造函数，只要在函数声明时加上<code>__attribute__((constructor))</code>的属性，即指定该函数为共享库构造函数，拥有这种属性的函数会在共享库加载时被执行，即在程序的<code>main</code>函数之前执行。如果使用<code>dlopen()</code>打开共享库，共享库构造函数会在<code>dlopen()</code>返回之前被执行。</p>
+<p>与共享库构造函数相对应的是析构函数，需要在函数声明时加上<code>__attribute__((destructor))</code>的属性，这种函数会在<code>main</code>函数执行完毕之后执行<code>(或者是程序调用exit()时执行)</code>。如果共享库是运行时加载的，则使用<code>dlclose()</code>来卸载共享库时，析构函数将会在<code>dlclose()</code>返回之前执行。声明构造和析构函数的格式如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> __attribute__((constructor)) init_function(<span class="keyword">void</span>);</span><br><span class="line"><span class="keyword">void</span> __attribute__((destructor)) finit_function(<span class="keyword">void</span>);</span><br></pre></td></tr></table></figure>
+
+<p>这种语法是<code>GCC</code>对<code>C/C++</code>语言的扩展，但是使用了这种析构或构造函数，那么必须使用系统默认的标准运行库和启动文件，即不可以使用<code>GCC</code>的<code>-nostartfiles</code>或<code>-nostdlib</code>两个参数。</p>
+<p>除此以外，如果有多个构造或析构函数，可以使用数字设定优先级。例如：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">void __attribute__((constructor(5))) init_function1(void);</span><br><span class="line">void __attribute__((constructor(9))) init_function2(void);</span><br></pre></td></tr></table></figure>
+
+<p>对于构造函数来说，属性中优先级数字越小的函数将会在优先级大的函数之前运行；而对于析构函数来讲，则刚好相反。</p>
+<h2 id="共享库脚本"><a href="#共享库脚本" class="headerlink" title="共享库脚本"></a>共享库脚本</h2><p>共享库还可以是符合一定格式的链接脚本文件。通过这种脚本文件，可以把几个现有的共享库通过一定的方式组合起来，从用户的角度看就是一个新的共享库。这里的脚本与<code>ld</code>的脚本从语法和命令上来讲没有什么区别，它们的作用也相似，即将一个或多个输入文件以一定的格式经过变换以后形成一个输出文件。这种共享库脚本叫做动态链接脚本，这个链接过程是动态完成的，也就是运行时完成的。</p>
+<h1 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h1><ul>
+<li>《程序员的自我修养——链接、装载与库》</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Basic/" rel="tag"><i class="fa fa-tag"></i> Basic</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/dynamic-link/" rel="prev" title="动态链接简析">
+                  <i class="fa fa-chevron-left"></i> 动态链接简析
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lu0k</span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <script size="250" alpha="0.5" zIndex="-1" src="https://cdn.jsdelivr.net/npm/ribbon.js@1.0.2/dist/ribbon.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>
