@@ -28,7 +28,7 @@
 <meta property="og:description" content="目标文件格式目标文件就是源代码编译后但未进行链接的那些中间文件(Windows的.obj和Linux的.o)，其内容和结构与可执行文件相似，所以一般与可执行文件采用一种格式存储。广义上来说，目标文件与可执行文件的格式几乎是一样的，所以我们可以广义地将目标文件与可执行文件视为一种类型的文件，在Windows下，统称为PE-COFF文件，在Linux下，统称为ELF文件。除了目标文件和可执行文件以外，">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-10-10T16:00:00.000Z">
-<meta property="article:modified_time" content="2021-10-18T09:54:49.063Z">
+<meta property="article:modified_time" content="2021-11-01T13:46:27.083Z">
 <meta property="article:author" content="Lu0k">
 <meta property="article:tag" content="Basic">
 <meta name="twitter:card" content="summary">
@@ -351,7 +351,7 @@
 </tbody></table>
 <p><strong><code>注：本文侧重于对Linking View的解析</code></strong></p>
 <p>示例程序：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;hello world!&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;hello world!&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>生成示例目标文件：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> gcc -c hello.c -o hello.o</span></span><br></pre></td></tr></table></figure>
