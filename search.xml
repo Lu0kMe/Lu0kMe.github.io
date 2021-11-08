@@ -3601,9 +3601,9 @@
 <li>临时RSA应用。美国出口法对RSA加密密钥长度进行了限制，因此，若希望能够同时与美国国内和国外客户端进行通信，就需要使用两种密钥</li>
 <li>Fortezza应用。在使用Fortezza生成密钥时，服务器利用该消息给客户端发送一个随机数以便客户端计算密钥</li>
 </ul>
-<h1 id="密钥导出"><a href="#密钥导出" class="headerlink" title="密钥导出"></a>密钥导出</h1><p>无论是使用密钥传输方式还是密钥协商方式，通信双方首先共享的都是预主密钥。SSL并不直接用这个密钥保护数据，而是将其和双方提供的随机数一起作为输入，生成4个用于保护数据的会话密钥，分别是服务器写加密密钥、服务器写MAC密钥、客户端写加密密钥和客户端写MAC密钥，它们分别用于服务器发出数据的加密和消息验证码计算操作，以及反方向客户端发出数据的加密和消息验证码计算操作。分别用Esc、Msc、Ecs、Mcs表示这4个密钥。使用四个密钥是为了增强通信的安全性，因为若加密被攻破且加密、MAC使用同一密钥的话，MAC也很容易被攻破了。</p>
+<h1 id="密钥导出"><a href="#密钥导出" class="headerlink" title="密钥导出"></a>密钥导出</h1><p>无论是使用密钥传输方式还是密钥协商方式，通信双方首先共享的都是预主密钥。SSL并不直接用这个密钥保护数据，而是将其和双方提供的随机数一起作为输入，生成4个用于保护数据的会话密钥，分别是服务器写加密密钥、服务器写MAC密钥、客户端写加密密钥和客户端写MAC密钥，它们分别用于服务器发出数据的加密和消息验证码计算操作，以及反方向客户端发出数据的加密和消息验证码计算操作。分别用E<sub>sc</sub>、M<sub>sc</sub>、E<sub>cs</sub>、M<sub>cs</sub>表示这4个密钥。使用四个密钥是为了增强通信的安全性，因为若加密被攻破且加密、MAC使用同一密钥的话，MAC也很容易被攻破了。</p>
 <p>通信双方最初共享的密钥之所以被称为预主密钥<code>(pre_master_secret)</code>，是因为SSLv3的密钥导出不是一步完成的，中间步骤获取的一个值被称为主密钥<code>(master_secret)</code>。整个密钥导出的过程如下：</p>
-<p>第一步计算的输入包括ClientHello和ServerHello中包含的随机数以及预主密钥，输出为主密钥；第二步计算的输入包括这两个随机数和主密钥，输出则是一个密钥分组。这个密钥被分为6段，依次被用作Mcs、Msc、Ecs、Esc、IVcs和IVsc，其中IVcs和IVsc分别是客户端和服务器所使用的初始化向量。具体的计算过程见<a href="https://datatracker.ietf.org/doc/html/rfc6101">SSLv3&#x2F;rfc6101 (ietf.org)</a>。</p>
+<p>第一步计算的输入包括ClientHello和ServerHello中包含的随机数以及预主密钥，输出为主密钥；第二步计算的输入包括这两个随机数和主密钥，输出则是一个密钥分组。这个密钥被分为6段，依次被用作M<sub>cs</sub>、M<sub>sc</sub>、E<sub>cs</sub>、E<sub>sc</sub>、IV<sub>cs</sub>和IV<sub>sc</sub>，其中IV<sub>cs</sub>和IV<sub>sc</sub>分别是客户端和服务器所使用的初始化向量。具体的计算过程见<a href="https://datatracker.ietf.org/doc/html/rfc6101">SSLv3&#x2F;rfc6101 (ietf.org)</a>。</p>
 <h1 id="SSLv3记录"><a href="#SSLv3记录" class="headerlink" title="SSLv3记录"></a>SSLv3记录</h1><p>记录层是SSL的数据承载层，记录则是它的数据传输单位。握手、警告、更改密码规范和高层协议数据都要封装到SSL记录中进行投递。SSL标准以规范语言的形式描述了记录格式及处理过程。</p>
 <h2 id="规范语言"><a href="#规范语言" class="headerlink" title="规范语言"></a>规范语言</h2><p>使用规范语言描述协议是一种常见的做法，它以一种无歧义而精简的方式描述协议报文的结构及其在线路上的传递方式。SSL规范语言定义了基本类型、向量、枚举、结构、变体、常量等类型。</p>
 <ul>
@@ -3616,7 +3616,7 @@
 <li>赋值：赋值即给一个变量赋予常量值</li>
 </ul>
 <h2 id="数据处理过程"><a href="#数据处理过程" class="headerlink" title="数据处理过程"></a>数据处理过程</h2><p>对于SSL发送方而言，记录层对数据的处理顺序依次为分片→压缩→计算MAC→加密，其中，分片是将高层协议数据划分为尺寸适当的片段，以便封装在记录中传递，压缩是为了提高数据传输的效率。此外，由于MAC计算先于加密处理，因此MAC也得到了加密保护。接收方的数据处理过程则依次为解密→验证MAC→解压→片段重组。具体的结构体声明见<a href="https://datatracker.ietf.org/doc/html/rfc6101">SSLv3&#x2F;rfc6101 (ietf.org)</a>。</p>
-<h2 id="消息格式"><a href="#消息格式" class="headerlink" title="消息格式"></a>消息格式</h2><p>SSL记录中既可能封装高层协议数据，也可能封装SSL协议数据。从SSL的角度来看，高层协议数据就是字节流，但SSL自身的各种消息必须有明确的定义。具体的定义见<a href="https://datatracker.ietf.org/doc/html/rfc6101">SSLv3&#x2F;rfc6101 (ietf.org)</a>。</p>
+<h2 id="消息格式"><a href="#消息格式" class="headerlink" title="消息格式"></a>消息格式</h2><p>SSL记录中既可能封装高层协议数据，也可能封装SSL协议数据。从SSL的角度来看，高层协议数据就是字节流，但SSL自身的各种消息必须有明确的定义。具体的各种消息定义见<a href="https://datatracker.ietf.org/doc/html/rfc6101">SSLv3&#x2F;rfc6101 (ietf.org)</a>。</p>
 <h1 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h1><ul>
 <li><a href="https://datatracker.ietf.org/doc/html/rfc6101">SSLv3&#x2F;rfc6101 (ietf.org)</a></li>
 </ul>
