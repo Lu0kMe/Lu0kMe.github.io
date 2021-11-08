@@ -3628,4 +3628,217 @@
         <tag>SSL</tag>
       </tags>
   </entry>
+  <entry>
+    <title>Kerberos协议</title>
+    <url>/posts/prot-kerberos/</url>
+    <content><![CDATA[<h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>Kerberos是一种网络身份认证协议，旨在通过使用密钥加密技术为客户端&#x2F;服务器应用程序提供强身份验证。Kerberos使用对称密码体制，并且依托可信第三方，使用Kerberos的用户和服务器都必须与第三方共享密钥。Kerberos实现了用户级的认证，其基本思想是：能正确解密信息的用户是有效的；用户在访问服务器之前必须首先从第三方获取身份凭证，即票据。除了票据以外，Kerberos第三方还会生成通信双方共享的会话密钥，除实施身份认证外，它还可以用于加密数据、计算MAC或保护随后的子会话密钥。</p>
+<span id="more"></span>
+
+<h1 id="安全威胁"><a href="#安全威胁" class="headerlink" title="安全威胁"></a>安全威胁</h1><p>在一个开放的分布式网络环境中，用户访问应用服务器时可能存在以下风险：</p>
+<ul>
+<li>同一工作站的某个用户可能冒充另一个用户操作该机器</li>
+<li>用户可以更改工作站的IP地址冒充另一台工作站</li>
+<li>攻击者可能实施重放攻击</li>
+<li>攻击者可能操纵某台机器冒充服务器</li>
+</ul>
+<p>针对上述风险，Kerberos实现了用户级的身份认证，并通过构造适当的票据格式以及认证符以防止IP地址伪造和重放攻击。此外，Kerberos定义了口令到密钥的转化机制，使得用户仅需记忆口令，而在认证过程中使用密钥。</p>
+<h1 id="协议流程"><a href="#协议流程" class="headerlink" title="协议流程"></a>协议流程</h1><h2 id="思想"><a href="#思想" class="headerlink" title="思想"></a>思想</h2><p>当收到来自某个用户的服务请求时，应用服务器需要对身份进行认证，而最直接的方式是验证用户口令。为减轻应用服务器的负担，Kerberos将验证用户身份的工作交给可信第三方。</p>
+<p>基于可信第三方<code>(定义可信第三方为认证服务器, 即AS, Authentication Server)</code>的认证要求第三方分别维护与用户和应用服务器共享的密钥。在访问应用服务器之前，用户所使用的客户端代理用户向AS发送认证请求，其中包含用户名和口令。AS收到这个请求后，将客户端提供的信息与本地维护的信息进行比较，若一致，则认可用户身份，并返回用于访问应用服务器的凭证——用应用服务器密钥加密的票据，内容为<code>票据: &#123;客户端用户名|客户端主机IP地址|应用服务名&#125;</code>。在获取票据后，客户端向应用服务器发送服务请求，其中包含用户名和票据。服务器用自己的密钥解密票据，如果解密成功，说明票据确实为可信第三方颁发，之后，它比较以下三项内容：</p>
+<ul>
+<li>票据中的用户名与客户端提供的用户名是否一致，由此防止攻击者使用他人的票据</li>
+<li>票据中的IP地址与客户端IP地址是否一致，由此防止攻击者假冒客户端</li>
+<li>票据中包含的服务名与自己的服务名是否一致，由此防止用访问其他服务的票据来访问自身的服务</li>
+</ul>
+<p>上述方案体现了第三方认证的基本思想，但存在以下缺陷：客户端向AS发送的认证请求中包含明文口令，存在泄露危险。</p>
+<p>为避免口令认证的缺陷，Kerberos引入票据许可服务<code>(TGS, Ticket Granting Service)</code>，它只向已由AS认证了身份的客户端颁发票据。客户端首先向AS证实自己的身份，并获取一张票据许可票据<code>(TGT, Ticket Granting Ticket)</code>，该票据可重用。当需要获取访问某项应用服务的票据时，客户端向票据许可服务器提出请求，并将TGT作为自己的身份凭证。此外，在向TGS证实用户身份时，客户端仅传输用户名。TGS以该用户名为关键字在本地库中查找相应密钥，并用其加密TGT，之后返回给客户端。通过上述途径，避免了明文口令的传输。客户端收到TGS的应答后会提示用户输入其口令，并将该口令转化为密钥，若能正确用该密钥解密TGT，即证实了用户的身份。</p>
+<p>AS和TGS一起构成了可信第三方服务器，即Kerberos服务器，或KDC。</p>
+<p>为提高通信效率，Kerberos票据可重用，即同一用户可以多次使用某个票据。出于安全考虑，票据生命期不能设置为无限长。为描述票据的有效期，Kerberos在票据中加入两个时间参数：生命期和时间戳，它们分别描述了票据的有效期限和颁发时间。</p>
+<p>综上，票据的形式为<code>票据: &#123;客户端用户名|客户端主机IP地址|应用服务名|生命期|时间戳&#125;</code>。</p>
+<p>然而，引入时间参数并不能解决所有问题，比如，同一客户端系统可能允许不同用户登录，某个用户退出时若不销毁自己的票据，则该票据有可能被随后登陆系统的用户使用。此外，假设某个用户的票据在网络中传输时被攻击者窃取，而该用户所登陆的客户端主机在该票据过期前下线或关机，则攻击者可以将自己的IP地址更改为该主机的IP地址以伪装成该用户使用其票据。</p>
+<p>为解决该问题，Kerberos引入会话密钥和认证符。可信第三方在为用户颁发票据的同时，还将为其和应用服务器生成共享的会话密钥。用户在访问应用服务器时需证明自己拥有该会话密钥，这通过认证符实现。当客户端向第三方发出身份认证请求时，第三方返回以下回应：<code>可信第三方应答: [会话密钥|票据]</code>。其中，会话密钥使用用户密钥加密，票据使用服务器密钥加密，且票据中也包含会话密钥，形式如下：<code>票据: &#123;会话密钥|客户端用户名|客户端主机IP地址|应用服务名|生命期|时间戳&#125;</code>，随后，客户端向应用服务器发出请求，形式如下：<code>客户端向应用服务器发出的请求: [票据|认证符]</code>，其中认证符用会话密钥加密，包含以下内容：<code>认证符: [客户端用户名|客户端主机IP地址]</code>。对上述设计进行分析：</p>
+<ul>
+<li>第三方将会话密钥发送给客户端，同时将会话密钥包含在票据中以通过客户端发送给服务器，由此实现会话密钥的共享。密钥分发时分别用用户和服务器的密钥加密，由此确保其安全性</li>
+<li>服务器收到客户端请求后，首先用自己的密钥解密票据即可获取会话密钥，随后用会话密钥解密认证符。若解密成功，说明用户拥有相应的会话密钥</li>
+<li>服务器将解密票据所获取的客户端用户名、IP地址与解密认证符所获取的这两项信息进行比较，若一致，则客户端用户身份认证通过</li>
+<li>服务器检查票据中包含的票据生存期及时间戳以确保这个票据确实还在有效期内</li>
+</ul>
+<p>由此可见，基于会话密钥、认证符和票据，Kerberos可以有效解决身份认证面临的各种问题，在Kerberos v5中，票据和会话密钥一起被称为<code>信任状态</code>。</p>
+<p>在实际应用中，用户有时也需确认服务器的身份，特别是在向服务器提交重要信息的场合。服务器身份认证也依托会话密钥，思想为：客户端向服务器发送请求后并非立即开始应用通信，而是要等待服务器返回一个应答，包含用会话密钥加密的信息。如果客户端能够正确解密该信息，说明服务器拥有正确的会话密钥，，从而验证了服务器的身份。</p>
+<p>除验证用户和服务器的身份外，会话密钥也可用于保护随后通信数据的机密性、完整性，或者用于通信双方交换子密钥。</p>
+<h2 id="流程"><a href="#流程" class="headerlink" title="流程"></a>流程</h2><p>Kerberos的整个流程可分为三个阶段。</p>
+<p>当用户初次登陆系统或者TGT过期时进入第一阶段。此时客户端向AS发出<code>KRB_AS_REQ</code>消息，请求获取TGT。AS的应答可能为两种：若同意颁发TGT，则返回<code>KRB_AS_REP</code>消息，其中包含TGT和用户与TGS共享的会话密钥；否则返回错误通告<code>KRB_ERROR</code>。若收到第一种消息，客户端会提示用户输入口令以生成密钥并还原会话密钥。</p>
+<p>当用户请求某个新的应用服务，或者用于访问某个应用服务的票据已经到期时进入第二阶段。此时客户端向TGS发送<code>KRB_TGS_REQ</code>，其中包含TGT和认证符。TGS验证TGT和认证符，验证成功则返回<code>KRB_TGS_REP</code>，其中包含用于访问应用服务的票据和用户与应用服务器共享的会话密钥；否则返回错误通告<code>KRB_ERROR</code>。</p>
+<p>当用户请求应用服务时进入第三阶段，此时客户端向应用服务器发送<code>KRB_AP_REQ</code>消息，其中包含票据和认证符。应用服务器验证票据和认证符，并根据验证结果返回<code>KRB_AP_REP</code>或<code>KRB_ERROR</code>。</p>
+<p>若客户端需要验证服务器的身份，则用会话密钥验证<code>KRB_AP_REP</code>。</p>
+<h2 id="跨域认证"><a href="#跨域认证" class="headerlink" title="跨域认证"></a>跨域认证</h2><p>当两个域需实现跨域认证功能时，必须建立域间密钥，即双方Kerberos服务器之间共享的密钥。通过域间密钥交换，每个域的TGS都被注册为另一个域的实体。若域A中的客户端需要访问域B中的服务器，它依次执行以下操作：</p>
+<ul>
+<li>访问AS<sub>a</sub>以获取访问TGS<sub>a</sub>的TGT<sub>tgsa</sub></li>
+<li>以TGT<sub>tgsa</sub>为凭证，访问TGS<sub>a</sub>以获取访问TGS<sub>b</sub>的TGT<sub>tgsb</sub></li>
+<li>以TGT<sub>tgsb</sub>为凭证，访问TGS<sub>b</sub>以获取访问服务器的票据Ticket<sub>s</sub></li>
+<li>以Ticket<sub>s</sub>为凭证，访问域B的服务器S</li>
+</ul>
+<p>TGT<sub>tgsb</sub>使用A和B之间的域间密钥加密。TGS<sub>b</sub>收到TGT<sub>tgsb</sub>时会用该密钥还原票据以确保该票据确实由TGS<sub>a</sub>颁发。引入域的概念后，域名作为实体名的一个组成部分，由此区分属于不同域的实体。</p>
+<p>在实际网络中会存在多个域，Kerberos允许跨越多个中间域进行认证，这些域之间构成了一个认证链，每两个直接跨域认证的域之间都共享域间密钥。在树状的域组织结构中，一个域与其父域和子域分别共享不同的域间密钥。如果两个域之间没有直接共享密钥，则可以通过该树建立一条认证路径，它由跨越的中间域构成。为提高通信效率，也可以建立备份路径，建立了备份路径后，就可以直接进行跨域认证。引入了跨域认证功能后，票据中将包含整个认证过程中所跨越的域信息，以便目标应用服务器或Kerberos服务器确定票据的有效性。</p>
+<h2 id="U2U认证"><a href="#U2U认证" class="headerlink" title="U2U认证"></a>U2U认证</h2><p>除用户—服务器认证外，Kerberos还定义了用户到用户<code>(U2U, User To User)</code>认证功能，它可以保障服务器安全。</p>
+<p>Kerberos使用的密钥可被分为两类：长期密钥和短期密钥。用户—Kerberos服务器，以及应用服务器—Kerberos服务器之间的共享密钥称为长期密钥，因为它们可能在很长一段时间内保持不变。会话密钥则属于短期密钥。出于安全性考虑，由长期密钥加密的数据不应该在网络上传输，而Kerberos票据使用服务器密钥<code>(长期密钥)</code>加密，而Kerberos票据又需要在网络上传输。为解决这个问题，Kerberos引入U2U认证，其核心思想是用短期密钥加密票据。</p>
+<p>客户端&#x2F;服务器身份具有相对性，所以应用服务器同样可以向AS请求TGT，其中包括其与TGS共享的会话密钥。当客户端需要时，服务器会把自己的TGT返回给客户端。当客户端向TGS请求访问应用服务器的票据时，同时出示自己和服务器的TGT。TGS同时验证这两个票据及认证符，认证成功后用服务器TGT中包含的会话密钥加密新票据，并返回给客户端。通过上述途径，可以避免使用长期密钥加密票据。而由于服务器请求TGT时充当了用户的角色，所以这种认证称为U2U认证。</p>
+<h1 id="票据和认证符"><a href="#票据和认证符" class="headerlink" title="票据和认证符"></a>票据和认证符</h1><p>Kerberos票据和认证符是整个认证系统的核心，设计者为票据使用者提供了很多灵活的功能，比如用户可以提前申请一个票据供以后使用。客户端可根据自己的需求在请求消息中以选项的形式指定票据属性，服务器则以标志的形式在票据中包含一系列对票据属性的描述。</p>
+<h2 id="选项和标志"><a href="#选项和标志" class="headerlink" title="选项和标志"></a>选项和标志</h2><ul>
+<li>初始认证：与初始认证相关的选项和标志包括<code>INITIAL</code>、<code>PRE-AUTHENT</code>、<code>HW-AUTHENT</code>和<code>OPT-HARDWARE-AUTH</code>。其中<code>INITIAL</code>表示票据由AS颁发，而不是基于TGT颁发；<code>PRE-AUTHENT</code>和<code>HW-AUTHENT</code>则提供了有关初始认证方式的附加信息。当AS给用户颁发票据时，仅表示在AS库中存在相应的实体，并不确保用户就是它所声称的那个实体。由于只有拥有正确用户口令的实体才能使用会话密钥和票据，就保证了认证的可靠性。如果AS要求在初始认证之前先认证客户端的身份，就用到<code>PRE-AUTHENT</code>标志，而客户端必须提供预认证信息。Kerberos给出的一种预认证方法是加密的时间戳，当客户端拥有证书时可以用自己的私钥加密本地时间戳并作为请求消息的一部分发送给服务器。<code>HW-AUTHENT</code>表示初始认证需硬件支持，同样与硬件认证相关的<code>OPT-HARDWARE-AUTH</code>用于以下两种情况：<ul>
+<li>客户端需使用基于口令、密钥以外的其他硬件认证方式</li>
+<li>客户端希望除使用基于口令、密钥的认证方式以外，同时使用其他硬件认证方式以提供附加的认证功能</li>
+</ul>
+</li>
+<li>可更新票据：在设置票据有效期时应综合权衡效率和安全性。票据有效期设置得越长，通信效率越高，但泄露信任状的风险也越大。如果将有效期设置得较短并定期获取新票据，客户端又需经常使用用户密钥加密请求信息并在网络中传输。为解决该问题，Kerberos引入可更新票据，标志为<code>RENEWABLE</code>，并为其设定两个生命期。第一个指示当前票据实例的生命期，第二个指示可更新的生命期。在第二个生命期终止之前，客户端可以通过设置<code>RENEW</code>选项向KDC申请新的票据实例。KDC颁发的新票据实例中则包含更新的会话密钥和生命期，其他内容不变。与可更新票据相关的另一个选项为<code>RENEWABLE-OK</code>。当客户端请求一个票据时，可能会指定自己期望的生命期，但这个期望值不一定能得到满足。如果客户端在请求中设置了该标志，就表示如果期望值得不到满足，它也可以接受一个时间更短的可更新票据</li>
+<li>可推迟票据：在实际应用中，用户可能希望在一段时间以后才使用某个票据。为此，Kerberos设计了可推迟使用的票据。客户可以在<code>KRB_AS_REQ</code>中设置<code>ALLOW-POSTDATE</code>选项，以获取包含<code>MAY-POSTDATE</code>标志的TGT，并利用它获取包含<code>POSTDATED</code>标志的可推迟使用票据。在使用可推迟票据访问应用服务之前，必须请求KDC将其激活</li>
+<li>无效票据：<code>INVALID</code>标志表示票据无效。应用服务器必须拒绝所有包含该标志的票据。在可推迟使用票据被激活之前，必须包含该标志。在请求KDC将其激活时，客户端必须在请求中同时包含<code>INVALID</code>和<code>VALIDATE</code>选项</li>
+<li>代理功能：Kerberos允许客户端指定一个实体代理其完成对应用服务器的访问。此时，TGT中应包含<code>PROXIABLE</code>标志，表示允许TGS为另外一个IP地址<code>(客户端必须指明这个IP地址)</code>颁发票据，该票据应设置<code>PROXY</code>标志。认证转发是代理功能的一个实例</li>
+<li>跨域认证策略：应用服务器是Kerberos认证系统中的最终决策者，除验证客户端的身份外，它还必须确定颁发票据的KDC是否有效。Kerberos定义了跨域认证功能，这意味着可能会有多个KDC参与认证过程。只要有一个KDC无效，认证请求就应该被拒绝</li>
+<li>U2U使用模式：当使用U2U认证时，客户端需在请求中设置<code>ENC-TKT-IN-SKEY</code>选项，以通知KDC用颁发给服务器的会话密钥加密票据</li>
+</ul>
+<h2 id="票据构成"><a href="#票据构成" class="headerlink" title="票据构成"></a>票据构成</h2><p>Kerberos票据中包含的字段如下：</p>
+<table>
+<thead>
+<tr>
+<th align="center">Kerberos票据</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">tkt-vno(票据版本)</td>
+</tr>
+<tr>
+<td align="center">realm(服务器域)</td>
+</tr>
+<tr>
+<td align="center">sname(服务器名)</td>
+</tr>
+<tr>
+<td align="center">enc-part(加密区域)<br />flags(标志)<br />key(会话密钥)<br />crealm(客户端域)<br />cname(客户端实体名)<br />transited(传输编码)<br />authtime(认证时间)<br />starttime(起始时间)<br />endtime(终止时间)<br />renew-till(更新终止时间)<br />caddr(主机地址)<br />authorization-data(认证数据)</td>
+</tr>
+</tbody></table>
+<h2 id="认证符"><a href="#认证符" class="headerlink" title="认证符"></a>认证符</h2><p>整个认证符使用会话密钥加密处理，认证符的构成如下：</p>
+<table>
+<thead>
+<tr>
+<th align="center">authenticator<br />authenticator-vno(认证符版本)<br />crealm(客户端域)<br />cname(客户端实体名)<br />chsum(校验和)<br />cusec(客户端时间戳)<br />ctime(客户端时间戳)<br />subkey(子会话密钥)<br />seq-number(序号)<br />authorization-data(认证数据)</th>
+</tr>
+</thead>
+</table>
+<h1 id="消息交换"><a href="#消息交换" class="headerlink" title="消息交换"></a>消息交换</h1><h2 id="认证服务交换"><a href="#认证服务交换" class="headerlink" title="认证服务交换"></a>认证服务交换</h2><p>认证服务交换用于两种场合：一是客户端在初始认证时向AS申请信任状，此时获取的通常是TGT；二是用于应用服务器需绕过TGS，直接确认用户掌握其秘密信息的场合。一个典型的实例是口令更改服务，若客户无法证明其知道原口令，则应用服务器会拒绝其请求。过程如下：</p>
+<ul>
+<li>客户端发送<code>KRB_AS_REQ</code>请求消息</li>
+<li>AS检查请求消息的有效性</li>
+<li>AS生成应答</li>
+<li>AS构造<code>KRB_AS_REP</code>消息</li>
+<li>客户端收到应答</li>
+</ul>
+<h2 id="TGS交换"><a href="#TGS交换" class="headerlink" title="TGS交换"></a>TGS交换</h2><p>TGS交换用于以下三种场合：</p>
+<ul>
+<li>客户端需要获取访问某个应用服务器的信任状</li>
+<li>客户端需要更新&#x2F;有效化已有的票据</li>
+<li>客户端需要获取一张代理票据</li>
+</ul>
+<p>过程如下：</p>
+<ul>
+<li>客户端生成<code>KRB_TGS_REQ</code>消息</li>
+<li>TGS处理<code>KRB_TGS_REQ</code>请求</li>
+<li>TGS生成<code>KRB_TGS_REP</code>消息</li>
+<li>客户端收到应答</li>
+</ul>
+<h2 id="应用服务认证交换"><a href="#应用服务认证交换" class="headerlink" title="应用服务认证交换"></a>应用服务认证交换</h2><p>在获取了访问应用服务器的信任状后，客户端即可开始应用服务认证交换，过程如下：</p>
+<ul>
+<li>客户端发送<code>KRB_AP_REQ</code>请求消息</li>
+<li>服务器对请求的应答</li>
+<li>服务器生成<code>KRB_AP_REP</code>消息</li>
+<li>客户端收到应答</li>
+</ul>
+<h2 id="安全交换"><a href="#安全交换" class="headerlink" title="安全交换"></a>安全交换</h2><p>安全交换用于检测通信双方交换的消息是否被更改。该功能的实现依托<code>KRB_SAFE</code>消息中包含的冲突检测校验和<code>(cksum)</code>。当应用需要进行该项检测时，可搜集应用相关数据及控制数据并计算校验和。控制数据包括时间戳、序号以及发送方地址等。当一个应用收到该消息时，对该消息进行验证。</p>
+<h2 id="机密交换"><a href="#机密交换" class="headerlink" title="机密交换"></a>机密交换</h2><p>当某个通信方需保障传输消息的机密性和完整性时，它使用机密交换，对应<code>KRB_PRIV</code>消息。该消息中包含应用数据和控制信息，并进行加密处理。当接收方收到该消息时，对该消息进行验证。</p>
+<h2 id="信任状交换"><a href="#信任状交换" class="headerlink" title="信任状交换"></a>信任状交换</h2><p>信任状交换使用<code>KRB_CRED</code>消息，其中包含一系列票据以及与票据有关的其他信息，这些信息被加密处理。当某一个应用收到该消息时，对该消息进行验证。</p>
+<h2 id="U2U认证交换"><a href="#U2U认证交换" class="headerlink" title="U2U认证交换"></a>U2U认证交换</h2><p>使用U2U认证交换时，客户端必须首先通过一条消息获取KDC颁发给服务器的TGT，该消息的形式由具体应用指定。U2U交换过程如下：</p>
+<ul>
+<li>应用服务器向客户端发送TGT</li>
+<li>客户端向KDC发送<code>KRB_TGS_REQ</code>消息</li>
+<li>KDC向客户端返回<code>KRB_TGS_REP</code>消息</li>
+<li>客户端向应用服务器发送<code>KRB_AP_REQ</code>消息</li>
+</ul>
+<h1 id="Kerberos应用"><a href="#Kerberos应用" class="headerlink" title="Kerberos应用"></a>Kerberos应用</h1><p>Kerberos工作于TCP&#x2F;IP协议栈的应用层，与Kerberos相关的端口号如下表：</p>
+<table>
+<thead>
+<tr>
+<th align="center">端口号</th>
+<th align="center">传输层协议</th>
+<th align="center">用途</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">88</td>
+<td align="center">TCP&#x2F;UDP</td>
+<td align="center">Kerberos v5</td>
+</tr>
+<tr>
+<td align="center">749</td>
+<td align="center">TCP&#x2F;UDP</td>
+<td align="center">Kerberos v5 口令更改服务</td>
+</tr>
+<tr>
+<td align="center">750</td>
+<td align="center">TCP&#x2F;UDP</td>
+<td align="center">Kerberos v4 KDC</td>
+</tr>
+<tr>
+<td align="center">751</td>
+<td align="center">TCP&#x2F;UDP</td>
+<td align="center">Kerberos v4 主数据库</td>
+</tr>
+<tr>
+<td align="center">752</td>
+<td align="center">UDP</td>
+<td align="center">Kerberos 口令服务器</td>
+</tr>
+<tr>
+<td align="center">753</td>
+<td align="center">UDP</td>
+<td align="center">Kerberos 用户注册服务器</td>
+</tr>
+<tr>
+<td align="center">754</td>
+<td align="center">TCP</td>
+<td align="center">Kerberos 从数据库复制</td>
+</tr>
+<tr>
+<td align="center">1109</td>
+<td align="center">TCP</td>
+<td align="center">使用 Kerberos 的 POP</td>
+</tr>
+<tr>
+<td align="center">2053</td>
+<td align="center">TCP</td>
+<td align="center">Kerberos 多路分解</td>
+</tr>
+<tr>
+<td align="center">2105</td>
+<td align="center">TCP</td>
+<td align="center">Kerberos 加密的 rlogin</td>
+</tr>
+</tbody></table>
+<h2 id="KDC发现"><a href="#KDC发现" class="headerlink" title="KDC发现"></a>KDC发现</h2><p>Kerberos客户端必须提供KDC发现机制，即确定KDC的位置。一种可用的方法是使用配置文件，但这种方法不利于动态更新。一种基于DNS的KDC发现方法如下。</p>
+<p>KDC的位置信息使用DNS SRV资源记录形式存储于DNS服务器中，其格式如下：</p>
+<p><code>_Service._Proto.Realm TTL Class SRV Priority Weight Port Target</code></p>
+<p>其中<code>Service(服务名)</code>设定为<code>Kerberos</code>，<code>Proto</code>设置为<code>udp</code>或<code>tcp</code>，<code>Port</code>为88，其他部分与DNS标准资源记录的设置方法相同。</p>
+<p>客户端使用DNS查询，并把查询类型设置为<code>SRV(编号为33)</code>即可获取KDC的域名，之后使用DNS查询，并把查询类型设置为<code>A(编号为1)</code>即可获取KDC的IP地址。</p>
+<h2 id="Kerberos-GSSAPI"><a href="#Kerberos-GSSAPI" class="headerlink" title="Kerberos GSSAPI"></a>Kerberos GSSAPI</h2><p>Kerberos GSSAPI提供了使用Kerberos进行安全开发的标准接口。用户登录系统后，操作系统会在后台为其生成一张TGT，并存储于信任状结构中，之后客户端即可调用<code>GSS_Acquire_cred()</code>函数以获取信任状句柄。随后，客户端调用<code>GSS_Init_sec_context()</code>，后台则利用<code>KRB_TGS_REQ</code>和<code>KRB_TGS_REP</code>消息获取访问应用服务器的票据，并建立上下文。建立上下文的过程实际就是一次Kerberos应用服务交换，应用服务器会使用<code>GSS_Accept_sec_context()</code>函数认证客户端用户的身份。当身份认证通过后，即可通过<code>GSS_GetMIC()</code>、<code>GSS_VerifyMIC()</code>、<code>GSS_Wrap()</code>和<code>GSS_Unwrap()</code>等函数进行安全的数据传输。</p>
+<h2 id="Kerberos实现"><a href="#Kerberos实现" class="headerlink" title="Kerberos实现"></a>Kerberos实现</h2><p>MIT的Kerberos实现可以参见<a href="https://web.mit.edu/kerberos/">Kerberos(mit.edu)</a>，MIT公布了所有实现的源代码，并且给出了相关文档。此外，MIT还发布了针对Windows、Macintosh以及MAC OS平台的实现。</p>
+<p>MIT实现的Kerberos包含了一系列操作命令，它们以k开头，所以称为k命令。比如，<code>kadmin</code>用于Kerberos数据库的管理，利用该命令可以查看、编辑实体信息，并可以进行策略管理。<code>kinit</code>和<code>kpassword</code>则是客户端的命令，用户可以利用它们获取票据或更改口令。</p>
+<h1 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h1><ul>
+<li><a href="https://datatracker.ietf.org/doc/html/rfc4120">Kerberos v5&#x2F;rfc4120 (ietf.org)</a></li>
+</ul>
+]]></content>
+      <categories>
+        <category>Protocol</category>
+      </categories>
+      <tags>
+        <tag>Kerberos</tag>
+      </tags>
+  </entry>
 </search>
