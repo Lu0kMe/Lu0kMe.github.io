@@ -4081,4 +4081,200 @@
         <tag>Basic</tag>
       </tags>
   </entry>
+  <entry>
+    <title>运行库简析</title>
+    <url>/posts/runtime-lib/</url>
+    <content><![CDATA[<h1 id="程序初始化"><a href="#程序初始化" class="headerlink" title="程序初始化"></a>程序初始化</h1><p>操作系统装载程序之后，首先运行的代码并不是<code>main</code>函数的第一行，而是某些别的代码，这些代码准备好<code>main</code>函数执行所需要的环境，并且负责调用<code>main</code>函数，这时候才运行<code>main</code>函数中的代码：申请内存、使用系统调用、触发异常、访问I&#x2F;O。在<code>main</code>函数返回之后，操作系统记录<code>main</code>函数的返回值，调用<code>atexit</code>注册的函数，然后结束进程。</p>
+<span id="more"></span>
+
+<p>运行这些代码的函数称为入口函数或入口点<code>(Entry Point)</code>，视平台的不同而有不同的名字。程序的入口点实际上是一个程序的初始化和结束部分，它往往是运行库的一部分。一个典型的程序运行步骤大致如下：</p>
+<ul>
+<li>操作系统在创建进程后，把控制权交到了程序的入口，这个入口往往是运行库中的某个入口函数</li>
+<li>入口函数对运行库和程序运行环境进行初始化，包括堆、I&#x2F;O、线程、全局变量构造等等</li>
+<li>入口函数在完成初始化之后，调用<code>main</code>函数，正式开始执行程序主体部分</li>
+<li><code>main</code>函数执行完毕之后，返回到入口函数，入口函数进行清理工作，包括全局变量析构、堆销毁、关闭I&#x2F;O等，然后进行系统调用结束进程</li>
+</ul>
+<h1 id="C-x2F-C-运行库"><a href="#C-x2F-C-运行库" class="headerlink" title="C&#x2F;C++运行库"></a>C&#x2F;C++运行库</h1><h2 id="C语言运行库"><a href="#C语言运行库" class="headerlink" title="C语言运行库"></a>C语言运行库</h2><p>任何一个C程序，它的背后都有一套庞大的代码来进行支撑，以使得该程序能够正常运行。这套代码至少包括入口函数，及其所依赖的函数所构成的函数集合。这样的一个代码集合称之为运行时库<code>(Runtime Library)</code>。C语言的运行库，被称为C运行库<code>(CRT)</code>。</p>
+<p>一个C语言运行库大致包含了如下功能：</p>
+<ul>
+<li>启动与退出：包括入口函数及入口函数所依赖的其他函数等</li>
+<li>标准函数：由C语言标准规定的C语言标准库所拥有的函数实现</li>
+<li>I&#x2F;O：I&#x2F;O功能的封装与实现</li>
+<li>堆：堆的封装与实现</li>
+<li>语言实现：语言中一些特殊功能的实现</li>
+<li>调试：实现调试功能的代码</li>
+</ul>
+<p>在运行库的组成部分中，C语言标准库占据了主要地位。C语言标准库是C语言标准化的基础函数库，定义了C语言中普遍存在的函数集合，可以放心地使用标准库中规定的函数而不同担心在将代码移植到别的平台时对应的平台上不提供这个函数。</p>
+<h2 id="C语言标准库"><a href="#C语言标准库" class="headerlink" title="C语言标准库"></a>C语言标准库</h2><p>ANSI C的标准库由24个C头文件组成。与许多其他语言的标准库不同，C语言的标准库非常轻量，它仅仅包含了数学函数、字符&#x2F;字符串处理、I&#x2F;O等基本方面，例如：</p>
+<ul>
+<li>标准输入输出<code>stdio.h</code></li>
+<li>文件操作<code>stdio.h</code></li>
+<li>字符操作<code>ctype.h</code></li>
+<li>字符串操作<code>string.h</code></li>
+<li>数学函数<code>math.h</code></li>
+<li>资源管理<code>stdlib.h</code></li>
+<li>格式转换<code>stdlib.h</code></li>
+<li>时间&#x2F;日期<code>time.h</code></li>
+<li>断言<code>assert.h</code></li>
+<li>各种类型上的常数<code>limits.h&amp;float.h</code></li>
+</ul>
+<p>除此之外，C语言标准库还有一些特殊的库，用于执行一些特殊的操作：</p>
+<ul>
+<li>变长参数<code>stdarg.h</code></li>
+<li>非局部跳转<code>setjump.h</code></li>
+</ul>
+<h3 id="变长参数"><a href="#变长参数" class="headerlink" title="变长参数"></a>变长参数</h3><p>变长参数是C语言的特殊参数形式，例如如下函数声明：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">printf</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span>* format, ...)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<p>这样的声明表示，<code>printf</code>函数除了第一个参数类型为<code>const char*</code>之外，其后可以追加任意数量、任意类型的参数。在函数的实现部分，可以使用<code>stdarg.h</code>中的多个宏来访问各个额外的参数：假设<code>lastarg</code>是变长参数函数的最后一个具名参数<code>(例如printf中的format)</code>，那么在函数内部定义类型为<code>va_list</code>的变量：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line">va_list ap;</span><br></pre></td></tr></table></figure>
+
+<p>该变量以后将会依次指向各个可变参数。<code>ap</code>必须用宏<code>va_start</code>初始化一次，其中<code>lastarg</code>必须是函数的最后一个具名的函数：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line">va_start(ap, lastarg);</span><br></pre></td></tr></table></figure>
+
+<p>此后，可以使用<code>va_arg</code>宏来获得下一个不定参数<code>(假设已知其类型为type)</code>：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line">type next = va_arg(ap,type);</span><br></pre></td></tr></table></figure>
+
+<p>在函数结束前，还必须用宏<code>va_end</code>来清理现场。<code>cdecl</code>调用惯例保证了参数的正确消除，因为<code>cdecl</code>是调用方负责清除堆栈，而有些调用惯例<code>(如stdcall)</code>是由被调用方来负责清除堆栈的参数，然而被调用方根本不知道有多少参数被传递进来，所以没有办法清除堆栈。</p>
+<h3 id="非局部跳转"><a href="#非局部跳转" class="headerlink" title="非局部跳转"></a>非局部跳转</h3><p>使用非局部跳转，可以实现从一个函数体内向另一个事先登记过的函数体内跳转，而不用担心堆栈混乱。例如：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;setjmp.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line">jmp_buf b;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">f</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    longjmp(b,<span class="number">1</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (setjmp(b))</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;World!&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Hello &quot;</span>);</span><br><span class="line">        f();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>运行结果如下：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> gcc 1.c</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> ./a.out</span></span><br><span class="line">Hello World!</span><br></pre></td></tr></table></figure>
+
+<h2 id="GLIBC与MSVCRT"><a href="#GLIBC与MSVCRT" class="headerlink" title="GLIBC与MSVCRT"></a>GLIBC与MSVCRT</h2><p>运行库是平台相关的，因为它与操作系统结合得非常紧密。C语言的运行库从某种程度上来讲是C语言的程序和不同操作系统平台之间的抽象层，它将不同的操作系统API抽象成相同的库函数。Linux和Windows平台下的两个主要的C语言运行库分别为<code>glibc(GNU C Library)</code>和<code>MSVCRT(Microsoft Visual C Run-time)</code>。</p>
+<p><code>glibc</code>的发布版本主要由两部分组成，一部分是头文件，往往位于<code>/usr/include</code>；另一部分是库的二进制文件部分。二进制部分主要的就是C语言标准库，它有静态和动态两个版本。在<code>glibc</code>中，除了C标准库之外，还有几个用于辅助程序运行的运行库，名为：<code>crt1.o</code>、<code>crti.o</code>、<code>crtn.o</code>。</p>
+<p><code>crt1.o</code>里面包含的是程序的入口函数<code>_start</code>，由它负责调用的<code>__libc_start_main</code>初始化<code>libc</code>并且调用<code>main</code>函数进入真正的程序主体。由于C++的出现和ELF文件的改进，出现了必须在<code>main</code>函数之前执行的全局&#x2F;静态对象构造和必须在<code>main</code>函数之后执行的全局&#x2F;静态对象析构。为了满足类似的需求，运行库在每个目标文件中引入两个与初始化相关的段<code>.init</code>和<code>.finit</code>，运行库会保证所有位于这两个段中的代码会先于&#x2F;后于<code>main</code>函数执行。链接器在进行链接时，会把所有输入目标文件中的<code>.init</code>和<code>.finit</code>按照顺序收集起来，然后将它们合并成输出文件中的<code>.init</code>和<code>.finit</code>。但这两个输出的段中所包含的指令还需要一些辅助的代码来帮助它们启动，于是引入了<code>crti.o</code>和<code>crtn.o</code>用来帮助实现初始化函数，其中包含的代码实际上是<code>_init()</code>函数和<code>_finit()</code>函数的开始和结尾部分，这两个文件和其他目标文件按照顺序链接起来以后，刚好形成两个完整的函数<code>_init()</code>和<code>_finit()</code>。其汇编代码如下<code>(64位环境下)</code>：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> objdump /usr/lib/x86_64-linux-gnu/crti.o -d</span></span><br><span class="line">/usr/lib/x86_64-linux-gnu/crti.o:     file format elf64-x86-64</span><br><span class="line">Disassembly of section .init:</span><br><span class="line">0000000000000000 &lt;_init&gt;:</span><br><span class="line">   0:   48 83 ec 08             sub    $0x8,%rsp</span><br><span class="line">   4:   48 8b 05 00 00 00 00    mov    0x0(%rip),%rax        # b &lt;_init+0xb&gt;</span><br><span class="line">   b:   48 85 c0                test   %rax,%rax</span><br><span class="line">   e:   74 02                   je     12 &lt;_init+0x12&gt;</span><br><span class="line">  10:   ff d0                   call   *%rax</span><br><span class="line">Disassembly of section .fini:</span><br><span class="line">0000000000000000 &lt;_fini&gt;:</span><br><span class="line">   0:   48 83 ec 08             sub    $0x8,%rsp</span><br><span class="line"><span class="meta">$</span><span class="bash"> objdump /usr/lib/x86_64-linux-gnu/crtn.o -d</span></span><br><span class="line">/usr/lib/x86_64-linux-gnu/crtn.o:     file format elf64-x86-64</span><br><span class="line">Disassembly of section .init:</span><br><span class="line">0000000000000000 &lt;.init&gt;:</span><br><span class="line">   0:   48 83 c4 08             add    $0x8,%rsp</span><br><span class="line">   4:   c3                      ret</span><br><span class="line">Disassembly of section .fini:</span><br><span class="line">0000000000000000 &lt;.fini&gt;:</span><br><span class="line">   0:   48 83 c4 08             add    $0x8,%rsp</span><br><span class="line">   4:   c3                      ret</span><br></pre></td></tr></table></figure>
+
+<p>同一版本的MSVCRT根据不同的属性提供了多种子版本，以供不同需求的开发者使用。常见的MSVCRT文件如下表：</p>
+<table>
+<thead>
+<tr>
+<th align="center">文件名</th>
+<th align="center">属性</th>
+<th align="center">编译器选项</th>
+<th align="center">预编译宏</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">libcmt.lib</td>
+<td align="center">多线程,静态链接</td>
+<td align="center">&#x2F;MT</td>
+<td align="center">_MT</td>
+</tr>
+<tr>
+<td align="center">msvcrt.lib</td>
+<td align="center">多线程,动态链接</td>
+<td align="center">&#x2F;MD</td>
+<td align="center">_MT,_DLL</td>
+</tr>
+<tr>
+<td align="center">libcmtd.lib</td>
+<td align="center">多线程,静态链接,调试</td>
+<td align="center">&#x2F;MTd</td>
+<td align="center">_DEBUG,_MT</td>
+</tr>
+<tr>
+<td align="center">msvcrtd.lib</td>
+<td align="center">多线程,动态链接,调试</td>
+<td align="center">&#x2F;MDd</td>
+<td align="center">_DEBUG,_MT,_DLL</td>
+</tr>
+<tr>
+<td align="center">msvcmrt.lib</td>
+<td align="center">托管&#x2F;本地混合代码</td>
+<td align="center">&#x2F;clr</td>
+<td align="center"></td>
+</tr>
+<tr>
+<td align="center">msvcurt.lib</td>
+<td align="center">纯托管代码</td>
+<td align="center">&#x2F;clr:pure</td>
+<td align="center"></td>
+</tr>
+</tbody></table>
+<p>MSVC还提供了相应的C++标准库，其中仅包含了C++的内容，比如<code>iostream</code>、<code>string</code>、<code>map</code>等，不包含C的标准库：</p>
+<table>
+<thead>
+<tr>
+<th align="center">文件名</th>
+<th align="center">属性</th>
+<th align="center">编译器选项</th>
+<th align="center">预编译宏</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">libcpmt.lib</td>
+<td align="center">多线程,静态链接</td>
+<td align="center">&#x2F;MT</td>
+<td align="center">_MT</td>
+</tr>
+<tr>
+<td align="center">msvcprt.lib</td>
+<td align="center">多线程,动态链接</td>
+<td align="center">&#x2F;MD</td>
+<td align="center">_MT,_DLL</td>
+</tr>
+<tr>
+<td align="center">libcpmtd.lib</td>
+<td align="center">多线程,静态链接,调试</td>
+<td align="center">&#x2F;MTd</td>
+<td align="center">_DEBUG,_MT</td>
+</tr>
+<tr>
+<td align="center">msvcprtd.lib</td>
+<td align="center">多线程,动态链接,调试</td>
+<td align="center">&#x2F;MDd</td>
+<td align="center">_DEBUG,_MT,_DLL</td>
+</tr>
+</tbody></table>
+<h1 id="运行库与多线程"><a href="#运行库与多线程" class="headerlink" title="运行库与多线程"></a>运行库与多线程</h1><h2 id="多线程困扰"><a href="#多线程困扰" class="headerlink" title="多线程困扰"></a>多线程困扰</h2><p>线程的访问非常自由，它可以访问进程内存里的所有数据，甚至包括了其他线程的堆栈<code>(如果知道其他线程的堆栈地址)</code>，但实际运用中线程也拥有自己的私有存储空间，包括：</p>
+<ul>
+<li>栈<code>(并非完全无法被其他线程访问，一般情况下仍可以认为是私有的数据)</code></li>
+<li>线程局部存储<code>(TLS, Thread Local Storage)</code>。线程局部存储是某些操作系统为线程单独提供的私有空间</li>
+<li>寄存器<code>(包括PC寄存器)</code>，寄存器存放的数据是执行流的基本数据</li>
+</ul>
+<p>从C语言的角度来看，数据在线程之间是否为私有如下表：</p>
+<table>
+<thead>
+<tr>
+<th align="center">局部变量<br />函数的参数<br />TLS数据</th>
+<th align="center">全局变量<br />堆上的数据<br />函数里的静态变量<br />程序代码<br />打开的文件</th>
+</tr>
+</thead>
+</table>
+<p>多线程相关主要有两个方面：一方面是提供那些多线程操作的接口，比如创建线程、退出线程、设置线程优先级等函数接口；另一方面是C运行库本身要能够在多线程的环境下正确运行。</p>
+<p>对于第一个方面，主流的CRT都会有相应的功能。比如在Windows下，MSVCRT提供了诸如<code>_beginthread()</code>、<code>_endthread()</code>等函数用于线程的创建和退出；而在Linux下，GLIBC也提供了一个可选的线程库<code>pthread(POSIX Thread)</code>，提供了诸如<code>pthread_create()</code>、<code>pthread_exit()</code>等函数用于线程的创建和退出。这些函数都不属于标准的运行库，都是平台相关的。对于第二个方面，C语言运行库必须支持多线程的环境，否则在多线程的环境下，会出现很多错误：</p>
+<ul>
+<li><code>errno</code>：在C标准库中，大多数错误代码是在函数返回之前赋值在名为<code>errno</code>的全局变量里的，多线程并发时，<code>errno</code>会被错误地覆盖</li>
+<li><code>strtok()</code>：这类函数会使用函数内部的局部静态变量来存储字符串的位置，不同线程调用这个函数将会把它内部的局部静态函数弄混乱</li>
+<li><code>malloc/new</code>与<code>free/delete</code>：堆分配&#x2F;释放函数或关键字在不加锁的情况下是线程不安全的</li>
+<li>异常处理：不同线程抛出的异常会彼此冲突</li>
+<li>IO函数：流输出函数是线程不安全的</li>
+<li>其他线程不安全函数：包括与信号相关的一些函数</li>
+</ul>
+<h2 id="对CRT的改进"><a href="#对CRT的改进" class="headerlink" title="对CRT的改进"></a>对CRT的改进</h2><ul>
+<li>使用TLS：<code>errno</code>等类似的变量必须成为线程的私有成员</li>
+<li>加锁：在多线程版本的运行库中，线程不安全的函数内部都会自动地进行加锁</li>
+<li>改进函数调用方式：通过修改线程不安全的函数的参数列表，改成某种线程安全的版本，一般不会改变任何标准库函数的原型，只是对标准库的实现进行一些改进，使得其能在多线程的环境下也能够顺利运行，做到向后兼容</li>
+</ul>
+<h2 id="线程局部存储"><a href="#线程局部存储" class="headerlink" title="线程局部存储"></a>线程局部存储</h2><h3 id="隐式TLS"><a href="#隐式TLS" class="headerlink" title="隐式TLS"></a>隐式TLS</h3><p>如果要在线程中使用一个全局变量，但希望这个全局变量是线程私有的，而不是所有线程共享的，就需要用到线程局部存储<code>(TLS, Thread Local Storage)</code>。TLS的用法很简单，如果要定义一个全局变量为TLS类型的，只需要在它定义前加上相应的关键字即可。对于GCC来说，使用<code>__thread</code>：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line">__thread <span class="keyword">int</span> number;</span><br></pre></td></tr></table></figure>
+
+<p>对于MSVC来说，使用<code>__declspec(thread)</code>：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line">__declspec(thread) <span class="keyword">int</span> number;</span><br></pre></td></tr></table></figure>
+
+<h3 id="显式TLS"><a href="#显式TLS" class="headerlink" title="显式TLS"></a>显式TLS</h3><p>使用隐式TLS，程序员无需关心TLS变量的申请、分配赋值和释放，编译器、运行库还有操作系统已经将这一切处理好了。还有一种显式TLS的方法，就是程序员需要手工申请TLS变量，并且每次访问该变量时都要调用相应的函数得到变量的地址，并且在访问完成之后需要释放该变量。在Windows平台上，系统提供了<code>TlsAlloc()</code>、<code>TlsGetValue()</code>、<code>TlsSetValue()</code>和<code>TlsFree()</code>4个API用于显式TLS变量的申请、取值、赋值和释放；在Linux平台上，相对应的库函数为<code>pthread</code>库中的<code>pthread_key_create()</code>、<code>pthread_getspecific()</code>、<code>pthread_setspecific()</code>和<code>pthread_key_delete()</code>。</p>
+<h1 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h1><ul>
+<li>《程序员的自我修养——链接、装载与库》</li>
+</ul>
+]]></content>
+      <categories>
+        <category>Linker and Loader</category>
+      </categories>
+      <tags>
+        <tag>Basic</tag>
+      </tags>
+  </entry>
 </search>
