@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-lu0k.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-lu0k.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-lu0k.png">
+  <link rel="mask-icon" href="/images/lu0k.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"lu0k.github.io","root":"/","images":"/images","scheme":"Gemini","version":"8.7.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+<meta name="description" content="系统调用简介在现代的操作系统里，系统有限的资源有可能被多个不同的应用程序同时访问，如果不加以保护，难免产生冲突。所以现代操作系统都将可能产生冲突的系统资源给保护起来，阻止应用程序直接访问。这些系统资源包括文件、网络、IO、各种设备等。所有应用程序对系统资源的操作都必须经由操作系统所规定的方式来进行。此外，有些行为应用程序不借助操作系统是无法办到或者不能有效地办到的。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="系统调用与API">
+<meta property="og:url" content="https://lu0k.github.io/posts/syscall-api/index.html">
+<meta property="og:site_name" content="Lu0k">
+<meta property="og:description" content="系统调用简介在现代的操作系统里，系统有限的资源有可能被多个不同的应用程序同时访问，如果不加以保护，难免产生冲突。所以现代操作系统都将可能产生冲突的系统资源给保护起来，阻止应用程序直接访问。这些系统资源包括文件、网络、IO、各种设备等。所有应用程序对系统资源的操作都必须经由操作系统所规定的方式来进行。此外，有些行为应用程序不借助操作系统是无法办到或者不能有效地办到的。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-11-14T16:00:00.000Z">
+<meta property="article:modified_time" content="2021-11-15T14:30:05.111Z">
+<meta property="article:author" content="Lu0k">
+<meta property="article:tag" content="Basic">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://lu0k.github.io/posts/syscall-api/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://lu0k.github.io/posts/syscall-api/","path":"posts/syscall-api/","title":"系统调用与API"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>系统调用与API | Lu0k</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">Lu0k</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Lu0k's Blog</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">系统调用简介</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8%E7%9A%84%E5%BC%8A%E7%AB%AF"><span class="nav-number">1.1.</span> <span class="nav-text">系统调用的弊端</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8%E5%8E%9F%E7%90%86"><span class="nav-number">2.</span> <span class="nav-text">系统调用原理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%89%B9%E6%9D%83%E7%BA%A7%E4%B8%8E%E4%B8%AD%E6%96%AD"><span class="nav-number">2.1.</span> <span class="nav-text">特权级与中断</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%8F%E5%85%B8%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8%E5%AE%9E%E7%8E%B0"><span class="nav-number">2.2.</span> <span class="nav-text">经典系统调用实现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A7%A6%E5%8F%91%E4%B8%AD%E6%96%AD"><span class="nav-number">2.2.1.</span> <span class="nav-text">触发中断</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%87%E6%8D%A2%E5%A0%86%E6%A0%88"><span class="nav-number">2.2.2.</span> <span class="nav-text">切换堆栈</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%AD%E6%96%AD%E5%A4%84%E7%90%86%E7%A8%8B%E5%BA%8F"><span class="nav-number">2.2.3.</span> <span class="nav-text">中断处理程序</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Windows-API"><span class="nav-number">3.</span> <span class="nav-text">Windows API</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A6%82%E8%A7%88"><span class="nav-number">3.1.</span> <span class="nav-text">概览</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E4%BD%BF%E7%94%A8Windows-API"><span class="nav-number">3.2.</span> <span class="nav-text">为什么使用Windows API</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Reference"><span class="nav-number">4.</span> <span class="nav-text">Reference</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-overview">
+            <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Lu0k"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Lu0k</p>
+  <div class="site-description" itemprop="description">谦虚学习!</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">46</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/lu0k" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;lu0k" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/Lu0kMe" title="Twitter → https:&#x2F;&#x2F;twitter.com&#x2F;Lu0kMe" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://lu0k.github.io/posts/syscall-api/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Lu0k">
+      <meta itemprop="description" content="谦虚学习!">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Lu0k">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          系统调用与API
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-11-15 00:00:00" itemprop="dateCreated datePublished" datetime="2021-11-15T00:00:00+08:00">2021-11-15</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Linker-and-Loader/" itemprop="url" rel="index"><span itemprop="name">Linker and Loader</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="系统调用简介"><a href="#系统调用简介" class="headerlink" title="系统调用简介"></a>系统调用简介</h1><p>在现代的操作系统里，系统有限的资源有可能被多个不同的应用程序同时访问，如果不加以保护，难免产生冲突。所以现代操作系统都将可能产生冲突的系统资源给保护起来，阻止应用程序直接访问。这些系统资源包括文件、网络、IO、各种设备等。所有应用程序对系统资源的操作都必须经由操作系统所规定的方式来进行。此外，有些行为应用程序不借助操作系统是无法办到或者不能有效地办到的。</p>
+<span id="more"></span>
+
+<p>为了让应用程序有能力访问系统资源，也为了让应用程序借助操作系统做一些必须由操作系统支持的行为，每个操作系统都会提供一些接口，以供应用程序使用。这些接口被称为系统调用<code>(System Call)</code>，其往往通过中断来实现，比如Linux使用<code>0x80</code>号中断作为系统调用的入口，Windows采用<code>0x2E</code>号中断作为系统调用的入口。</p>
+<p>系统调用涵盖的功能很广，有程序运行所必需的支持，例如创建&#x2F;退出进程和线程、进程内存管理，也有对系统资源的访问，例如文件、网络、进程间通信、硬件设备的访问，也可能有对图形界面的操作支持，例如Windows下的GUI机制。</p>
+<p>系统调用作为一个所有应用程序都依赖的接口，它的定义非常重要。首先系统调用必须有明确的定义，即每个调用的含义、参数、行为都需要有严格而清晰的定义，这样应用程序<code>(运行库)</code>才可以正确地使用它；其次它必须保持稳定和向后兼容，如果某次系统更新导致系统调用接口发生改变，新的系统调用接口与之前版本完全不同，所有之前能正常运行的程序都将无法使用，所以操作系统的系统调用往往从一开始定义后就基本不做改变，而仅仅是增加新的调用接口，以保持向后兼容。</p>
+<p>而Windows系统是完全基于DLL机制的，它通过DLL对系统调用进行了包装，形成了Windows API。因此对于Windows来说，系统调用实际上并不是它与应用程序的最终接口，而是API。</p>
+<h2 id="系统调用的弊端"><a href="#系统调用的弊端" class="headerlink" title="系统调用的弊端"></a>系统调用的弊端</h2><p>系统调用完成了应用程序和内核交流的工作，因此理论上只需要系统调用就可以完成一些程序，但是事实上，大部分操作系统的系统调用都有两个特点：</p>
+<ul>
+<li>使用不便：操作系统提供的系统调用接口往往过于原始，使用起来不方便</li>
+<li>各个操作系统之间系统调用不兼容：各个操作系统之间的系统调用虽然内容很多都一样，但是定义和实现不大一样</li>
+</ul>
+<p>相对而言，运行库作为系统调用与程序之间的一个抽象层保持着这样的特点：</p>
+<ul>
+<li>使用简便：运行库本身是语言级别的，设计相对友好</li>
+<li>形式统一：运行库有标准，即标准库，凡是所有遵循这个标准的运行库理论上都是相互兼容的，不会随着操作系统或编译器的变化而变化</li>
+</ul>
+<p>运行库将不同的操作系统的系统调用包装为统一固定的接口，使得同样的代码，在不同的操作系统下都可以直接编译，并产生一致的效果，实现了源代码级别的可移植性。但是运行库为了保证多平台之间能够相互通用，只能取各个平台之间功能的交集。</p>
+<h1 id="系统调用原理"><a href="#系统调用原理" class="headerlink" title="系统调用原理"></a>系统调用原理</h1><h2 id="特权级与中断"><a href="#特权级与中断" class="headerlink" title="特权级与中断"></a>特权级与中断</h2><p>现代的CPU常常可以在多种截然不同的特权级别下执行指令，在现代操作系统中，通常也据此有两种特权级别，分别为用户模式<code>(User Mode)</code>和内核模式<code>(Kernel Mode)</code>，也称为用户态和内核态。由于有多种特权模式的存在，操作系统就可以让不同的代码运行在不同的模式下，以限制它们的权力，提高稳定性和安全性。普通应用程序运行在用户态的模式下，诸多操作将受到限制，这些操作包括访问硬件设备、开关中断、改变特权模式等。</p>
+<p>一般来说，运行在高特权级的代码将自己降至低特权级是允许的，但是低特权级的代码将自己提升至高特权级则不是轻易就能进行的。在将低特权级的环境转为高特权级时，需要使用一种较为受控和安全的形式，以防止低特权模式代码破坏高特权模式代码的执行。</p>
+<p>系统调用是运行在内核态的，而应用程序基本都是运行在用户态的。操作系统一般是通过中断<code>(Interrupt)</code>来从用户态切换到内核态。中断是一个硬件或软件发出的请求，要求CPU暂停当前的工作转手去处理更加重要的事情。中断一般具有两个属性，一个称为中断号，一个称为中断处理程序<code>(ISR, Interrupt Service Routine)</code>。不同的中断具有不同的中断号而同时一个中断处理程序一一对应一个中断号。在内核中，有一个数组称为中断向量表<code>(Interrupt Vector Table)</code>，这个数组的第n项包含了指向第n号中断的中断处理程序的指针。当中断到来时，CPU会暂停当前执行的代码，根据中断的中断号，在中断向量表中找到相应的中断处理程序，并调用它。中断处理程序执行完成之后，CPU会继续执行之前的代码。</p>
+<p>由于中断号是有限的，操作系统往往用一个或几个中断号来对应所有的系统调用。例如，<code>i386</code>下Windows里绝大多数系统调用都是由<code>int 0x2e</code>来触发的，而Linux则使用<code>int 0x80</code>来触发所有的系统调用。和中断一样，系统调用都有一个系统调用号，这个系统调用号通常就是系统调用在系统调用表中的位置，这个系统调用号会在执行<code>int</code>指令前被放置在某个固定的寄存器里，对应的中断代码会取得这个系统调用号，并且调用正确的函数。</p>
+<h2 id="经典系统调用实现"><a href="#经典系统调用实现" class="headerlink" title="经典系统调用实现"></a>经典系统调用实现</h2><p>32位架构下基于<code>int</code>指令的Linux的经典系统调用实现如下<code>(以fork为例)</code>：</p>
+<h3 id="触发中断"><a href="#触发中断" class="headerlink" title="触发中断"></a>触发中断</h3><p>首先程序在代码里调用一个系统调用时，是以一个函数的形式调用的，例如调用<code>fork()</code>：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    fork();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>fork()</code>函数是一个对系统调用<code>fork</code>的封装，可以用下列宏来定义它：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">_syscall0(<span class="keyword">pid_t</span>, fork);</span><br></pre></td></tr></table></figure>
+
+<p><code>_syscall0</code>是一个宏函数，用于定义一个没有参数的系统调用的封装。第一个参数是这个系统调用的返回值类型，这里为<code>pid_t</code>，是一个Linux自定义类型，代表进程的<code>id</code>。第二个参数是系统调用的名称，<code>_syscall0</code>展开之后会形成一个与系统调用名称同名的函数，<code>syscall0</code>及<code>fork</code>如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> _syscall0(type, name)</span></span><br><span class="line"><span class="function">type <span class="title">name</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">long</span> __res;</span><br><span class="line">    <span class="function">__asm__ <span class="title">volatile</span><span class="params">(<span class="string">&quot;int 0x80&quot;</span></span></span></span><br><span class="line"><span class="params"><span class="function">                    : <span class="string">&quot;=a&quot;</span> (__res)</span></span></span><br><span class="line"><span class="params"><span class="function">                    : <span class="string">&quot;0&quot;</span> (__NR_##name))</span></span>;</span><br><span class="line">    __syscall_return(type, __res);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">pid_t</span> <span class="title">fork</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">long</span> __res;</span><br><span class="line">    <span class="function">__asm__ <span class="title">volatile</span><span class="params">(<span class="string">&quot;int 0x80&quot;</span></span></span></span><br><span class="line"><span class="params"><span class="function">                    : <span class="string">&quot;=a&quot;</span> (__res)</span></span></span><br><span class="line"><span class="params"><span class="function">                    : <span class="string">&quot;0&quot;</span> (__NR_fork))</span></span>;</span><br><span class="line">    __syscall_return(<span class="keyword">pid_t</span>, __res);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>__syscall_return</code>是另一个宏，定义如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> __syscall_return(type, res)</span></span><br><span class="line"><span class="keyword">do</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> ((<span class="keyword">unsigned</span> <span class="keyword">long</span>)(res) &gt;= (<span class="keyword">unsigned</span> <span class="keyword">long</span>)(<span class="number">-125</span>))&#123;</span><br><span class="line">        errno = -(res);</span><br><span class="line">        res = <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> (type) (res);</span><br><span class="line">&#125;<span class="keyword">while</span>(<span class="number">0</span>)</span><br></pre></td></tr></table></figure>
+
+<p>这个宏用于检查系统调用的返回值，并把它相应地转换为C语言的<code>errno</code>错误码。在Linux里，系统调用使用返回值传递错误码，如果返回值为负数，那么表明调用失败，返回值的绝对值就是错误码。<code>fork</code>函数在汇编后，就会形成类似如下的汇编代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">fork:</span><br><span class="line">mov eax, 2</span><br><span class="line">int 0x80</span><br><span class="line">cmp eax, 0xFFFFFF83</span><br><span class="line">jb syscall_noerror</span><br><span class="line">neg eax</span><br><span class="line">mov errno, eax</span><br><span class="line">mov eax, 0xFFFFFFFF</span><br><span class="line">sysacll_noerror:</span><br><span class="line">ret</span><br></pre></td></tr></table></figure>
+
+<p>如果系统调用本身有参数，则使用对应的宏函数来封装。<code>x86</code>下Linux支持的系统调用参数至多有6个，分别使用6个寄存器来传递，分别是<code>EBX</code>、<code>ECX</code>、<code>EDX</code>、<code>ESI</code>、<code>EDI</code>和<code>EBP</code>。当用户调用某个系统调用的时候，实际是执行了以上一段汇编代码。CPU执行到<code>int 0x80</code>时，会保存状态并切换特权状态到内核态。然后CPU便会查找中断向量表中的第<code>0x80</code>号元素。</p>
+<h3 id="切换堆栈"><a href="#切换堆栈" class="headerlink" title="切换堆栈"></a>切换堆栈</h3><p>在实际执行中断向量表中的第<code>0x80</code>号元素所对应的函数之前，CPU首先还要进行栈的切换。在Linux中，用户态和内核态使用的是不同的栈，两者各自负责各自的函数调用，互不干扰。但在应用程序调用<code>0x80</code>号中断时，程序的执行流程从用户态切换到内核态，这时程序的当前栈必须也相应地从用户栈切换到内核栈。从中断处理函数中返回时，程序的当前栈还要从内核栈切换回用户栈。</p>
+<p>所谓的当前栈，指的是<code>ESP</code>的值所在的栈空间。如果<code>ESP</code>的值位于用户栈的范围内，那么程序的当前栈就是用户栈，反之亦然。此外，寄存器<code>SS</code>的值还应该指向当前栈所在的页。所以，将当前栈由用户栈切换为内核栈的实际行为就是：</p>
+<ul>
+<li>保存当前的<code>ESP</code>、<code>SS</code>的值</li>
+<li>将<code>ESP</code>、<code>SS</code>的值设置为内核栈的相应值</li>
+</ul>
+<p>将当前栈由内核栈切换为用户栈的实际行为就是：</p>
+<ul>
+<li>恢复原来<code>ESP</code>、<code>SS</code>的值</li>
+</ul>
+<p>当<code>0x80</code>号中断发生的时候，CPU除了切入内核态之外，还会自动完成下列几件事：</p>
+<ul>
+<li>找到当前进程的内核栈<code>(每一个进程都有自己的内核栈)</code></li>
+<li>在内核栈中依次压入用户态的寄存器<code>SS</code>、<code>ESP</code>、<code>EFLAGS</code>、<code>CS</code>、<code>EIP</code></li>
+</ul>
+<p>当内核从系统调用中返回的时候，需要用<code>iret</code>指令来回到用户态，<code>iret</code>指令则会从内核栈里弹出寄存器<code>SS</code>、<code>ESP</code>、<code>EFLAGS</code>、<code>CS</code>、<code>EIP</code>的值，使得栈恢复到用户态的状态。</p>
+<h3 id="中断处理程序"><a href="#中断处理程序" class="headerlink" title="中断处理程序"></a>中断处理程序</h3><p>在<code>int</code>指令合理地切换了栈之后，程序的流程就切换到了中断向量表中记录的<code>0x80</code>号中断处理程序，系统执行函数<code>system_call</code>。</p>
+<p>这个函数一开始使用宏<code>SAVE_ALL</code>将各种寄存器压入栈中，以免其值被后续执行的代码覆盖。然后接下来使用<code>cmpl</code>指令比较<code>eax</code>和<code>nr_syscalls</code>的值，<code>nr_syscalls</code>是比最大的有效系统调用号大1的值，如果<code>eax(用户传入的系统调用号)</code>大于等于<code>nr_syscalls</code>，那么这个系统调用就是无效的，就会跳转执行<code>syscall_badsys</code>；否则跳转执行<code>syscall_call</code>，这个函数调用<code>*sys_call_table(0,%eax,4)</code>来查找中断服务程序并执行，执行结束之后使用宏<code>RESTORE_REGS</code>来恢复之前被<code>SAVE_ALL</code>保存的寄存器，最后通过指令<code>iret</code>从中断处理程序中返回。<code>*sys_call_table(0,%eax,4)</code>指的是<code>sys_call_table</code>上偏移量为<code>0+%eax*4</code>上的那个元素的值指向的函数，也就是<code>%eax</code>所记录的系统调用号所对应的系统调用函数。不同CPU架构下的相关源代码位于Linux源码的<code>Linux/arch/架构名/kernel/entry.S</code>文件中。</p>
+<h1 id="Windows-API"><a href="#Windows-API" class="headerlink" title="Windows API"></a>Windows API</h1><p>API的全称为<code>(Application Programming Interface)</code>，即应用程序接口。API不是一个专门事物，而是一系列事物的总称。但是在Windows下，API一般指Windows系统提供给应用程序的接口，即Windows API。</p>
+<p>Windows API指Windows操作系统提供给应用开发者的最底层的、最直接与Windows打交道的接口。在Windows操作系统下，CRT是建立在Windows API之上的。另外还有许多对Windows API的各种包装库，MFC就是很著名的一种以C++形式封装的库。</p>
+<h2 id="概览"><a href="#概览" class="headerlink" title="概览"></a>概览</h2><p>Windows API是以DLL导出函数的形式提供给应用程序开发者的，它被包含在诸多的系统DLL内，规模非常庞大，所有的导出函数由上千个。微软把这些Windows API DLL导出函数的头文件、导出库、相关文件和工具一起提供给开发者，称为<code>Software Development Kit(SDK)</code>。</p>
+<p>Windows API随着Windows版本的升级也经历了好几个版本，每次Windows进行大升级的时候，也会引入新版本的API。最早期的Windows API是16位Windows的API<code>Win16</code>，其核心是<code>kernel.exe</code>、<code>user.exe</code>以及<code>gdi.exe</code>，虽然扩展名是<code>exe</code>，但实际上都有导出函数。然后是32位Windows的API<code>Win32</code>，主要有三个核心DLL：<code>kernel32.dll</code>、<code>user32.dll</code>和<code>gdi32.dll</code>。64位Windows的API提供了兼容<code>Win32</code>的API，称为<code>Win64</code>。<code>Win64</code>与<code>Win32</code>主要区别在于指针的类型。</p>
+<p>目前Win32是使用最广泛也是最成熟的Windows API版本。Windows API的数量十分庞大，按照功能可以分为以下几类：</p>
+<table>
+<thead>
+<tr>
+<th align="center">类别</th>
+<th align="center">DLL</th>
+<th align="center">示例API</th>
+<th align="center">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">基本服务</td>
+<td align="center">kernel32.dll</td>
+<td align="center">CreateProcess<br />ReadFile<br />HeapAlloc</td>
+<td align="center">包括Windows操作系统最基本的功能，比如文件系统、设备访问、进程、线程、内存、错误处理等。这些功能基本上是所有操作系统都提供的服务</td>
+</tr>
+<tr>
+<td align="center">图形设备接口</td>
+<td align="center">gdi32.dll</td>
+<td align="center">CreateDC<br />TextOut<br />BitBlt</td>
+<td align="center">与图形、绘图、打印机及其他图形设备相关的操作</td>
+</tr>
+<tr>
+<td align="center">用户接口</td>
+<td align="center">user32.dll</td>
+<td align="center">CreateWindow<br />GetMessage<br />SendMessage</td>
+<td align="center">与Windows窗口交互相关的操作、鼠标键盘、基本控件</td>
+</tr>
+<tr>
+<td align="center">高级服务</td>
+<td align="center">advapi32.dll</td>
+<td align="center">RegOpenKeyEx<br />CreateService<br />LogonUser</td>
+<td align="center">Windows内核提供的额外功能。包括注册表、系统关闭重启、Windows Service、用户账号管理</td>
+</tr>
+<tr>
+<td align="center">通用对话框</td>
+<td align="center">comdlg32.dll</td>
+<td align="center">GetOpenFileName<br />PrintDlg<br />ChooseFont</td>
+<td align="center">Windows通用对话框，比如打开文件、打印窗口、选择字体、选择颜色等</td>
+</tr>
+<tr>
+<td align="center">通用控件</td>
+<td align="center">comctl32.dll</td>
+<td align="center">CreateStatusWindow<br />CreateToolbar</td>
+<td align="center">Windows高级控件，诸如状态栏、进度条、工具条等</td>
+</tr>
+<tr>
+<td align="center">Shell</td>
+<td align="center">shell32.dll</td>
+<td align="center">ExtractIcon<br />ShellExecute</td>
+<td align="center">与Windows图形Shell相关的操作</td>
+</tr>
+<tr>
+<td align="center">网络服务</td>
+<td align="center">ws2_32.dll</td>
+<td align="center">send<br />recv</td>
+<td align="center">网络相关服务，包括Winsock、NetDDE、RPC、NetBIOS</td>
+</tr>
+</tbody></table>
+<p>在Windows NT系列的平台上，这些DLL在实现上都会依赖一个更为底层的DLL叫做<code>NTDLL.DLL</code>，然后由<code>NTDLL.DLL</code>进行系统调用。<code>NTDLL.DLL</code>把Windows NT内核的系统调用包装了起来，它实际上是Windows系统用户层面的最底层，所有的DLL都是通过调用<code>NTDLL.DLL</code>，由它进行系统调用的。<code>NTDLL.DLL</code>的导出函数对于应用程序开发者是不公开的，原则上应用程序不应该直接使用<code>NTDLL.DLL</code>中的任何导出函数。可以使用<code>dumpbin</code>等工具来查看它的导出函数。</p>
+<p>由于Windows API所提供的接口还是比较原始的，Windows系统还在API之上建立了很多应用模块，这些模块是对Windows API的功能扩展，比如对<code>HTTP/FTP</code>等协议进行包装的Internet模块<code>(wininet.dll)</code>对WinSocket API进行了扩展。除了<code>wininet.dll</code>之外，Windows还有许多类似的对Windows API的包装模块，比如OPENGL模块、ODBC<code>(统一的数据库接口)</code>、WIA<code>(数字图像设备接口)</code>等。</p>
+<h2 id="为什么使用Windows-API"><a href="#为什么使用Windows-API" class="headerlink" title="为什么使用Windows API"></a>为什么使用Windows API</h2><p>Windows作为一个成功的商业操作系统，它对应用程序的向后兼容性非常好，虽然它没有完全做到向后兼容，但是可以看到Windows系统为向后兼容所付出的努力及Windows系统为此所背负的历史包袱。</p>
+<p>系统调用实际上是非常依赖于硬件结构的一种接口，它受到硬件的严格限制，比如寄存器的数量、调用时的参数传递、中断号、堆栈切换等，都与硬件密切相关。如果硬件结构稍微发生改变，大量的应用程序可能就会出现问题，那么直接使用系统调用作为程序接口的系统，它的应用程序在不同的硬件平台间的兼容性也是存在较大问题的。</p>
+<p>为了尽量隔离硬件结构的不同而导致的程序兼容性的问题，Windows系统把系统调用包装了起来，使用DLL导出函数作为应用程序的唯一可用的接口暴漏给用户。这样可以让内核随版本自由地改变系统调用接口，只要让API层不改变，用户程序就可以完全无碍地运行在新的系统上。</p>
+<p>除了隔离硬件结构不同之外，Windows本身也有可能使用不同版本的内核，系统调用的接口自然也是不一样的。Windows API以DLL导出函数的形式存在也自然是水到渠成，DLL作为Windows系统的最基本的模块组织形式，它有着良好的接口定义和灵活的组合方式。DLL基本上是Windows系统上很多高级接口和程序设计方法的基石，包括内核与驱动程序、COM、OLE、ActiveX等都是基于DLL技术的。</p>
+<h1 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h1><ul>
+<li>《程序员的自我修养——链接、装载与库》</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Basic/" rel="tag"><i class="fa fa-tag"></i> Basic</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/runtime-lib/" rel="prev" title="运行库简析">
+                  <i class="fa fa-chevron-left"></i> 运行库简析
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lu0k</span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <script size="250" alpha="0.5" zIndex="-1" src="https://cdn.jsdelivr.net/npm/ribbon.js@1.0.2/dist/ribbon.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>
