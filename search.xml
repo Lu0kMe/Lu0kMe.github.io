@@ -888,7 +888,7 @@
 </tbody></table>
 ]]></content>
       <categories>
-        <category>Linux</category>
+        <category>Reading Notes</category>
       </categories>
       <tags>
         <tag>Basic</tag>
@@ -1043,7 +1043,7 @@
 <h2 id="安全性分析-4"><a href="#安全性分析-4" class="headerlink" title="安全性分析"></a>安全性分析</h2><p>在不完全开启RELRO时，外部符号还未被解析时，此时got表项对应的不是真正的外部函数的地址，在第一次调用外部符号时会执行符号解析逻辑，可以采用Ret2dl_resolve方法进行攻击。而完全开启RELRO时，就需要更复杂的手段来实现绕过。</p>
 ]]></content>
       <categories>
-        <category>Linux</category>
+        <category>Reading Notes</category>
       </categories>
       <tags>
         <tag>Pwn</tag>
@@ -1249,7 +1249,7 @@
 </ul>
 ]]></content>
       <categories>
-        <category>Linker and Loader</category>
+        <category>Reading Notes</category>
       </categories>
       <tags>
         <tag>Basic</tag>
@@ -1600,7 +1600,7 @@
 </ul>
 ]]></content>
       <categories>
-        <category>Linker and Loader</category>
+        <category>Reading Notes</category>
       </categories>
       <tags>
         <tag>Basic</tag>
@@ -1745,7 +1745,7 @@
   </entry>
   <entry>
     <title>链接的接口--符号</title>
-    <url>/posts/link-symbol/</url>
+    <url>/posts/symbol-intro/</url>
     <content><![CDATA[<h1 id="符号简介"><a href="#符号简介" class="headerlink" title="符号简介"></a>符号简介</h1><p>在链接中，目标文件之间相互拼合实际上是目标文件之间对地址的引用，即对函数和变量的地址的引用。比如目标文件B要用到目标文件A中的函数foo，那么称目标文件A定义<code>(Define)</code>了函数foo，称目标文件B引用<code>(Reference)</code>了目标文件A中的函数foo。每个函数和变量都有自己独特的名字，才能避免链接过程中不同变量和函数之间的混淆。在链接中，我们将函数和变量统称为符号<code>(Symbol)</code>，函数名或变量名就是符号名<code>(Symbol Name)</code>。</p>
 <span id="more"></span>
 
@@ -1889,7 +1889,7 @@
 </ul>
 ]]></content>
       <categories>
-        <category>Linker and Loader</category>
+        <category>Reading Notes</category>
       </categories>
       <tags>
         <tag>Basic</tag>
@@ -1994,7 +1994,7 @@
 </ul>
 ]]></content>
       <categories>
-        <category>Linker and Loader</category>
+        <category>Reading Notes</category>
       </categories>
       <tags>
         <tag>Basic</tag>
@@ -2368,7 +2368,7 @@
 </ul>
 ]]></content>
       <categories>
-        <category>Linker and Loader</category>
+        <category>Reading Notes</category>
       </categories>
       <tags>
         <tag>Basic</tag>
@@ -2442,7 +2442,7 @@
 </ul>
 ]]></content>
       <categories>
-        <category>Linker and Loader</category>
+        <category>Reading Notes</category>
       </categories>
       <tags>
         <tag>Basic</tag>
@@ -2760,7 +2760,7 @@
 </ul>
 ]]></content>
       <categories>
-        <category>Linker and Loader</category>
+        <category>Reading Notes</category>
       </categories>
       <tags>
         <tag>Basic</tag>
@@ -2869,7 +2869,7 @@
 </ul>
 ]]></content>
       <categories>
-        <category>Linker and Loader</category>
+        <category>Reading Notes</category>
       </categories>
       <tags>
         <tag>Basic</tag>
@@ -3002,7 +3002,7 @@
 </ul>
 ]]></content>
       <categories>
-        <category>Linker and Loader</category>
+        <category>Reading Notes</category>
       </categories>
       <tags>
         <tag>Basic</tag>
@@ -4075,7 +4075,7 @@
 </ul>
 ]]></content>
       <categories>
-        <category>Linker and Loader</category>
+        <category>Reading Notes</category>
       </categories>
       <tags>
         <tag>Basic</tag>
@@ -4271,7 +4271,7 @@
 </ul>
 ]]></content>
       <categories>
-        <category>Linker and Loader</category>
+        <category>Reading Notes</category>
       </categories>
       <tags>
         <tag>Basic</tag>
@@ -4411,7 +4411,7 @@
 </ul>
 ]]></content>
       <categories>
-        <category>Linker and Loader</category>
+        <category>Reading Notes</category>
       </categories>
       <tags>
         <tag>Basic</tag>
