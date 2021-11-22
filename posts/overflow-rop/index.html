@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-lu0k.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-lu0k.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-lu0k.png">
+  <link rel="mask-icon" href="/images/lu0k.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"lu0k.github.io","root":"/","images":"/images","scheme":"Gemini","version":"8.7.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+<meta name="description" content="栈溢出原理由于C语言对于数组引用不做任何边界检查，从而导致缓冲区溢出(buffer overflow)成为一种很常见的漏洞。根据溢出发生的内存位置，通常可以分为栈溢出和堆溢出。其中，由于栈上保存着局部变量和一些状态信息(寄存器值、返回地址等)，一旦发生严重的溢出，攻击者就可以通过覆写返回地址来执行任意代码，利用方法包括shellcode注入、ret2libc、ROP等。同时，防守方也发展出多种利用">
+<meta property="og:type" content="article">
+<meta property="og:title" content="栈溢出与ROP">
+<meta property="og:url" content="https://lu0k.github.io/posts/overflow-rop/index.html">
+<meta property="og:site_name" content="Lu0k">
+<meta property="og:description" content="栈溢出原理由于C语言对于数组引用不做任何边界检查，从而导致缓冲区溢出(buffer overflow)成为一种很常见的漏洞。根据溢出发生的内存位置，通常可以分为栈溢出和堆溢出。其中，由于栈上保存着局部变量和一些状态信息(寄存器值、返回地址等)，一旦发生严重的溢出，攻击者就可以通过覆写返回地址来执行任意代码，利用方法包括shellcode注入、ret2libc、ROP等。同时，防守方也发展出多种利用">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-11-21T16:00:00.000Z">
+<meta property="article:modified_time" content="2021-11-22T14:09:47.106Z">
+<meta property="article:author" content="Lu0k">
+<meta property="article:tag" content="Pwn">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://lu0k.github.io/posts/overflow-rop/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://lu0k.github.io/posts/overflow-rop/","path":"posts/overflow-rop/","title":"栈溢出与ROP"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>栈溢出与ROP | Lu0k</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">Lu0k</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Lu0k's Blog</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%A0%88%E6%BA%A2%E5%87%BA%E5%8E%9F%E7%90%86"><span class="nav-number">1.</span> <span class="nav-text">栈溢出原理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%87%BD%E6%95%B0%E8%B0%83%E7%94%A8%E6%A0%88"><span class="nav-number">1.1.</span> <span class="nav-text">函数调用栈</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%B1%E9%99%A9%E5%87%BD%E6%95%B0"><span class="nav-number">1.2.</span> <span class="nav-text">危险函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ret2libc"><span class="nav-number">1.3.</span> <span class="nav-text">ret2libc</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%BF%94%E5%9B%9E%E5%AF%BC%E5%90%91%E7%BC%96%E7%A8%8B"><span class="nav-number">2.</span> <span class="nav-text">返回导向编程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#ROP%E7%AE%80%E4%BB%8B"><span class="nav-number">2.1.</span> <span class="nav-text">ROP简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ROP%E7%9A%84%E5%8F%98%E7%A7%8D"><span class="nav-number">2.2.</span> <span class="nav-text">ROP的变种</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Blind-ROP"><span class="nav-number">3.</span> <span class="nav-text">Blind ROP</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#SROP"><span class="nav-number">4.</span> <span class="nav-text">SROP</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Signal%E6%9C%BA%E5%88%B6"><span class="nav-number">4.1.</span> <span class="nav-text">Signal机制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SROP-1"><span class="nav-number">4.2.</span> <span class="nav-text">SROP</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#srop%E6%A8%A1%E5%9D%97"><span class="nav-number">4.3.</span> <span class="nav-text">srop模块</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Stack-Pivoting"><span class="nav-number">5.</span> <span class="nav-text">Stack Pivoting</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Ret2dl-resolve"><span class="nav-number">6.</span> <span class="nav-text">Ret2dl-resolve</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Reference"><span class="nav-number">7.</span> <span class="nav-text">Reference</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-overview">
+            <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Lu0k"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Lu0k</p>
+  <div class="site-description" itemprop="description">谦虚学习!</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">53</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/lu0k" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;lu0k" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/Lu0kMe" title="Twitter → https:&#x2F;&#x2F;twitter.com&#x2F;Lu0kMe" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://lu0k.github.io/posts/overflow-rop/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Lu0k">
+      <meta itemprop="description" content="谦虚学习!">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Lu0k">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          栈溢出与ROP
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-11-22 00:00:00" itemprop="dateCreated datePublished" datetime="2021-11-22T00:00:00+08:00">2021-11-22</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Reading-Notes/" itemprop="url" rel="index"><span itemprop="name">Reading Notes</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="栈溢出原理"><a href="#栈溢出原理" class="headerlink" title="栈溢出原理"></a>栈溢出原理</h1><p>由于C语言对于数组引用不做任何边界检查，从而导致缓冲区溢出<code>(buffer overflow)</code>成为一种很常见的漏洞。根据溢出发生的内存位置，通常可以分为栈溢出和堆溢出。其中，由于栈上保存着局部变量和一些状态信息<code>(寄存器值、返回地址等)</code>，一旦发生严重的溢出，攻击者就可以通过覆写返回地址来执行任意代码，利用方法包括<code>shellcode注入</code>、<code>ret2libc</code>、<code>ROP</code>等。同时，防守方也发展出多种利用缓解机制。</p>
+<span id="more"></span>
+
+<h2 id="函数调用栈"><a href="#函数调用栈" class="headerlink" title="函数调用栈"></a>函数调用栈</h2><p>函数调用栈是一块连续的用来保存函数运行状态的内存区域，调用函数<code>(caller)</code>和被调用函数<code>(callee)</code>根据调用关系堆叠起来，从内存的高地址向低地址增长。这个过程主要涉及<code>eip</code>、<code>esp</code>和<code>ebp</code>三个寄存器：<code>eip</code>用于存储即将执行的指令地址；<code>esp</code>用于存储栈顶地址，随着数据的压栈和出栈而变化；<code>ebp</code>用于存储栈基址，并参与栈内数据的寻址。</p>
+<p>样例程序：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">func</span><span class="params">(<span class="keyword">int</span> arg1, <span class="keyword">int</span> arg2, <span class="keyword">int</span> arg3, <span class="keyword">int</span> arg4, <span class="keyword">int</span> arg5, <span class="keyword">int</span> arg6, <span class="keyword">int</span> arg7, <span class="keyword">int</span> arg8)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> loc1 = arg1 + <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">int</span> loc8 = arg8 + <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">return</span> loc1 + loc8;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> func(<span class="number">11</span>, <span class="number">22</span>, <span class="number">33</span>, <span class="number">44</span>, <span class="number">55</span>, <span class="number">66</span>, <span class="number">77</span>, <span class="number">88</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>编译程序：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> gcc -m32 1.c -o stack32</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> gcc 1.c -o stack64</span></span><br></pre></td></tr></table></figure>
+
+<p><code>x86</code>程序：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">gef➤  disassemble main</span><br><span class="line">Dump of assembler code for function main:</span><br><span class="line">   0x000011b9 &lt;+0&gt;:     push   ebp</span><br><span class="line">   0x000011ba &lt;+1&gt;:     mov    ebp,esp</span><br><span class="line">   0x000011bc &lt;+3&gt;:     call   0x11e0 &lt;__x86.get_pc_thunk.ax&gt;</span><br><span class="line">   0x000011c1 &lt;+8&gt;:     add    eax,0x2e3f</span><br><span class="line">   0x000011c6 &lt;+13&gt;:    push   0x58</span><br><span class="line">   0x000011c8 &lt;+15&gt;:    push   0x4d</span><br><span class="line">   0x000011ca &lt;+17&gt;:    push   0x42</span><br><span class="line">   0x000011cc &lt;+19&gt;:    push   0x37</span><br><span class="line">   0x000011ce &lt;+21&gt;:    push   0x2c</span><br><span class="line">   0x000011d0 &lt;+23&gt;:    push   0x21</span><br><span class="line">   0x000011d2 &lt;+25&gt;:    push   0x16</span><br><span class="line">   0x000011d4 &lt;+27&gt;:    push   0xb</span><br><span class="line">   0x000011d6 &lt;+29&gt;:    call   0x118d &lt;func&gt;</span><br><span class="line">   0x000011db &lt;+34&gt;:    add    esp,0x20</span><br><span class="line">   0x000011de &lt;+37&gt;:    leave</span><br><span class="line">   0x000011df &lt;+38&gt;:    ret</span><br><span class="line">End of assembler dump.</span><br><span class="line">gef➤  disassemble func</span><br><span class="line">Dump of assembler code for function func:</span><br><span class="line">   0x5655618d &lt;+0&gt;:     push   ebp</span><br><span class="line">   0x5655618e &lt;+1&gt;:     mov    ebp,esp</span><br><span class="line">   0x56556190 &lt;+3&gt;:     sub    esp,0x10</span><br><span class="line">   0x56556193 &lt;+6&gt;:     call   0x565561e0 &lt;__x86.get_pc_thunk.ax&gt;</span><br><span class="line">   0x56556198 &lt;+11&gt;:    add    eax,0x2e68</span><br><span class="line">   0x5655619d &lt;+16&gt;:    mov    eax,DWORD PTR [ebp+0x8]</span><br><span class="line">   0x565561a0 &lt;+19&gt;:    add    eax,0x1</span><br><span class="line">   0x565561a3 &lt;+22&gt;:    mov    DWORD PTR [ebp-0x4],eax</span><br><span class="line">   0x565561a6 &lt;+25&gt;:    mov    eax,DWORD PTR [ebp+0x24]</span><br><span class="line">   0x565561a9 &lt;+28&gt;:    add    eax,0x1</span><br><span class="line">   0x565561ac &lt;+31&gt;:    mov    DWORD PTR [ebp-0x8],eax</span><br><span class="line">   0x565561af &lt;+34&gt;:    mov    edx,DWORD PTR [ebp-0x4]</span><br><span class="line">   0x565561b2 &lt;+37&gt;:    mov    eax,DWORD PTR [ebp-0x8]</span><br><span class="line">   0x565561b5 &lt;+40&gt;:    add    eax,edx</span><br><span class="line">   0x565561b7 &lt;+42&gt;:    leave</span><br><span class="line">   0x565561b8 &lt;+43&gt;:    ret</span><br><span class="line">End of assembler dump.</span><br></pre></td></tr></table></figure>
+
+<p>对于<code>x86</code>程序，被调用函数<code>func()</code>的8个参数从后向前依次入栈，当执行<code>call</code>指令时，下一条指令的地址<code>0x000011db</code>作为返回地址入栈。然后程序跳转到<code>func()</code>，在函数的开头，被调用函数的<code>ebp</code>压栈保存并更新为当前的栈顶地址<code>esp</code>，作为新的栈基址，而<code>esp</code>则下移为局部变量开辟空间。函数返回时则相反，通过<code>leave</code>指令将<code>esp</code>恢复为当前的<code>ebp</code>，并从栈中将调用者的<code>ebp</code>弹出，最后<code>ret</code>指令弹出返回地址作为<code>eip</code>，程序回到<code>main()</code>函数中，最后抬高<code>esp</code>清理被调用者的参数，一次函数调用过程就结束了。</p>
+<p><code>x86-64</code>程序：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">gef➤  disassemble main</span><br><span class="line">Dump of assembler code for function main:</span><br><span class="line">   0x000000000000115d &lt;+0&gt;:     push   rbp</span><br><span class="line">   0x000000000000115e &lt;+1&gt;:     mov    rbp,rsp</span><br><span class="line">   0x0000000000001161 &lt;+4&gt;:     push   0x58</span><br><span class="line">   0x0000000000001163 &lt;+6&gt;:     push   0x4d</span><br><span class="line">   0x0000000000001165 &lt;+8&gt;:     mov    r9d,0x42</span><br><span class="line">   0x000000000000116b &lt;+14&gt;:    mov    r8d,0x37</span><br><span class="line">   0x0000000000001171 &lt;+20&gt;:    mov    ecx,0x2c</span><br><span class="line">   0x0000000000001176 &lt;+25&gt;:    mov    edx,0x21</span><br><span class="line">   0x000000000000117b &lt;+30&gt;:    mov    esi,0x16</span><br><span class="line">   0x0000000000001180 &lt;+35&gt;:    mov    edi,0xb</span><br><span class="line">   0x0000000000001185 &lt;+40&gt;:    call   0x1129 &lt;func&gt;</span><br><span class="line">   0x000000000000118a &lt;+45&gt;:    add    rsp,0x10</span><br><span class="line">   0x000000000000118e &lt;+49&gt;:    leave</span><br><span class="line">   0x000000000000118f &lt;+50&gt;:    ret</span><br><span class="line">End of assembler dump.</span><br><span class="line">gef➤  disassemble func</span><br><span class="line">Dump of assembler code for function func:</span><br><span class="line">   0x0000000000001129 &lt;+0&gt;:     push   rbp</span><br><span class="line">   0x000000000000112a &lt;+1&gt;:     mov    rbp,rsp</span><br><span class="line">   0x000000000000112d &lt;+4&gt;:     mov    DWORD PTR [rbp-0x14],edi</span><br><span class="line">   0x0000000000001130 &lt;+7&gt;:     mov    DWORD PTR [rbp-0x18],esi</span><br><span class="line">   0x0000000000001133 &lt;+10&gt;:    mov    DWORD PTR [rbp-0x1c],edx</span><br><span class="line">   0x0000000000001136 &lt;+13&gt;:    mov    DWORD PTR [rbp-0x20],ecx</span><br><span class="line">   0x0000000000001139 &lt;+16&gt;:    mov    DWORD PTR [rbp-0x24],r8d</span><br><span class="line">   0x000000000000113d &lt;+20&gt;:    mov    DWORD PTR [rbp-0x28],r9d</span><br><span class="line">   0x0000000000001141 &lt;+24&gt;:    mov    eax,DWORD PTR [rbp-0x14]</span><br><span class="line">   0x0000000000001144 &lt;+27&gt;:    add    eax,0x1</span><br><span class="line">   0x0000000000001147 &lt;+30&gt;:    mov    DWORD PTR [rbp-0x4],eax</span><br><span class="line">   0x000000000000114a &lt;+33&gt;:    mov    eax,DWORD PTR [rbp+0x18]</span><br><span class="line">   0x000000000000114d &lt;+36&gt;:    add    eax,0x1</span><br><span class="line">   0x0000000000001150 &lt;+39&gt;:    mov    DWORD PTR [rbp-0x8],eax</span><br><span class="line">   0x0000000000001153 &lt;+42&gt;:    mov    edx,DWORD PTR [rbp-0x4]</span><br><span class="line">   0x0000000000001156 &lt;+45&gt;:    mov    eax,DWORD PTR [rbp-0x8]</span><br><span class="line">   0x0000000000001159 &lt;+48&gt;:    add    eax,edx</span><br><span class="line">   0x000000000000115b &lt;+50&gt;:    pop    rbp</span><br><span class="line">   0x000000000000115c &lt;+51&gt;:    ret</span><br><span class="line">End of assembler dump.</span><br></pre></td></tr></table></figure>
+
+<p>对于<code>x86-64</code>程序，前6个参数分别通过<code>RDI</code>、<code>RSI</code>、<code>RDX</code>、<code>RCX</code>、<code>R8</code>和<code>R9</code>进行传递，剩余参数才像<code>x86</code>一样从后向前依次压栈。除此以外，<code>func()</code>没有下移<code>rsp</code>开辟栈空间的操作，导致<code>rbp</code>和<code>rsp</code>的值是相同的，其实这是一项编译优化：根据<code>AMD64 ABI</code>文档的描述，<code>rsp</code>以下128字节的区域被称为<code>red zone</code>，这是一块被保留的内存，不会被信号或者中断所修改。于是，<code>func()</code>作为叶子函数就可以在不调整栈指针的情况下，使用这块内存保存临时数据。</p>
+<h2 id="危险函数"><a href="#危险函数" class="headerlink" title="危险函数"></a>危险函数</h2><p>大多数缓冲区溢出问题都是错误地使用了一些危险函数所导致的。第一类危险函数是<code>scanf</code>、<code>gets</code>等输入读取函数。下面的语句将用户输入读到<code>buf</code>中，第一条语句并未限制读取长度，明显存在栈溢出的风险；第二条语句限制长度为10，但由于<code>scanf()</code>函数会在字符串末尾自动添加一个<code>\0</code>，如果输入刚好10个字符，那么<code>\0</code>就会溢出；第三条语句才是最安全的做法，既考虑了缓冲区大小，又考虑了函数特性。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">char</span> buf[<span class="number">10</span>];</span><br><span class="line"><span class="built_in">scanf</span>(<span class="string">&quot;%s&quot;</span>, buf);</span><br><span class="line"><span class="built_in">scanf</span>(<span class="string">&quot;%10s&quot;</span>, buf);</span><br><span class="line"><span class="built_in">scanf</span>(<span class="string">&quot;%9s&quot;</span>, buf);</span><br></pre></td></tr></table></figure>
+
+<p>第二类危险函数是<code>strcpy</code>、<code>strcat</code>、<code>sprintf</code>等字符串拷贝函数。考虑下面的语句，<code>read()</code>函数读取用户的输入到<code>srcbuf</code>，接下来<code>strcpy</code>把<code>srcbuf</code>拷贝到<code>destbuf</code>，由于<code>destbuf</code>的最大长度只有10，小于<code>srcbuf</code>的最大长度20，显然是有可能造成溢出的。对于这种情况，建议使用对应的安全函数<code>strcpy</code>、<code>strcat</code>、<code>sprintf</code>等来代替。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> len;</span><br><span class="line"><span class="keyword">char</span> srcbuf[<span class="number">20</span>];</span><br><span class="line"><span class="keyword">char</span> destbuf[<span class="number">10</span>];</span><br><span class="line">len = read(<span class="number">0</span>, srcbuf, <span class="number">19</span>);</span><br><span class="line">srcbuf[len] = <span class="number">0</span>;</span><br><span class="line"><span class="built_in">strcpy</span>(destbuf, srcbuf);</span><br></pre></td></tr></table></figure>
+
+<h2 id="ret2libc"><a href="#ret2libc" class="headerlink" title="ret2libc"></a>ret2libc</h2><p>栈溢出的主要目的就是覆写函数的返回地址，从而劫持控制流，在没有<code>NX</code>保护机制的时候，在栈溢出的时候就可以将<code>shellcode</code>注入栈上并执行。使用填充数据<code>padding1</code>一直覆盖到调用者的<code>ebp</code>，然后在返回地址处填充上<code>shellcode</code>的地址，当函数返回时，就会跳到<code>shellcode</code>的位置。<code>padding2</code>也可以使用任意数据，但如果开启了<code>ASLR</code>，使<code>shellcode</code>的地址不太确定，那么就可以使用<code>NOP sled(&quot;\x90\x90...&quot;)</code>作为一段滑板指令，当程序跳到这段指令时就会一直滑到<code>shellcode</code>执行。如下：</p>
+<table>
+<thead>
+<tr>
+<th align="center">原函数调用栈</th>
+<th align="center">ret2shellcode</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><code>caller&#39;s data</code></td>
+<td align="center"><code>caller&#39;s data</code></td>
+</tr>
+<tr>
+<td align="center"><code>caller&#39;s data</code></td>
+<td align="center"><code>shellcode</code></td>
+</tr>
+<tr>
+<td align="center"><code>caller&#39;s data</code></td>
+<td align="center"><code>padding2</code></td>
+</tr>
+<tr>
+<td align="center"><code>return address</code></td>
+<td align="center"><code>shellcode address</code></td>
+</tr>
+<tr>
+<td align="center"><code>caller&#39;s ebp</code></td>
+<td align="center"><code>padding1</code></td>
+</tr>
+<tr>
+<td align="center"><code>caller&#39;s data</code></td>
+<td align="center"><code>padding1</code></td>
+</tr>
+</tbody></table>
+<p>开启<code>NX</code>后，栈上的<code>shellcode</code>不可执行，这时就需要使用<code>ret2libc</code>来调用<code>libc.so</code>中的<code>system(&quot;/bin/sh&quot;)</code>。此时返回地址被覆盖上<code>system()</code>函数的地址，<code>padding2</code>为其添加一个伪造的返回地址，长度为4字节。紧接着放上<code>&quot;/bin/sh&quot;</code>字符串的地址，作为<code>system()</code>函数的参数。如果开启了<code>ASLR</code>，那么<code>system()</code>和<code>&quot;/bin/sh&quot;</code>的地址就变成随机的，此时需要先做内存泄漏，再填充真实地址。如下：</p>
+<table>
+<thead>
+<tr>
+<th align="center">原函数调用栈</th>
+<th align="center">ret2shellcode</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><code>caller&#39;s data</code></td>
+<td align="center"><code>caller&#39;s data</code></td>
+</tr>
+<tr>
+<td align="center"><code>caller&#39;s data</code></td>
+<td align="center"><code>&quot;/bin/sh&quot; address</code></td>
+</tr>
+<tr>
+<td align="center"><code>caller&#39;s data</code></td>
+<td align="center"><code>padding2</code></td>
+</tr>
+<tr>
+<td align="center"><code>return address</code></td>
+<td align="center"><code>system() address</code></td>
+</tr>
+<tr>
+<td align="center"><code>caller&#39;s ebp</code></td>
+<td align="center"><code>padding1</code></td>
+</tr>
+<tr>
+<td align="center"><code>caller&#39;s data</code></td>
+<td align="center"><code>padding1</code></td>
+</tr>
+</tbody></table>
+<h1 id="返回导向编程"><a href="#返回导向编程" class="headerlink" title="返回导向编程"></a>返回导向编程</h1><h2 id="ROP简介"><a href="#ROP简介" class="headerlink" title="ROP简介"></a>ROP简介</h2><p>最开始，要利用栈溢出只需将返回地址覆盖为<code>jmp esp</code>指令的地址，并在后面添加<code>shellcode</code>就可以执行。后来引入了<code>NX</code>缓解机制，数据所在内存页被标记为不可执行，此时再执行<code>shellcode</code>就会抛出异常。于是攻击者就开始考虑利用<code>libc</code>中的函数，即<code>ret2libc</code>。这种技术仍然存在缺陷，首先，虽然攻击者可以一个接一个地调用<code>libc</code>中的函数，但这个执行流仍是线性的，而不是像代码注入那样任意执行；其次，攻击者只能使用程序<code>text</code>段和<code>libc</code>中已有的函数，通过移除这些特定的函数就可以限制此类攻击。</p>
+<p>论文<a target="_blank" rel="noopener" href="https://hovav.net/ucsd/dist/geometry.pdf">The Geometry of Innocent Flesh on the Bone: Return-into-libc without Function Calls (on the x86)</a>提出了一种新的攻击技术——返回导向编程<code>(ROP, Return-Oriented Programming)</code>，无需调用任何函数即可执行任意代码。使用<code>ROP</code>攻击，首先需要扫描文件，提取出可用的<code>gadget</code>片段<code>(通常以ret指令结尾)</code>，然后将这些<code>gadget</code>根据所需要的功能进行组合，达到攻击者的目的。</p>
+<p>为了完成指令序列的构建，首先需要找到这些以<code>ret</code>指令结尾，并且在执行时必然以<code>ret</code>结束，而不会跳到其他地方的<code>gadget</code>，算法如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">Algorithm Galileo:</span><br><span class="line">	create a node, root, representing the ret instruction;</span><br><span class="line">	place root in the trie;</span><br><span class="line">	for pos from 1 to textseg len do:</span><br><span class="line">		if the byte at pos is c3, i.e., a ret instruction, then:</span><br><span class="line">			call BuildFrom(pos,root).</span><br><span class="line">			</span><br><span class="line">Procedure BuildFrom(index pos, instruction parent insn):</span><br><span class="line">	for step from 1 to max insn len do:</span><br><span class="line">		if bytes [(pos − step). . .(pos − 1)]decode as a valid instruction insn then:</span><br><span class="line">			ensure insn is in the trie as a child of parent insn;</span><br><span class="line">			if insn isn’t boring then:</span><br><span class="line">				call BuildFrom(pos − step, insn).</span><br><span class="line">					Figure 1: The Galileo Algorithm.</span><br></pre></td></tr></table></figure>
+
+<p>即扫描二进制找到<code>ret(c3)</code>指令，将其作为<code>trie</code>的根节点，然后回溯解析前面的指令，如果是有效指令，将其添加为子节点，再判断是否为<code>boring</code>；如果不是，就继续递归回溯。举个例子，在一个<code>trie</code>中一个表示<code>pop %eax</code>的节点是表示<code>ret</code>的根节点的子节点，则这个<code>gadget</code>为<code>pop %eax;ret</code>。如此就能把有用的<code>gadgets</code>都找出来了。<code>boring</code>指令则分为三种情况：</p>
+<ul>
+<li>该指令是<code>leave</code>，后跟一个<code>ret</code>指令</li>
+<li>该指令是一个<code>pop %ebp</code>，后跟一个<code>ret</code>指令</li>
+<li>该指令是返回或者非条件跳转</li>
+</ul>
+<p>有很多工具可以帮助我们完成<code>gadgets</code>搜索的工作，常用的有<code>ROPgadget</code>、<code>Ropper</code>等，还可以直接在<code>ropshell</code>网站上搜索。<code>gadgets</code>在多个体系架构上都是图灵完备的，允许任意复杂度的计算。常见用法有：</p>
+<ul>
+<li>保存栈数据到寄存器</li>
+<li>保存内存数据到寄存器</li>
+<li>保存寄存器数据到内存</li>
+<li>算术和逻辑运算</li>
+<li>系统调用。执行内核中断</li>
+<li>影响栈帧的<code>gadget</code>。这些<code>gadget</code>会改变<code>ebp</code>的值，从而影响栈帧</li>
+</ul>
+<h2 id="ROP的变种"><a href="#ROP的变种" class="headerlink" title="ROP的变种"></a>ROP的变种</h2><p>论文<a target="_blank" rel="noopener" href="https://hovav.net/ucsd/dist/noret-ccs.pdf">Return-Oriented Programming without Returns</a>中指出，正常程序的指令流执行和<code>ROP</code>指令流有很大不同，至少有两点：</p>
+<ul>
+<li><code>ROP</code>执行流会包含很多<code>ret</code>指令，而且这些<code>ret</code>指令可能只间隔了几条其他指令</li>
+<li><code>ROP</code>利用<code>ret</code>指令来<code>unwind</code>堆栈，却没有与<code>ret</code>指令相对应的<code>call</code>指令</li>
+</ul>
+<p>针对以上两点，研究人员提出了多种<code>ROP</code>检测和防御技术。针对第一点，可以检测程序执行中是否有频繁<code>ret</code>的指令流，作为报警的依据；针对第二点，可以通过<code>call</code>和<code>ret</code>指令的配对情况来判断异常。或者维护一个影子栈<code>(shadow stack)</code>作为正常栈的备份，每次<code>ret</code>的时候就与正常栈对比一下，或者直接在编译器层面重写二进制文件，消除<code>ret</code>指令。</p>
+<p>这些早期的防御技术默认<code>ROP</code>中一定存在<code>ret</code>指令，如果攻击者能够找到既不使用<code>ret</code>指令，又能改变执行流的<code>ROP</code>链，就能成功绕过这些防御。于是就诞生了不依赖于<code>ret</code>指令的<code>ROP</code>变种。</p>
+<p><code>ret</code>指令的作用主要有两个：</p>
+<ul>
+<li>通过间接跳转改变程序执行流</li>
+<li>更新寄存器状态</li>
+</ul>
+<p>在<code>x86</code>和<code>ARM</code>中都存在一些指令序列，也能够完成类似的工作，它们首先更新全局状态<code>(如栈指针)</code>，然后根据更新后的状态加载下一条指令的地址，并跳转过去执行。这样的指令序列称为<code>update-load-branch</code>，使用它们来避免<code>ret</code>指令的使用。由于<code>update-load-branch</code>相比于<code>ret</code>指令更加稀少，所以通常作为跳板<code>(trampoline)</code>来重复利用。当一个<code>gadget</code>执行结束后，跳转到<code>trampoline</code>，<code>trampoline</code>更新程序状态后把控制权交到下一个<code>gadget</code>，由此形成<code>ROP</code>链。由于这些<code>gadgets</code>都以<code>jump</code>指令作为结尾，称之为<code>JOP(Jump-Oriented Programming)</code>，如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pop %eax; jmp *%eax</span><br></pre></td></tr></table></figure>
+
+<p>它的行为与<code>ret</code>很像，唯一的副作用是覆盖了<code>eax</code>寄存器，假如程序执行不依赖于<code>eax</code>，这一段指令就可以取代<code>ret</code>。当然，<code>eax</code>可以被换成任意一个通用寄存器，而且比起单间接跳转，通常更愿意使用双重间接跳转：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pop %eax; jmp *(%eax)</span><br></pre></td></tr></table></figure>
+
+<p>此时，<code>eax</code>存放的是一个被称为<code>sequence catalog</code>表的地址，该表用于存放各种指令序列的地址，也就是一个类似于<code>GOT</code>表的东西。所谓双间接跳转，就是先从上一段指令序列跳到<code>catalog</code>表，然后从<code>catalog</code>表跳到下一段指令序列。这就使得<code>ROP</code>链的构造更加便捷，甚至可以根据偏移来实现跳转。</p>
+<p>另一篇论文<a target="_blank" rel="noopener" href="https://www.comp.nus.edu.sg/~liangzk/papers/asiaccs11.pdf">Jump-Oriented Programming: A New Class of Code-Reuse Attack</a>几乎同时提出了这种基于<code>jmp</code>指令的攻击方法，此外，<code>ROP</code>的变种还包括<code>string-oriented programming(SOP)</code>、<code>sigreturn-oriented programming(SROP)</code>、<code>data-oriented programming(DOP)</code>、<code>crash-resistant oriented programming(CROP)</code>、<code>printf programming</code>等。</p>
+<h1 id="Blind-ROP"><a href="#Blind-ROP" class="headerlink" title="Blind ROP"></a>Blind ROP</h1><p><code>BROP</code>，即<code>Blind Return Oriented Programming</code>，于2014年在论文<a target="_blank" rel="noopener" href="https://www.scs.stanford.edu/brop/bittau-brop.pdf">Hacking Blind</a>中提出。<code>BROP</code>能够在无法获得二进制程序的情况下，基于远程服务崩溃与否<code>(连接是否中断)</code>，进行<code>ROP</code>攻击获得<code>shell</code>，可用于开启了<code>ASLR</code>、<code>NX</code>和<code>Canaries</code>的64位Linux。</p>
+<p>传统的<code>ROP</code>攻击需要攻击者通过逆向等手段，从二进制文件里提取可用的<code>gadgets</code>，而<code>BROP</code>在符合一定的前提条件下，无需获得二进制文件。其中，两个必要的条件是：</p>
+<ul>
+<li>目标程序存在栈溢出漏洞，并且可以稳定触发</li>
+<li>目标进程在崩溃后立即重启，并且重启后的进程内存不会重新随机化，这样即使目标机器开启了<code>ASLR</code>也没有影响。如果同时在编译时启用了<code>PIE</code>，则服务器必须是一个<code>fork</code>服务器，并且在重启时不使用<code>execve</code></li>
+</ul>
+<p><code>BROP</code>攻击的主要阶段如下：</p>
+<ul>
+<li><p><code>Stack reading</code>：泄露<code>Canaries</code>和返回地址，然后从返回地址可以推算出程序的加载地址，用于后续<code>gadgets</code>的扫描。泄露的方法是遍历所有256个数，每次溢出一个字节，根据程序是否崩溃来判断溢出值是否正确。就这样一个字节一个字节地泄露，直到获得完整的8字节<code>Canaries</code>。用同样的方法泄露得到返回地址</p>
+</li>
+<li><p><code>Blind ROP</code>：这一阶段用于远程搜索<code>gadgets</code>，目标是将目标程序从内存写到<code>socket</code>，传回攻击者本地</p>
+<ul>
+<li><code>write()</code>、<code>puts()</code>等函数都可以作为目标，函数调用可以通过<code>syscall</code>指令，也可以通过<code>call</code>指令，甚至是直接改变控制流跳转到<code>PLT</code>执行。另外，还需要一些修改寄存器的<code>gadgets</code>，可以在通用<code>gadget</code>里找到</li>
+<li>同样地，搜索<code>gadgets</code>的思路也是基于溢出返回地址后判断程序是否崩溃。从上一步得到的加载地址开始，每次给返回地址加1，大多数时候这都是一个非法地址，导致程序崩溃。但某些时候，程序会被挂起，例如进入无限循环、<code>sleep</code>或者<code>read</code>，此时连接不会中断，将这些指令片段称为<code>stop gadgets</code>。将<code>stop gadgets</code>放到<code>ROP</code>链的最后，就可以防止程序崩溃，利于其他<code>gadgets</code>的搜索。例如，如果覆盖的返回地址是指令<code>pop rdi;ret</code>，那么它在<code>ret</code>的时候，从栈里弹出返回地址，就可能导致崩溃，但如果栈里放着<code>stop gadgets</code>，那么程序就会挂起</li>
+<li>有了<code>stop gadgets</code>，就可以搜索和判断<code>gadgets</code>的行为，从而推断某个<code>gadgets</code>是否是需要的</li>
+</ul>
+</li>
+<li><p><code>Build the exploit</code>：利用得到的<code>gadgets</code>构造<code>ROP</code>，将程序从远程服务器的内存里传回来，<code>BROP</code>就转换成了普通的<code>ROP</code>攻击</p>
+</li>
+</ul>
+<p>由于<code>BROP</code>攻击的前提是程序在每次崩溃后会立即重启，并且重启后内存不会再次随机化，有如下几种防御方案：</p>
+<ul>
+<li>同时开启<code>ASLR</code>和<code>PIE</code>，并在程序重启时重新随机化内存地址空间以及<code>Canaries</code>，例如复刻一个新进程并执行</li>
+<li>在程序发生段错误后延迟复刻新进程，降低攻击者的暴力枚举速度</li>
+<li>其他的一些通用<code>ROP</code>防御措施，例如控制流完整性<code>CFI</code></li>
+</ul>
+<h1 id="SROP"><a href="#SROP" class="headerlink" title="SROP"></a>SROP</h1><p><code>SROP</code>于2014年在论文<a target="_blank" rel="noopener" href="https://www.cs.vu.nl/~herbertb/papers/srop_sp14.pdf">Framing Signals—A Return to Portable Shellcode</a>中被提出。<code>SROP</code>与<code>ROP</code>类似，通过一个简单的栈溢出，覆盖返回地址并执行<code>gadgets</code>控制执行流。不同的是，<code>SROP</code>使用能够调用<code>sigreturn</code>的<code>gadget</code>覆盖返回地址，并将一个伪造的<code>sigcontext</code>结构体放到栈中。</p>
+<h2 id="Signal机制"><a href="#Signal机制" class="headerlink" title="Signal机制"></a>Signal机制</h2><p>当有中断或异常产生时，内核会向某个进程发送一个<code>signal</code>，该进程被挂起并进入内核，然后内核为其保存相应的上下文，再跳转到之前注册好的<code>signal handler</code>中进行处理，待<code>signal handler</code>返回后，内核为该进程恢复之前保存的上下文，最终恢复执行。具体步骤如下：</p>
+<ul>
+<li>一个<code>signal frame</code>被添加到栈，这个<code>frame</code>中包含了当前寄存器的值和一些<code>signal</code>信息</li>
+<li>一个新的返回地址被添加到栈顶，这个返回地址指向<code>sigreturn</code>系统调用</li>
+<li><code>signal handler</code>被调用，<code>signal handler</code>的行为取决于收到什么<code>signal</code></li>
+<li><code>signal handler</code>执行完后，如果程序没有终止，则返回地址用于执行<code>sigreturn</code>系统调用</li>
+<li><code>sigreturn</code>利用<code>signal frame</code>恢复所有寄存器以回到之前的状态</li>
+<li>程序继续执行</li>
+</ul>
+<p>不同的架构有不同的<code>signal frame</code>，下面是32位下的<code>sigcontext</code>结构体，会被保存到栈中：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">sigcontext</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">short</span> gs, __gsh;</span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">short</span> fs, __fsh;</span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">short</span> es, __esh;</span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">short</span> ds, __dsh;</span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">long</span> edi;</span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">long</span> esi;</span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">long</span> ebp;</span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">long</span> esp;</span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">long</span> ebx;</span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">long</span> edx;</span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">long</span> ecx;</span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">long</span> eax;</span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">long</span> trapno;</span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">long</span> err;</span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">long</span> eip;</span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">short</span> cs, __csh;</span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">long</span> eflags;</span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">long</span> esp_at_signal;</span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">short</span> ss, __ssh;</span><br><span class="line">  <span class="class"><span class="keyword">struct</span> _<span class="title">fpstate</span> * <span class="title">fpstate</span>;</span></span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">long</span> oldmask;</span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">long</span> cr2;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>下面是64位下被保存到栈中的<code>ucontext_t</code>结构体：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">ucontext_t</span></span></span><br><span class="line"><span class="class">  &#123;</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">long</span> <span class="keyword">int</span> __ctx(uc_flags);</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">ucontext_t</span> *<span class="title">uc_link</span>;</span></span><br><span class="line">    <span class="keyword">stack_t</span> uc_stack;</span><br><span class="line">    <span class="keyword">mcontext_t</span> uc_mcontext;</span><br><span class="line">    <span class="keyword">sigset_t</span> uc_sigmask;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> _<span class="title">libc_fpstate</span> __<span class="title">fpregs_mem</span>;</span></span><br><span class="line">    __extension__ <span class="keyword">unsigned</span> <span class="keyword">long</span> <span class="keyword">long</span> <span class="keyword">int</span> __ssp[<span class="number">4</span>];</span><br><span class="line">  &#125; <span class="keyword">ucontext_t</span>;</span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span></span></span><br><span class="line"><span class="class">  &#123;</span></span><br><span class="line">    <span class="keyword">void</span> *ss_sp;</span><br><span class="line">    <span class="keyword">int</span> ss_flags;</span><br><span class="line">    <span class="keyword">size_t</span> ss_size;</span><br><span class="line">  &#125; <span class="keyword">stack_t</span>;</span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">sigcontext</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">long</span> r8;</span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">long</span> r9;</span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">long</span> r10;</span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">long</span> r11;</span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">long</span> r12;</span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">long</span> r13;</span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">long</span> r14;</span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">long</span> r15;</span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">long</span> rdi;</span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">long</span> rsi;</span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">long</span> rbp;</span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">long</span> rbx;</span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">long</span> rdx;</span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">long</span> rax;</span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">long</span> rcx;</span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">long</span> rsp;</span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">long</span> rip;</span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">long</span> eflags;</span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">short</span> cs;</span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">short</span> gs;</span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">short</span> fs;</span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">short</span> __pad0;</span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">long</span> err;</span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">long</span> trapno;</span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">long</span> oldmask;</span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">long</span> cr2;</span><br><span class="line">  <span class="class"><span class="keyword">struct</span> _<span class="title">fpstate</span> * <span class="title">fpstate</span>;</span></span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">long</span> __reserved1 [<span class="number">8</span>];</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h2 id="SROP-1"><a href="#SROP-1" class="headerlink" title="SROP"></a>SROP</h2><p><code>SROP</code>，即<code>Sigreturn Oriented Programming</code>，正是利用了<code>Sigreturn</code>机制的弱点来进行攻击的。</p>
+<p>首先，系统在执行<code>sigreturn</code>系统调用时候，不会对<code>signal</code>检查，它不知道当前的这个<code>frame</code>是不是之前保存的那个<code>frame</code>。由于<code>sigreturn</code>会从用户栈上恢复所有寄存器的值，而用户栈是保存在用户进程的地址空间中的，是用户进程可读写的。如果攻击者可以控制栈，也就控制了所有寄存器的值，而这一切只需要一个<code>gadget: &quot;syscall;retn&quot;</code>，并且该<code>gadget</code>的地址在一些较老的系统上是没有随机化的，通常可以在<code>vsyscall</code>中找到，地址为<code>0xffffffffff600000</code>。如果是在32位Linux，则可以寻找<code>int 80</code>指令，通常可以在<code>vDSO</code>中找到，但这个地址可能是随机的。</p>
+<p>论文中给出了一个<code>x86-64</code>系统上的例子，具体步骤如下：</p>
+<ul>
+<li>首先利用一个栈溢出漏洞，将返回地址覆盖为一个指向<code>sigreturn gadget</code>的指针。如果只有<code>syscall</code>，则将<code>RAX</code>设置为<code>0xf</code>，效果是一样的。在栈上覆盖上<code>fake frame</code>。其中<ul>
+<li><code>RSP</code>：一个可写的内存地址</li>
+<li><code>RIP</code>：<code>&quot;syscall;retn&quot; gadget</code>的地址</li>
+<li><code>RAX</code>：<code>read</code>的系统调用号</li>
+<li><code>RDI</code>：文件描述符，即从哪儿读入</li>
+<li><code>RSI</code>：可写内存的地址，即写入到哪儿</li>
+<li><code>RDX</code>：读入的字节数</li>
+</ul>
+</li>
+<li><code>sigreturn gadget</code>执行完之后，因为设置了<code>RIP</code>，会再次执行<code>&quot;syscall;retn&quot; gadget</code>。<code>payload</code>的第二部分就是通过这里读入文件描述符的。这一部分包含了3个<code>&quot;syscall;retn&quot;</code>、<code>fake frame</code>和其他的代码或数据</li>
+<li>接收完数据后，<code>read</code>函数返回，返回值即读入的字节数被放到<code>RAX</code>中。可写内存被这些数据所覆盖，并且<code>RSP</code>指向了它的开头。然后<code>&quot;syscall;retn&quot;</code>被执行，由于<code>RAX</code>的值为306，即<code>syncfs</code>的系统调用号，该调用总是返回0，而0又是<code>read</code>的调用号</li>
+<li>再次执行<code>&quot;syscall;retn&quot;</code>，即<code>read</code>系统调用，读入的内容不重要，使其数量为15即<code>sigreturn</code>的调用号</li>
+<li>执行第三个<code>&quot;syscall;retn&quot;</code>，即<code>sigreturn</code>系统调用。从第二个<code>fake frame</code>中恢复寄存器，这里是<code>execve(&quot;/bin/sh&quot;,...)</code>。另外还可以调用<code>mprotect</code>将某段数据变为可执行的</li>
+<li>执行<code>execve</code>，获得<code>shell</code></li>
+</ul>
+<p>论文还提出了<code>SROP</code>的两种防御措施：</p>
+<ul>
+<li>在<code>sigreturn frame</code>中嵌入一个由内核提供的随机数，当<code>signal</code>返回时，检查该随机数是否一致</li>
+<li>在内核里为每个进程维护一个计数器，并持续跟踪进程<code>signal handler</code>的数量，当计数器为负数时杀死进程</li>
+</ul>
+<h2 id="srop模块"><a href="#srop模块" class="headerlink" title="srop模块"></a>srop模块</h2><p><code>pwntools</code>中已经集成了<code>SROP</code>的利用工具<code>pwnlib.rop.srop</code>，类<code>SigreturnFrame</code>的构造总共分为三种情况，结构和初始化的值会有所不同：</p>
+<ul>
+<li>32位系统上运行32位程序</li>
+<li>64位系统上运行32位程序</li>
+<li>64位系统上运行64位程序</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>context.arch = <span class="string">&#x27;i386&#x27;</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>SigreturnFrame(kernel=<span class="string">&#x27;i386&#x27;</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>SigreturnFrame(kernel=<span class="string">&#x27;amd64&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>context.arch = <span class="string">&#x27;amd64&#x27;</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>SigreturnFrame(kernel=<span class="string">&#x27;amd64&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<h1 id="Stack-Pivoting"><a href="#Stack-Pivoting" class="headerlink" title="Stack Pivoting"></a>Stack Pivoting</h1><p>程序的执行离不开指令和数据，堆栈就是一个用于保存数据的地方。如果攻击者能够控制<code>ESP</code>和<code>EBP</code>的值，那么就相当于控制了整个堆栈，通过伪造栈上的返回地址进而控制执行流。<code>Stack pivoting</code>就是这样一种将程序真实的堆栈转移到伪造堆栈上的攻击技术，可用于绕过不可执行栈保护或者处理栈空间过小的情况。</p>
+<h1 id="Ret2dl-resolve"><a href="#Ret2dl-resolve" class="headerlink" title="Ret2dl-resolve"></a>Ret2dl-resolve</h1><p><code>Ret2dl-resolve</code>于2015年在论文<a target="_blank" rel="noopener" href="https://www.usenix.org/system/files/conference/usenixsecurity15/sec15-paper-di-frederico.pdf">How the ELF Ruined Christmas</a>中被提出。随着安全防御机制的不断完善，如今一个现代的漏洞利用通常包括两个阶段：</p>
+<ul>
+<li>先通过信息泄露获得程序的内存布局</li>
+<li>进行实际的漏洞利用</li>
+</ul>
+<p>然而，从程序中获得内存布局的方法并不总是可行的，且获得的被破坏的内存有时并不可靠。于是作者提出了<code>Ret2dl-resolve</code>，巧妙地利用了<code>ELF</code>格式以及动态装载器的弱点，不需要进行信息泄露，就可以直接标识关键函数的位置并调用。</p>
+<p>动态装载器负责将二进制文件及依赖库加载到内存，该过程包含了对导入符号<code>(函数和全局变量)</code>的解析。每个符号都是一个<code>Elf_Sym</code>结构体的实例，这些符号又共同组成了<code>.dynsym</code>段。<code>Elf_Sym</code>结构体如下所示，其中<code>st_name</code>域是相对于<code>.dynstr</code>段的偏移，保存符号名字符串；<code>st_value</code>域是当符号被导出时用于存放虚拟地址的，不导出时则为<code>NULL</code>。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">elf32_sym</span>&#123;</span></span><br><span class="line">  Elf32_Word	st_name;</span><br><span class="line">  Elf32_Addr	st_value;</span><br><span class="line">  Elf32_Word	st_size;</span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">char</span>	st_info;</span><br><span class="line">  <span class="keyword">unsigned</span> <span class="keyword">char</span>	st_other;</span><br><span class="line">  Elf32_Half	st_shndx;</span><br><span class="line">&#125; Elf32_Sym;</span><br></pre></td></tr></table></figure>
+
+<p>导入符号的解析需要进行重定位，每个重定位都是一个<code>Elf_Rel</code>结构体的实例，这些项又共同组成了<code>.rel.plt</code>段<code>(用于导入函数)</code>和<code>.rel.dyn</code>段<code>(用于导入全局变量)</code>。<code>Elf_Rel</code>结构体如下所示，其中<code>r_offset</code>域用于保存解析后的符号地址写入内存的地址<code>(绝对地址)</code>，<code>r_info</code>域的高位3个字节用于标识该符号在<code>.dynsym</code>段中的位置<code>(无符号下标)</code>。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">elf32_rel</span> &#123;</span></span><br><span class="line">  Elf32_Addr	r_offset;</span><br><span class="line">  Elf32_Word	r_info;</span><br><span class="line">&#125; Elf32_Rel;</span><br></pre></td></tr></table></figure>
+
+<p>因此，当程序导入一个函数时，动态链接器会同时在<code>.dynstr</code>段中添加一个函数名字符串，在<code>.dynsym</code>段中添加一个指向函数名字符串的<code>Elf_Sym</code>，在<code>.rel.plt</code>段中添加一个指向<code>Elf_Sym</code>的<code>Elf_Rel</code>。最后，这些<code>Elf_Rel</code>的<code>r_offset</code>域又构成了<code>GOT</code>表，保存在<code>.got.plt</code>段中。</p>
+<p>由于引入了延迟绑定机制，符号的解析只有在第一次使用的时候才进行，该过程是通过<code>PLT</code>表进行的。每个导入函数都在<code>PLT</code>表中有一个条目，其第一条指令无条件跳转到对应<code>GOT</code>条目保存的地址处。而每个<code>GOT</code>条目在初始化时都默认指向对应<code>PLT</code>条目的第二条指令的位置，相当于又跳回来了。此时继续执行<code>PLT</code>的后两条指令，先将导入函数的标识<code>(Elf_Rel在.rel.plt段中的偏移)</code>压栈，然后跳转到<code>PLT0</code>执行。<code>PLT0</code>包含两条指令，先将<code>GOT[1]</code>的值<code>(一个link_map对象的地址)</code>压栈，然后跳转到<code>GOT[2]</code>保存到地址处，也就是<code>_dl_runtime_resolve()</code>函数。函数参数<code>link_map_obj</code>用于获取解析导入函数所需的信息，参数<code>reloc_index</code>则标识了解析哪一个导入函数。解析完成后，相应的<code>GOT</code>条目会被修改为正确的函数地址，此后程序在调用该函数时就不需要再次进行解析了。</p>
+<p>此外，由于<code>RELRO</code>保护机制会影响延迟绑定，因此也会影响<code>ret2dl_resolve</code>：</p>
+<ul>
+<li><code>Partial RELRO</code>：包括<code>.dynamic</code>段在内的一些段会被标识为只读</li>
+<li><code>Full RELRO</code>：在<code>Partial RELRO</code>的基础上，禁用延迟绑定，即所有的导入符号在加载时就被解析，<code>.got.plt</code>段被完全初始化为目标函数的地址，并标记为只读</li>
+</ul>
+<p>论文提出的两个简单攻击场景如下：</p>
+<ul>
+<li>关闭<code>RELRO</code>保护，使<code>.dynamic</code>段可写时：由于动态装载器是从<code>.dynamic</code>段的<code>DT_STRTAB</code>条目中来获取<code>.dynstr</code>段的地址，而<code>DT_STRTAB</code>的位置是已知的，且默认情况下可写，所以攻击者能够改写<code>DT_STRTAB</code>的内容，欺骗动态装载器，使它以为<code>.dynstr</code>段在<code>.bss</code>上，同时在那里伪造一个假的字符串表。当动态装载器尝试解析<code>printf()</code>时就会使用不同的基地址来寻找函数名，最终执行的是<code>execve()</code></li>
+<li>开启<code>Partial RELRO</code>保护，使<code>.dynamic</code>段不可写时：<code>_dl_runtime_resolve()</code>的第二个参数<code>reloc_index</code>对应的<code>Elf_Rel</code>在<code>.rel.plt</code>段中的偏移，动态装载器将其加上<code>.rel.plt</code>的基地址来得到目标<code>Elf_Rel</code>的内存地址。然而，当这个内存地址超出了<code>.rel.plt</code>段，并最终落在<code>.bss</code>段中时，攻击者就可以在那里伪造一个<code>Elf_Rel</code>，使<code>r_offset</code>的值是一个可写的内存地址来将解析后的函数地址写在那里。同理，使<code>r_info</code>的值是一个能够将动态装载器导向到攻击者控制内存的下标，指向一个位于它后面的<code>Elf_Sym</code>，而<code>Elf_Sym</code>中的<code>st_name</code>指向它后面的函数名字符串</li>
+</ul>
+<p>其他更复杂的攻击场景，包括修改<code>GOT[1]</code>的<code>link_map</code>对象，以及绕过<code>Full RELRO</code>的方法等，可以阅读论文进一步了解。</p>
+<h1 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h1><ul>
+<li><p>《CTF竞赛权威指南（Pwn篇）》</p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://hovav.net/ucsd/dist/geometry.pdf">Return-Oriented Programming</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://hovav.net/ucsd/dist/noret-ccs.pdf">Return-Oriented Programming without Returns</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://www.comp.nus.edu.sg/~liangzk/papers/asiaccs11.pdf">Jump-Oriented Programming: A New Class of Code-Reuse Attack</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://www.cs.vu.nl/~herbertb/papers/srop_sp14.pdf">Framing Signals—A Return to Portable Shellcode</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://www.usenix.org/system/files/conference/usenixsecurity15/sec15-paper-di-frederico.pdf">How the ELF Ruined Christmas</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://docs.pwntools.com/en/stable/">pwntools — pwntools 4.7.0 documentation</a></p>
+</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Pwn/" rel="tag"><i class="fa fa-tag"></i> Pwn</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/format-str/" rel="prev" title="格式化字符串">
+                  <i class="fa fa-chevron-left"></i> 格式化字符串
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lu0k</span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <script size="250" alpha="0.5" zIndex="-1" src="https://cdn.jsdelivr.net/npm/ribbon.js@1.0.2/dist/ribbon.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>
