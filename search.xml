@@ -4569,6 +4569,9 @@
 <h2 id="截断"><a href="#截断" class="headerlink" title="截断"></a>截断</h2><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">short</span> <span class="keyword">int</span> total;</span><br><span class="line">    total = <span class="built_in">strlen</span>(argv[<span class="number">1</span>]) + <span class="built_in">strlen</span>(argv[<span class="number">2</span>]) + <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">char</span> *buf = (<span class="keyword">char</span>*)<span class="built_in">malloc</span>(total);</span><br><span class="line">    <span class="built_in">strcpy</span>(buf, argv[<span class="number">1</span>]);</span><br><span class="line">    <span class="built_in">strcat</span>(buf, argv[<span class="number">2</span>]);</span><br><span class="line">    ......</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>这个例子接受两个字符类型的参数并计算总长度，程序分配足够的内存来存储拼接后的字符串。首先将第一个字符串复制到缓冲区，然后将第二个字符串连接到尾部。此时如果攻击者提供的两个字符串总长度无法用<code>total</code>表示，就会发生截断，从而导致后面的缓冲区溢出。</p>
+<h1 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h1><ul>
+<li>《CTF竞赛权威指南（Pwn篇）》</li>
+</ul>
 ]]></content>
       <categories>
         <category>Reading Notes</category>
@@ -4752,7 +4755,10 @@
 <li><code>write_size</code>：必须是<code>byte</code>、<code>short</code>或<code>int</code>。指定要逐<code>byte</code>写、逐<code>short</code>写还是逐<code>int</code>写<code>(hhn、hn或n)</code></li>
 </ul>
 <h1 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h1><ul>
-<li><a href="https://docs.pwntools.com/en/stable/">pwntools — pwntools 4.7.0 documentation</a></li>
+<li><p>《CTF竞赛权威指南（Pwn篇）》</p>
+</li>
+<li><p><a href="https://docs.pwntools.com/en/stable/">pwntools — pwntools 4.7.0 documentation</a></p>
+</li>
 </ul>
 ]]></content>
       <categories>
