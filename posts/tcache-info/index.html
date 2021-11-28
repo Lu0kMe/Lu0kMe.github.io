@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-lu0k.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-lu0k.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-lu0k.png">
+  <link rel="mask-icon" href="/images/lu0k.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"lu0k.github.io","root":"/","images":"/images","scheme":"Gemini","version":"8.7.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+<meta name="description" content="简介在Glibc-2.26版本内存分配器加入了TCache机制而有了较大的变化。TCache全名为Thread Local Caching，它为每个线程创建一个缓存，里面包含了一些小堆块，无须对arena上锁即可使用，这种无锁的分配算法能有不错的性能提升。虽然线程缓存在很多年前已经在另一种内存分配器TCMalloc(Thread-Caching Malloc)中实现，但直到2017年ptmallo">
+<meta property="og:type" content="article">
+<meta property="og:title" content="TCache机制">
+<meta property="og:url" content="https://lu0k.github.io/posts/tcache-info/index.html">
+<meta property="og:site_name" content="Lu0k">
+<meta property="og:description" content="简介在Glibc-2.26版本内存分配器加入了TCache机制而有了较大的变化。TCache全名为Thread Local Caching，它为每个线程创建一个缓存，里面包含了一些小堆块，无须对arena上锁即可使用，这种无锁的分配算法能有不错的性能提升。虽然线程缓存在很多年前已经在另一种内存分配器TCMalloc(Thread-Caching Malloc)中实现，但直到2017年ptmallo">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-11-27T16:00:00.000Z">
+<meta property="article:modified_time" content="2021-11-28T11:24:14.089Z">
+<meta property="article:author" content="Lu0k">
+<meta property="article:tag" content="Pwn">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://lu0k.github.io/posts/tcache-info/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://lu0k.github.io/posts/tcache-info/","path":"posts/tcache-info/","title":"TCache机制"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>TCache机制 | Lu0k</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">Lu0k</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Lu0k's Blog</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84"><span class="nav-number">2.</span> <span class="nav-text">数据结构</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E6%96%B9%E6%B3%95"><span class="nav-number">3.</span> <span class="nav-text">使用方法</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%89%E5%85%A8%E6%80%A7%E5%88%86%E6%9E%90"><span class="nav-number">4.</span> <span class="nav-text">安全性分析</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#CVE-2017-17426"><span class="nav-number">4.1.</span> <span class="nav-text">CVE-2017-17426</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E6%AC%A1%E9%87%8A%E6%94%BE%E6%A3%80%E6%9F%A5"><span class="nav-number">4.2.</span> <span class="nav-text">二次释放检查</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Reference"><span class="nav-number">5.</span> <span class="nav-text">Reference</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-overview">
+            <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Lu0k"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Lu0k</p>
+  <div class="site-description" itemprop="description">谦虚学习!</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">59</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/lu0k" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;lu0k" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/Lu0kMe" title="Twitter → https:&#x2F;&#x2F;twitter.com&#x2F;Lu0kMe" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://lu0k.github.io/posts/tcache-info/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Lu0k">
+      <meta itemprop="description" content="谦虚学习!">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Lu0k">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          TCache机制
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-11-28 00:00:00" itemprop="dateCreated datePublished" datetime="2021-11-28T00:00:00+08:00">2021-11-28</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Reading-Notes/" itemprop="url" rel="index"><span itemprop="name">Reading Notes</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>在<code>Glibc-2.26</code>版本内存分配器加入了<code>TCache</code>机制而有了较大的变化。<code>TCache</code>全名为<code>Thread Local Caching</code>，它为每个线程创建一个缓存，里面包含了一些小堆块，无须对<code>arena</code>上锁即可使用，这种无锁的分配算法能有不错的性能提升。虽然线程缓存在很多年前已经在另一种内存分配器<code>TCMalloc(Thread-Caching Malloc)</code>中实现，但直到2017年<code>ptmalloc2</code>才在<code>glibc-2.26</code>中将其正式加入，并默认开启。</p>
+<span id="more"></span>
+
+<h1 id="数据结构"><a href="#数据结构" class="headerlink" title="数据结构"></a>数据结构</h1><p><code>glibc</code>在编译时使用<code>USE_TCACHE</code>条件来开启<code>TCache</code>机制，并定义了下面这些宏：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">if</span> USE_TCACHE</span></span><br><span class="line"><span class="comment">/* We want 64 entries.  This is an arbitrary limit, which tunables can reduce.  */</span></span><br><span class="line"><span class="meta"># <span class="meta-keyword">define</span> TCACHE_MAX_BINS		64</span></span><br><span class="line"><span class="meta"># <span class="meta-keyword">define</span> MAX_TCACHE_SIZE	tidx2usize (TCACHE_MAX_BINS-1)</span></span><br><span class="line"><span class="comment">/* Only used to pre-fill the tunables.  */</span></span><br><span class="line"><span class="meta"># <span class="meta-keyword">define</span> tidx2usize(idx)	(((size_t) idx) * MALLOC_ALIGNMENT + MINSIZE - SIZE_SZ)</span></span><br><span class="line"><span class="comment">/* When &quot;x&quot; is from chunksize().  */</span></span><br><span class="line"><span class="meta"># <span class="meta-keyword">define</span> csize2tidx(x) (((x) - MINSIZE + MALLOC_ALIGNMENT - 1) / MALLOC_ALIGNMENT)</span></span><br><span class="line"><span class="comment">/* When &quot;x&quot; is a user-provided size.  */</span></span><br><span class="line"><span class="meta"># <span class="meta-keyword">define</span> usize2tidx(x) csize2tidx (request2size (x))</span></span><br><span class="line"><span class="comment">/* With rounding and alignment, the bins are...</span></span><br><span class="line"><span class="comment">   idx 0   bytes 0..24 (64-bit) or 0..12 (32-bit)</span></span><br><span class="line"><span class="comment">   idx 1   bytes 25..40 or 13..20</span></span><br><span class="line"><span class="comment">   idx 2   bytes 41..56 or 21..28</span></span><br><span class="line"><span class="comment">   etc.  */</span></span><br><span class="line"><span class="comment">/* This is another arbitrary limit, which tunables can change.  Each</span></span><br><span class="line"><span class="comment">   tcache bin will hold at most this number of chunks.  */</span></span><br><span class="line"><span class="meta"># <span class="meta-keyword">define</span> TCACHE_FILL_COUNT 7</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br></pre></td></tr></table></figure>
+
+<p>值得注意的是，每个线程默认使用64个单链表结构的<code>bins</code>，每个<code>bins</code>最多存放7个<code>chunk</code>。<code>chunk</code>的大小在64位机器上以16字节递增，从24到1032字节，在32位机器上则以8字节递增，从12到512字节，所以<code>tcache bin</code>只用于存放<code>non-large</code>的<code>chunk</code>。然后引入了两个新的数据结构<code>tcache_entry</code>和<code>tcache_perthread_struct</code>：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* We overlay this structure on the user-data portion of a chunk when</span></span><br><span class="line"><span class="comment">   the chunk is stored in the per-thread cache.  */</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">tcache_entry</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">  <span class="class"><span class="keyword">struct</span> <span class="title">tcache_entry</span> *<span class="title">next</span>;</span></span><br><span class="line">&#125; tcache_entry;</span><br><span class="line"><span class="comment">/* There is one of these for each thread, which contains the</span></span><br><span class="line"><span class="comment">   per-thread cache (hence &quot;tcache_perthread_struct&quot;).  Keeping</span></span><br><span class="line"><span class="comment">   overall size low is mildly important.  Note that COUNTS and ENTRIES</span></span><br><span class="line"><span class="comment">   are redundant (we could have just counted the linked list each</span></span><br><span class="line"><span class="comment">   time), this is for performance reasons.  */</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">tcache_perthread_struct</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">  <span class="keyword">char</span> counts[TCACHE_MAX_BINS];</span><br><span class="line">  tcache_entry *entries[TCACHE_MAX_BINS];</span><br><span class="line">&#125; tcache_perthread_struct;</span><br></pre></td></tr></table></figure>
+
+<p><code>tcache_perthread_struct</code>位于堆开头的位置，这说明它本身也是一个堆块，大小为<code>0x250</code>。其中包含数组<code>entries</code>，用于放置64个<code>bins</code>的地址，数组<code>counts</code>则存放每个<code>bins</code>中的<code>chunk</code>数量。每个被放入<code>bins</code>的<code>chunk</code>都会在其用户数据中包含一个<code>tcache_entry(即fd指针)</code>，指向同<code>bins</code>中下一个<code>chunk</code>的用户数据<code>(而不是chunk头)</code>，从而构成单链表。<code>tcache</code>的初始化操作如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span></span></span><br><span class="line"><span class="function"><span class="title">tcache_init</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  mstate ar_ptr;</span><br><span class="line">  <span class="keyword">void</span> *victim = <span class="number">0</span>;</span><br><span class="line">  <span class="keyword">const</span> <span class="keyword">size_t</span> bytes = <span class="keyword">sizeof</span> (tcache_perthread_struct);</span><br><span class="line">  <span class="keyword">if</span> (tcache_shutting_down)</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">  arena_get (ar_ptr, bytes);</span><br><span class="line">  victim = _int_malloc (ar_ptr, bytes);</span><br><span class="line">  <span class="keyword">if</span> (!victim &amp;&amp; ar_ptr != <span class="literal">NULL</span>)</span><br><span class="line">    &#123;</span><br><span class="line">      ar_ptr = arena_get_retry (ar_ptr, bytes);</span><br><span class="line">      victim = _int_malloc (ar_ptr, bytes);</span><br><span class="line">    &#125;</span><br><span class="line">  <span class="keyword">if</span> (ar_ptr != <span class="literal">NULL</span>)</span><br><span class="line">    __libc_lock_unlock (ar_ptr-&gt;mutex);</span><br><span class="line">  <span class="comment">/* In a low memory situation, we may not be able to allocate memory</span></span><br><span class="line"><span class="comment">     - in which case, we just keep trying later.  However, we</span></span><br><span class="line"><span class="comment">     typically do this very early, so either there is sufficient</span></span><br><span class="line"><span class="comment">     memory, or there isn&#x27;t enough memory to do non-trivial</span></span><br><span class="line"><span class="comment">     allocations anyway.  */</span></span><br><span class="line">  <span class="keyword">if</span> (victim)</span><br><span class="line">    &#123;</span><br><span class="line">      tcache = (tcache_perthread_struct *) victim;</span><br><span class="line">      <span class="built_in">memset</span> (tcache, <span class="number">0</span>, <span class="keyword">sizeof</span> (tcache_perthread_struct));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="使用方法"><a href="#使用方法" class="headerlink" title="使用方法"></a>使用方法</h1><p>首先，来看能够触发在<code>tcache</code>中放入<code>chunk</code>的操作：</p>
+<ul>
+<li>释放堆块时：在<code>fastbins</code>的操作之前进行，如果<code>chunk</code>的大小符合要求，并且对应的<code>bins</code>还未装满，就将其放进去</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">if</span> USE_TCACHE</span></span><br><span class="line">  &#123;</span><br><span class="line">    <span class="keyword">size_t</span> tc_idx = csize2tidx (size);</span><br><span class="line">    <span class="keyword">if</span> (tcache</span><br><span class="line">	&amp;&amp; tc_idx &lt; mp_.tcache_bins</span><br><span class="line">	&amp;&amp; tcache-&gt;counts[tc_idx] &lt; mp_.tcache_count)</span><br><span class="line">      &#123;</span><br><span class="line">	tcache_put (p, tc_idx);</span><br><span class="line">	<span class="keyword">return</span>;</span><br><span class="line">      &#125;</span><br><span class="line">  &#125;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>分配堆块时，触发点有三处：</p>
+<ul>
+<li>如果从<code>fastbins</code>中成功返回了一个需要的<code>chunk</code>，那么对应<code>fastbins</code>中的其他<code>chunk</code>会被释放进相应的<code>tcache bin</code>中，直到上限。需要注意的是<code>chunks</code>在<code>tcache bin</code>的顺序和在<code>fastbins</code>中的顺序是反过来的</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">if</span> USE_TCACHE</span></span><br><span class="line">	  <span class="comment">/* While we&#x27;re here, if we see other chunks of the same size,</span></span><br><span class="line"><span class="comment">	     stash them in the tcache.  */</span></span><br><span class="line">	  <span class="keyword">size_t</span> tc_idx = csize2tidx (nb);</span><br><span class="line">	  <span class="keyword">if</span> (tcache &amp;&amp; tc_idx &lt; mp_.tcache_bins)</span><br><span class="line">	    &#123;</span><br><span class="line">	      mchunkptr tc_victim;</span><br><span class="line">	      <span class="comment">/* While bin not empty and tcache not full, copy chunks over.  */</span></span><br><span class="line">	      <span class="keyword">while</span> (tcache-&gt;counts[tc_idx] &lt; mp_.tcache_count</span><br><span class="line">		     &amp;&amp; (pp = *fb) != <span class="literal">NULL</span>)</span><br><span class="line">		&#123;</span><br><span class="line">		  REMOVE_FB (fb, tc_victim, pp);</span><br><span class="line">		  <span class="keyword">if</span> (tc_victim != <span class="number">0</span>)</span><br><span class="line">		    &#123;</span><br><span class="line">		      tcache_put (tc_victim, tc_idx);</span><br><span class="line">	            &#125;</span><br><span class="line">		&#125;</span><br><span class="line">	    &#125;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>small bins</code>中的情况与<code>fastbins</code>中的相似，双链表中剩余的<code>chunk</code>会被填充到<code>tcache bin</code>中，直到上限</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">if</span> USE_TCACHE</span></span><br><span class="line">	  <span class="comment">/* While we&#x27;re here, if we see other chunks of the same size,</span></span><br><span class="line"><span class="comment">	     stash them in the tcache.  */</span></span><br><span class="line">	  <span class="keyword">size_t</span> tc_idx = csize2tidx (nb);</span><br><span class="line">	  <span class="keyword">if</span> (tcache &amp;&amp; tc_idx &lt; mp_.tcache_bins)</span><br><span class="line">	    &#123;</span><br><span class="line">	      mchunkptr tc_victim;</span><br><span class="line">	      <span class="comment">/* While bin not empty and tcache not full, copy chunks over.  */</span></span><br><span class="line">	      <span class="keyword">while</span> (tcache-&gt;counts[tc_idx] &lt; mp_.tcache_count</span><br><span class="line">		     &amp;&amp; (tc_victim = last (bin)) != bin)</span><br><span class="line">		&#123;</span><br><span class="line">		  <span class="keyword">if</span> (tc_victim != <span class="number">0</span>)</span><br><span class="line">		    &#123;</span><br><span class="line">		      bck = tc_victim-&gt;bk;</span><br><span class="line">		      set_inuse_bit_at_offset (tc_victim, nb);</span><br><span class="line">		      <span class="keyword">if</span> (av != &amp;main_arena)</span><br><span class="line">			set_non_main_arena (tc_victim);</span><br><span class="line">		      bin-&gt;bk = bck;</span><br><span class="line">		      bck-&gt;fd = bin;</span><br><span class="line">		      tcache_put (tc_victim, tc_idx);</span><br><span class="line">	            &#125;</span><br><span class="line">		&#125;</span><br><span class="line">	    &#125;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>binning code(chunk合并等其他情况)</code>中，每一个符合要求的<code>chunk</code>都会优先被放入<code>tcache</code>，而不是直接返回<code>(除非tcache已装满)</code>。然后，程序会从<code>tcache</code>中返回其中一个</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">if</span> USE_TCACHE</span></span><br><span class="line">	      <span class="comment">/* Fill cache first, return to user only if cache fills.</span></span><br><span class="line"><span class="comment">		 We may return one of these chunks later.  */</span></span><br><span class="line">	      <span class="keyword">if</span> (tcache_nb</span><br><span class="line">		  &amp;&amp; tcache-&gt;counts[tc_idx] &lt; mp_.tcache_count)</span><br><span class="line">		&#123;</span><br><span class="line">		  tcache_put (victim, tc_idx);</span><br><span class="line">		  return_cached = <span class="number">1</span>;</span><br><span class="line">		  <span class="keyword">continue</span>;</span><br><span class="line">		&#125;</span><br><span class="line">	      <span class="keyword">else</span></span><br><span class="line">		&#123;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br></pre></td></tr></table></figure></li>
+</ul>
+<p>接下来看能够触发从<code>tcache</code>中取出<code>chunk</code>的操作：</p>
+<ul>
+<li>在<code>__libc_malloc()</code>调用<code>_int_malloc()</code>之前，如果<code>tcache bin</code>中有符合要求的<code>chunk</code>，则直接将它返回</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">if</span> USE_TCACHE</span></span><br><span class="line">  <span class="comment">/* int_free also calls request2size, be careful to not pad twice.  */</span></span><br><span class="line">  <span class="keyword">size_t</span> tbytes = request2size (bytes);</span><br><span class="line">  <span class="keyword">size_t</span> tc_idx = csize2tidx (tbytes);</span><br><span class="line">  MAYBE_INIT_TCACHE ();</span><br><span class="line">  DIAG_PUSH_NEEDS_COMMENT;</span><br><span class="line">  <span class="keyword">if</span> (tc_idx &lt; mp_.tcache_bins</span><br><span class="line">      <span class="comment">/*&amp;&amp; tc_idx &lt; TCACHE_MAX_BINS*/</span> <span class="comment">/* to appease gcc */</span></span><br><span class="line">      &amp;&amp; tcache</span><br><span class="line">      &amp;&amp; tcache-&gt;entries[tc_idx] != <span class="literal">NULL</span>)</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="keyword">return</span> tcache_get (tc_idx);</span><br><span class="line">    &#125;</span><br><span class="line">  DIAG_POP_NEEDS_COMMENT;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>binning code</code>中，如果在<code>tcache</code>中放入的<code>chunk</code>达到上限，则会直接返回最后一个<code>chunk</code>。默认情况下是没有限制的</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">if</span> USE_TCACHE</span></span><br><span class="line">      <span class="comment">/* If we&#x27;ve processed as many chunks as we&#x27;re allowed while</span></span><br><span class="line"><span class="comment">	 filling the cache, return one of the cached ones.  */</span></span><br><span class="line">      ++tcache_unsorted_count;</span><br><span class="line">      <span class="keyword">if</span> (return_cached</span><br><span class="line">	  &amp;&amp; mp_.tcache_unsorted_limit &gt; <span class="number">0</span></span><br><span class="line">	  &amp;&amp; tcache_unsorted_count &gt; mp_.tcache_unsorted_limit)</span><br><span class="line">	&#123;</span><br><span class="line">	  <span class="keyword">return</span> tcache_get (tc_idx);</span><br><span class="line">	&#125;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>binning code</code>结束后，如果没有直接返回<code>(如上)</code>，那么如果有至少一个符合要求的<code>chunk</code>被找到，则返回最后一个</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">if</span> USE_TCACHE</span></span><br><span class="line">      <span class="comment">/* If all the small chunks we found ended up cached, return one now.  */</span></span><br><span class="line">      <span class="keyword">if</span> (return_cached)</span><br><span class="line">	&#123;</span><br><span class="line">	  <span class="keyword">return</span> tcache_get (tc_idx);</span><br><span class="line">	&#125;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br></pre></td></tr></table></figure>
+
+<p>最后，需要注意的是<code>tcache</code>中的<code>chunk</code>不会被合并，无论是相邻<code>chunk</code>，还是<code>chunk</code>和<code>top chunk</code>都不会。这是因为这些<code>chunk</code>的<code>PREV_INUSE</code>位会被标记。</p>
+<h1 id="安全性分析"><a href="#安全性分析" class="headerlink" title="安全性分析"></a>安全性分析</h1><p>函数<code>tcache_put()</code>和<code>tcache_get()</code>分别用于从单链表中放入和取出<code>chunk</code>：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* Caller must ensure that we know tc_idx is valid and there&#x27;s room</span></span><br><span class="line"><span class="comment">   for more chunks.  */</span></span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span></span></span><br><span class="line"><span class="function"><span class="title">tcache_put</span> <span class="params">(mchunkptr chunk, <span class="keyword">size_t</span> tc_idx)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  tcache_entry *e = (tcache_entry *) chunk2mem (chunk);</span><br><span class="line">  assert (tc_idx &lt; TCACHE_MAX_BINS);</span><br><span class="line">  e-&gt;next = tcache-&gt;entries[tc_idx];</span><br><span class="line">  tcache-&gt;entries[tc_idx] = e;</span><br><span class="line">  ++(tcache-&gt;counts[tc_idx]);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/* Caller must ensure that we know tc_idx is valid and there&#x27;s</span></span><br><span class="line"><span class="comment">   available chunks to remove.  */</span></span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span> *</span></span><br><span class="line"><span class="function"><span class="title">tcache_get</span> <span class="params">(<span class="keyword">size_t</span> tc_idx)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  tcache_entry *e = tcache-&gt;entries[tc_idx];</span><br><span class="line">  assert (tc_idx &lt; TCACHE_MAX_BINS);</span><br><span class="line">  assert (tcache-&gt;entries[tc_idx] &gt; <span class="number">0</span>);</span><br><span class="line">  tcache-&gt;entries[tc_idx] = e-&gt;next;</span><br><span class="line">  --(tcache-&gt;counts[tc_idx]);</span><br><span class="line">  <span class="keyword">return</span> (<span class="keyword">void</span> *) e;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这两个函数都假设调用者已经对参数进行了有效性检查，然而由于<code>tcache</code>的操作在<code>free</code>和<code>malloc</code>中往往都处于很靠前的位置，导致原来的许多有效性检查都被无视了。这样做虽然有利于提升执行效率，但对安全性造成了负面影响。</p>
+<h2 id="CVE-2017-17426"><a href="#CVE-2017-17426" class="headerlink" title="CVE-2017-17426"></a>CVE-2017-17426</h2><p><code>glibc-2.26</code>中的<code>tcache</code>机制被发现了安全漏洞，由于<code>__libc_malloc()</code>使用<code>request2size()</code>来将请求大小转换为实际大小，该函数不会进行整数溢出检查。所以如果请求一个非常大的堆块<code>(接近SIZE_MAX)</code>，那么就会导致整数溢出，从而导致<code>malloc</code>错误地返回<code>tcache bin</code>里的堆块。</p>
+<p>使用下面的样例代码来检测该漏洞：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">void</span> *x = <span class="built_in">malloc</span>(<span class="number">10</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;malloc(10): %p\n&quot;</span>, x);</span><br><span class="line">    <span class="built_in">free</span>(x);</span><br><span class="line">    <span class="keyword">void</span> *y = <span class="built_in">malloc</span>(((<span class="keyword">size_t</span>) ~ <span class="number">0</span>) - <span class="number">2</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;malloc(((size_t) ~ 0) - 2): %p\n&quot;</span>, y);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>编译并在不同<code>glibc</code>版本下运行：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> gcc 1.c</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> /usr/<span class="built_in">local</span>/glibc-2.26/lib/ld-2.26.so ./a.out</span></span><br><span class="line">malloc(10): 0x55f0b4f532a0</span><br><span class="line">malloc(((size_t) ~ 0) - 2): 0x55f0b4f532a0</span><br><span class="line"><span class="meta">$</span><span class="bash"> /usr/<span class="built_in">local</span>/glibc-2.27/lib/ld-2.27.so ./a.out</span></span><br><span class="line">malloc(10): 0x55f0b4f532a0</span><br><span class="line">malloc(((size_t) ~ 0) - 2): (nil)</span><br></pre></td></tr></table></figure>
+
+<p>修复的方法很简单，就是用更加安全的<code>checked_request2size()</code>函数替换<code>request2size()</code>函数，以实现对整数溢出的检查。如下：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> git show 34697694e8a93b325b18f25f7dcded55d6baeaf6 malloc/malloc.c</span></span><br><span class="line">commit 34697694e8a93b325b18f25f7dcded55d6baeaf6</span><br><span class="line">Author: Arjun Shankar &lt;arjun@redhat.com&gt;</span><br><span class="line">Date:   Thu Nov 30 13:31:45 2017 +0100</span><br><span class="line"></span><br><span class="line">    Fix integer overflow in malloc when tcache is enabled [BZ #22375]</span><br><span class="line"></span><br><span class="line">    When the per-thread cache is enabled, __libc_malloc uses request2size (which</span><br><span class="line">    does not perform an overflow check) to calculate the chunk size from the</span><br><span class="line">    requested allocation size. This leads to an integer overflow causing malloc</span><br><span class="line">    to incorrectly return the last successfully allocated block when called with</span><br><span class="line">    a very large size argument (close to SIZE_MAX).</span><br><span class="line"></span><br><span class="line">    This commit uses checked_request2size instead, removing the overflow.</span><br><span class="line"></span><br><span class="line">diff --git a/malloc/malloc.c b/malloc/malloc.c</span><br><span class="line">index 79f0e9eac7..0c9e0748b4 100644</span><br><span class="line">--- a/malloc/malloc.c</span><br><span class="line">+++ b/malloc/malloc.c</span><br><span class="line">@@ -3031,7 +3031,8 @@ __libc_malloc (size_t bytes)</span><br><span class="line">     return (*hook)(bytes, RETURN_ADDRESS (0));</span><br><span class="line"><span class="meta"> #</span><span class="bash"><span class="keyword">if</span> USE_TCACHE</span></span><br><span class="line">   /* int_free also calls request2size, be careful to not pad twice.  */</span><br><span class="line">-  size_t tbytes = request2size (bytes);</span><br><span class="line">+  size_t tbytes;</span><br><span class="line">+  checked_request2size (bytes, tbytes);</span><br><span class="line">   size_t tc_idx = csize2tidx (tbytes);</span><br><span class="line"></span><br><span class="line">   MAYBE_INIT_TCACHE ();</span><br></pre></td></tr></table></figure>
+
+<h2 id="二次释放检查"><a href="#二次释放检查" class="headerlink" title="二次释放检查"></a>二次释放检查</h2><p><code>glibc-2.28</code>版本增加了对<code>tcache</code>中二次释放<code>(double free)</code>的检查，方法是在<code>tcache_entry</code>结构体中增加了一个标志<code>key</code>，用于表示<code>chunk</code>是否已经在<code>tcache bin</code>中，如下所示：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br></pre></td><td class="code"><pre><span class="line">$ git show bcdaad21d4635931d1bd3b54a7894276925d081d <span class="built_in">malloc</span>/<span class="built_in">malloc</span>.c</span><br><span class="line">commit bcdaad21d4635931d1bd3b54a7894276925d081d</span><br><span class="line">Author: DJ Delorie &lt;dj@delorie.com&gt;</span><br><span class="line">Date:   Tue Nov <span class="number">20</span> <span class="number">13</span>:<span class="number">24</span>:<span class="number">09</span> <span class="number">2018</span> <span class="number">-0500</span></span><br><span class="line"></span><br><span class="line">    <span class="built_in">malloc</span>: tcache <span class="keyword">double</span> <span class="built_in">free</span> check</span><br><span class="line"></span><br><span class="line">    * <span class="built_in">malloc</span>/<span class="built_in">malloc</span>.c (tcache_entry): Add key field.</span><br><span class="line">    (tcache_put): Set it.</span><br><span class="line">    (tcache_get): Likewise.</span><br><span class="line">    (_int_free): Check <span class="keyword">for</span> <span class="keyword">double</span> <span class="built_in">free</span> in tcache.</span><br><span class="line">    * <span class="built_in">malloc</span>/tst-tcfree1.c: New.</span><br><span class="line">    * <span class="built_in">malloc</span>/tst-tcfree2.c: New.</span><br><span class="line">    * <span class="built_in">malloc</span>/Makefile: Run the <span class="keyword">new</span> tests.</span><br><span class="line">    * manual/probes.texi: Document memory_tcache_double_free probe.</span><br><span class="line"></span><br><span class="line">    * dlfcn/dlerror.c (check_free): Prevent <span class="keyword">double</span> frees.</span><br><span class="line"></span><br><span class="line">diff --git a/<span class="built_in">malloc</span>/<span class="built_in">malloc</span>.c b/<span class="built_in">malloc</span>/<span class="built_in">malloc</span>.c</span><br><span class="line">index <span class="number">6</span>d7a6a8cab..f730d7a2ee <span class="number">100644</span></span><br><span class="line">--- a/<span class="built_in">malloc</span>/<span class="built_in">malloc</span>.c</span><br><span class="line">+++ b/<span class="built_in">malloc</span>/<span class="built_in">malloc</span>.c</span><br><span class="line">@@ <span class="number">-2967</span>,<span class="number">6</span> +<span class="number">2967</span>,<span class="number">8</span> @@ mremap_chunk (mchunkptr p, <span class="keyword">size_t</span> new_size)</span><br><span class="line"> <span class="keyword">typedef</span> struct tcache_entry</span><br><span class="line"> &#123;</span><br><span class="line">   struct tcache_entry *next;</span><br><span class="line">+  <span class="comment">/* This field exists to detect double frees.  */</span></span><br><span class="line">+  <span class="class"><span class="keyword">struct</span> <span class="title">tcache_perthread_struct</span> *<span class="title">key</span>;</span></span><br><span class="line"> &#125; tcache_entry;</span><br><span class="line"></span><br><span class="line"> <span class="comment">/* There is one of these for each thread, which contains the</span></span><br><span class="line"><span class="comment">@@ -2990,6 +2992,11 @@ tcache_put (mchunkptr chunk, size_t tc_idx)</span></span><br><span class="line"><span class="comment"> &#123;</span></span><br><span class="line"><span class="comment">   tcache_entry *e = (tcache_entry *) chunk2mem (chunk);</span></span><br><span class="line"><span class="comment">   assert (tc_idx &lt; TCACHE_MAX_BINS);</span></span><br><span class="line"><span class="comment">+</span></span><br><span class="line"><span class="comment">+  /* Mark this chunk as &quot;in the tcache&quot; so the test in _int_free will</span></span><br><span class="line"><span class="comment">+     detect a double free.  */</span></span><br><span class="line">+  e-&gt;key = tcache;</span><br><span class="line">+</span><br><span class="line">   e-&gt;next = tcache-&gt;entries[tc_idx];</span><br><span class="line">   tcache-&gt;entries[tc_idx] = e;</span><br><span class="line">   ++(tcache-&gt;counts[tc_idx]);</span><br><span class="line">@@ <span class="number">-3005</span>,<span class="number">6</span> +<span class="number">3012</span>,<span class="number">7</span> @@ tcache_get (<span class="keyword">size_t</span> tc_idx)</span><br><span class="line">   assert (tcache-&gt;entries[tc_idx] &gt; <span class="number">0</span>);</span><br><span class="line">   tcache-&gt;entries[tc_idx] = e-&gt;next;</span><br><span class="line">   --(tcache-&gt;counts[tc_idx]);</span><br><span class="line">+  e-&gt;key = <span class="literal">NULL</span>;</span><br><span class="line">   <span class="keyword">return</span> (<span class="keyword">void</span> *) e;</span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line">@@ <span class="number">-4218</span>,<span class="number">6</span> +<span class="number">4226</span>,<span class="number">26</span> @@ _int_free (mstate av, mchunkptr p, <span class="keyword">int</span> have_lock)</span><br><span class="line">   &#123;</span><br><span class="line">     <span class="keyword">size_t</span> tc_idx = csize2tidx (size);</span><br><span class="line"></span><br><span class="line">+    <span class="comment">/* Check to see if it&#x27;s already in the tcache.  */</span></span><br><span class="line">+    tcache_entry *e = (tcache_entry *) chunk2mem (p);</span><br><span class="line">+</span><br><span class="line">+    <span class="comment">/* This test succeeds on double free.  However, we don&#x27;t 100%</span></span><br><span class="line"><span class="comment">+       trust it (it also matches random payload data at a 1 in</span></span><br><span class="line"><span class="comment">+       2^&lt;size_t&gt; chance), so verify it&#x27;s not an unlikely coincidence</span></span><br><span class="line"><span class="comment">+       before aborting.  */</span></span><br><span class="line">+    <span class="keyword">if</span> (__glibc_unlikely (e-&gt;key == tcache &amp;&amp; tcache))</span><br><span class="line">+      &#123;</span><br><span class="line">+       tcache_entry *tmp;</span><br><span class="line">+       LIBC_PROBE (memory_tcache_double_free, <span class="number">2</span>, e, tc_idx);</span><br><span class="line">+       <span class="keyword">for</span> (tmp = tcache-&gt;entries[tc_idx];</span><br><span class="line">+            tmp;</span><br><span class="line">+            tmp = tmp-&gt;next)</span><br><span class="line">+         <span class="keyword">if</span> (tmp == e)</span><br><span class="line">+           malloc_printerr (<span class="string">&quot;free(): double free detected in tcache 2&quot;</span>);</span><br><span class="line">+       <span class="comment">/* If we get here, it was a coincidence.  We&#x27;ve wasted a few</span></span><br><span class="line"><span class="comment">+          cycles, but don&#x27;t abort.  */</span></span><br><span class="line">+      &#125;</span><br><span class="line">+</span><br><span class="line">     <span class="keyword">if</span> (tcache</span><br><span class="line">        &amp;&amp; tc_idx &lt; mp_.tcache_bins</span><br><span class="line">        &amp;&amp; tcache-&gt;counts[tc_idx] &lt; mp_.tcache_count)</span><br></pre></td></tr></table></figure>
+
+<h1 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h1><ul>
+<li>《CTF竞赛权威指南（Pwn篇）》</li>
+<li><a target="_blank" rel="noopener" href="https://ftp.gnu.org/gnu/glibc/">Index of &#x2F;gnu&#x2F;glibc Glibc-2.26</a></li>
+<li><a target="_blank" rel="noopener" href="https://sourceware.org/bugzilla/show_bug.cgi?id=22375">(CVE-2017-17426) malloc returns pointer from tcache_get when should return NULL</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Pwn/" rel="tag"><i class="fa fa-tag"></i> Pwn</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/heap-intro/" rel="prev" title="堆简析">
+                  <i class="fa fa-chevron-left"></i> 堆简析
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lu0k</span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <script size="250" alpha="0.5" zIndex="-1" src="https://cdn.jsdelivr.net/npm/ribbon.js@1.0.2/dist/ribbon.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>
