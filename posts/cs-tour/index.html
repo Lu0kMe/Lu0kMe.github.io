@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-lu0k.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-lu0k.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-lu0k.png">
+  <link rel="mask-icon" href="/images/lu0k.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"lu0k.github.io","root":"/","images":"/images","scheme":"Gemini","version":"8.7.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+<meta name="description" content="内容简介计算机系统是由硬件和系统软件组成的，它们共同工作来运行应用程序。虽然系统的具体实现方式随着时间不断变化，但是系统内在的概念却没有改变。所有计算机系统都有相似的硬件和软件组件，它们执行着相似的功能。在Kernighan和Ritchie的关于C编程语言的经典教材中，他们通过hello程序来介绍C。本书通过跟踪hello程序的生命周期来开始对系统的学习。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="计算机系统漫游">
+<meta property="og:url" content="https://lu0k.github.io/posts/cs-tour/index.html">
+<meta property="og:site_name" content="Lu0k">
+<meta property="og:description" content="内容简介计算机系统是由硬件和系统软件组成的，它们共同工作来运行应用程序。虽然系统的具体实现方式随着时间不断变化，但是系统内在的概念却没有改变。所有计算机系统都有相似的硬件和软件组件，它们执行着相似的功能。在Kernighan和Ritchie的关于C编程语言的经典教材中，他们通过hello程序来介绍C。本书通过跟踪hello程序的生命周期来开始对系统的学习。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://lu0k.github.io/1-2.png">
+<meta property="og:image" content="https://lu0k.github.io/1-3.png">
+<meta property="og:image" content="https://lu0k.github.io/1-4.png">
+<meta property="og:image" content="https://lu0k.github.io/1-5.png">
+<meta property="og:image" content="https://lu0k.github.io/1-6.png">
+<meta property="og:image" content="https://lu0k.github.io/1-7.png">
+<meta property="og:image" content="https://lu0k.github.io/1-8.png">
+<meta property="og:image" content="https://lu0k.github.io/1-9.png">
+<meta property="og:image" content="https://lu0k.github.io/1-10.png">
+<meta property="og:image" content="https://lu0k.github.io/1-11.png">
+<meta property="og:image" content="https://lu0k.github.io/1-12.png">
+<meta property="og:image" content="https://lu0k.github.io/1-13.png">
+<meta property="og:image" content="https://lu0k.github.io/1-14.png">
+<meta property="og:image" content="https://lu0k.github.io/1-15.png">
+<meta property="og:image" content="https://lu0k.github.io/f-1.png">
+<meta property="og:image" content="https://lu0k.github.io/f-2.png">
+<meta property="og:image" content="https://lu0k.github.io/1-17.png">
+<meta property="og:image" content="https://lu0k.github.io/1-18.png">
+<meta property="article:published_time" content="2021-12-10T16:00:00.000Z">
+<meta property="article:modified_time" content="2021-12-11T13:38:15.109Z">
+<meta property="article:author" content="Lu0k">
+<meta property="article:tag" content="CSAPP">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://lu0k.github.io/1-2.png">
+
+
+<link rel="canonical" href="https://lu0k.github.io/posts/cs-tour/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://lu0k.github.io/posts/cs-tour/","path":"posts/cs-tour/","title":"计算机系统漫游"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>计算机系统漫游 | Lu0k</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">Lu0k</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Lu0k's Blog</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%86%85%E5%AE%B9%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">内容简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BF%A1%E6%81%AF%E5%B0%B1%E6%98%AF%E4%BD%8D%E5%8A%A0%E4%B8%8A%E4%B8%8B%E6%96%87"><span class="nav-number">2.</span> <span class="nav-text">信息就是位加上下文</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%A8%8B%E5%BA%8F%E8%A2%AB%E7%BF%BB%E8%AF%91%E6%88%90%E4%B8%8D%E5%90%8C%E6%A0%BC%E5%BC%8F"><span class="nav-number">3.</span> <span class="nav-text">程序被翻译成不同格式</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BA%86%E8%A7%A3%E7%BC%96%E8%AF%91%E7%B3%BB%E7%BB%9F%E5%A6%82%E4%BD%95%E5%B7%A5%E4%BD%9C"><span class="nav-number">4.</span> <span class="nav-text">了解编译系统如何工作</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%A4%84%E7%90%86%E5%99%A8%E8%AF%BB%E5%B9%B6%E8%A7%A3%E9%87%8A%E5%86%85%E5%AD%98%E6%8C%87%E4%BB%A4"><span class="nav-number">5.</span> <span class="nav-text">处理器读并解释内存指令</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B3%BB%E7%BB%9F%E7%9A%84%E7%A1%AC%E4%BB%B6%E7%BB%84%E6%88%90"><span class="nav-number">5.1.</span> <span class="nav-text">系统的硬件组成</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%90%E8%A1%8Chello%E7%A8%8B%E5%BA%8F"><span class="nav-number">5.2.</span> <span class="nav-text">运行hello程序</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%AB%98%E9%80%9F%E7%BC%93%E5%AD%98%E8%87%B3%E5%85%B3%E9%87%8D%E8%A6%81"><span class="nav-number">6.</span> <span class="nav-text">高速缓存至关重要</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AD%98%E5%82%A8%E8%AE%BE%E5%A4%87%E5%B1%82%E6%AC%A1%E7%BB%93%E6%9E%84"><span class="nav-number">7.</span> <span class="nav-text">存储设备层次结构</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E7%AE%A1%E7%90%86%E7%A1%AC%E4%BB%B6"><span class="nav-number">8.</span> <span class="nav-text">操作系统管理硬件</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%9B%E7%A8%8B"><span class="nav-number">8.1.</span> <span class="nav-text">进程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BA%BF%E7%A8%8B"><span class="nav-number">8.2.</span> <span class="nav-text">线程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98"><span class="nav-number">8.3.</span> <span class="nav-text">虚拟内存</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%87%E4%BB%B6"><span class="nav-number">8.4.</span> <span class="nav-text">文件</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%B3%BB%E7%BB%9F%E4%B9%8B%E9%97%B4%E5%88%A9%E7%94%A8%E7%BD%91%E7%BB%9C%E9%80%9A%E4%BF%A1"><span class="nav-number">9.</span> <span class="nav-text">系统之间利用网络通信</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%87%8D%E8%A6%81%E4%B8%BB%E9%A2%98"><span class="nav-number">10.</span> <span class="nav-text">重要主题</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Amdahl%E5%AE%9A%E5%BE%8B"><span class="nav-number">10.1.</span> <span class="nav-text">Amdahl定律</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B9%B6%E5%8F%91%E5%92%8C%E5%B9%B6%E8%A1%8C"><span class="nav-number">10.2.</span> <span class="nav-text">并发和并行</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BA%BF%E7%A8%8B%E7%BA%A7%E5%B9%B6%E5%8F%91"><span class="nav-number">10.2.1.</span> <span class="nav-text">线程级并发</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8C%87%E4%BB%A4%E7%BA%A7%E5%B9%B6%E8%A1%8C"><span class="nav-number">10.2.2.</span> <span class="nav-text">指令级并行</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8D%95%E6%8C%87%E4%BB%A4%E3%80%81%E5%A4%9A%E6%95%B0%E6%8D%AE%E5%B9%B6%E8%A1%8C"><span class="nav-number">10.2.3.</span> <span class="nav-text">单指令、多数据并行</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F%E4%B8%AD%E6%8A%BD%E8%B1%A1%E7%9A%84%E9%87%8D%E8%A6%81%E6%80%A7"><span class="nav-number">10.3.</span> <span class="nav-text">计算机系统中抽象的重要性</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%B0%8F%E7%BB%93"><span class="nav-number">11.</span> <span class="nav-text">小结</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Reference"><span class="nav-number">12.</span> <span class="nav-text">Reference</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-overview">
+            <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Lu0k"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Lu0k</p>
+  <div class="site-description" itemprop="description">谦虚学习!</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">72</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">32</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/lu0k" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;lu0k" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/Lu0kMe" title="Twitter → https:&#x2F;&#x2F;twitter.com&#x2F;Lu0kMe" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://lu0k.github.io/posts/cs-tour/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Lu0k">
+      <meta itemprop="description" content="谦虚学习!">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Lu0k">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          计算机系统漫游
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-12-11 00:00:00" itemprop="dateCreated datePublished" datetime="2021-12-11T00:00:00+08:00">2021-12-11</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Reading-Notes/" itemprop="url" rel="index"><span itemprop="name">Reading Notes</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="内容简介"><a href="#内容简介" class="headerlink" title="内容简介"></a>内容简介</h1><p>计算机系统是由硬件和系统软件组成的，它们共同工作来运行应用程序。虽然系统的具体实现方式随着时间不断变化，但是系统内在的概念却没有改变。所有计算机系统都有相似的硬件和软件组件，它们执行着相似的功能。在<code>Kernighan</code>和<code>Ritchie</code>的关于C编程语言的经典教材中，他们通过<code>hello</code>程序来介绍C。本书通过跟踪<code>hello</code>程序的生命周期来开始对系统的学习。</p>
+<span id="more"></span>
+
+<h1 id="信息就是位加上下文"><a href="#信息就是位加上下文" class="headerlink" title="信息就是位加上下文"></a>信息就是位加上下文</h1><p><code>hello</code>程序的生命周期是从一个源程序开始的，即程序员通过编辑器创建并保存的文本文件，文件名是<code>hello.c</code>。源代码如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;hello world\n&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>源程序实际上就是一个由值0和1组成的位<code>(比特)</code>序列，8个位被组织成一组，称为字节。每个字节表示程序中的某些文本字符。大部分的现代计算机系统都使用<code>ASCII</code>标准来表示文本字符，这种方式实际上就是用一个唯一的单字节大小的整数值来表示每个字符。<code>hello.c</code>程序的<code>ASCII</code>码表示如图<code>1-2</code>所示：</p>
+<p><img src="/1-2.png"></p>
+<p><code>hello.c</code>程序是以字节序列的方式储存在文件中的。每个字节都有一个整数值，对应于某些字符。例如，第一个字节的整数值就是35，它对应的就是字符<code>#</code>，第二个字节的整数值为105，它对应的就是字符<code>i</code>，依此类推。注意，每个文本行都是以一个看不见的换行符<code>\n</code>来结束的，它所对应的整数值为10。像<code>hello.c</code>这样只由<code>ASCII</code>字符构成的文件称为文本文件，所有其他文件称为都称为二进制文件。</p>
+<p><code>hello.c</code>的表示方法说明了一个基本思想：系统中的所有信息——包括磁盘文件、内存中的程序、内存中存放的用户数据以及网络上传送的数据，都是由一串比特表示的。区分不同数据对象的唯一方法是读到这些数据对象时的上下文。比如，在不同的上下文中，一个同样的字节序列可能表示一个整数、浮点数、字符串或者机器指令。</p>
+<h1 id="程序被翻译成不同格式"><a href="#程序被翻译成不同格式" class="headerlink" title="程序被翻译成不同格式"></a>程序被翻译成不同格式</h1><p><code>hello.c</code>程序的生命周期是是从一个高级C语言程序开始的，因为这种形式能够被人读懂。然而，为了在系统上运行<code>hello.c</code>程序，每条C语言都必须被其他程序转化为一系列的低级机器语言指令。然后这些指令按照一种称为可执行目标文件程序的格式打好包，并以二进制磁盘文件的形式存放起来。目标程序也称为可执行目标文件。</p>
+<p>在Unix系统上，从源文件到目标文件的转化是由编译器驱动程序完成的：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> gcc hello.c -o hello</span></span><br></pre></td></tr></table></figure>
+
+<p><code>GCC</code>编译器驱动程序读取源程序文件<code>hello.c</code>，并把它翻译为一个可执行目标文件<code>hello</code>。这个翻译过程可分为四个阶段：预处理、编译、汇编、链接。执行这四个阶段的程序<code>(预处理器、编译器、汇编器和链接器)</code>一起构成了编译系统<code>(compilation system)</code>，如图<code>1-3</code>所示：</p>
+<p><img src="/1-3.png"></p>
+<ul>
+<li>预处理阶段：预处理器<code>(cpp)</code>根据以字符<code>#</code>开头的命令，修改原始的C程序。比如<code>#include &lt;stdio.h&gt;</code>命令告诉预处理器读取系统头文件<code>stdio.h</code>内容并把它插入程序文本中。结果就得到了另一个C程序，通常是以<code>.i</code>作为文件扩展名</li>
+<li>编译阶段：编译器<code>(ccl)</code>将文本文件<code>hello.i</code>翻译成文本文件<code>hello.s</code>，它包含一个汇编语言程序</li>
+<li>汇编阶段：汇编器<code>(as)</code>将<code>hello.s</code>翻译成机器语言指令，把这些指令打包成一种叫做可重定位目标程序<code>(relocatable object program)</code>的格式，并将结果保存在目标文件<code>hello.o</code>中。<code>hello.o</code>是一个二进制文件，包含程序的指令编码</li>
+<li>链接阶段：<code>hello</code>程序调用了<code>printf</code>函数，它是每个C编译器都提供的标准C库中的一个函数。<code>printf</code>函数存在于一个名为<code>printf.o</code>的单独的预编译好的目标文件中，而这个文件必须以某种方式合并到<code>hello.o</code>程序中。链接器<code>(ld)</code>就负责处理这种合并，结果就得到<code>hello</code>文件，它是一个可执行目标文件<code>(可执行文件)</code>，可以被加载到内存中，由系统执行</li>
+</ul>
+<h1 id="了解编译系统如何工作"><a href="#了解编译系统如何工作" class="headerlink" title="了解编译系统如何工作"></a>了解编译系统如何工作</h1><p>对于像<code>hello.c</code>这样简单的程序，我们可以依靠编译系统生成正确有效的机器代码。但是，有一些重要的原因促使程序员必须直到编译系统是如何工作的：</p>
+<ul>
+<li>优化程序性能：现代编译器都是成熟的工具，通常可以生成很好的代码。作为程序员，我们无须为了写出高效代码而去了解编译器的内部工作。但是，为了在C程序中做出更好的编码选择，我们确实需要了解一些机器代码以及编译器将不同的C语句转化为机器代码的方式。比如，一个<code>switch</code>语句是否总是比一系列的<code>if-else</code>语句高效得多？一个函数调用的开销有多大？<code>while</code>循环比<code>for</code>循环更有效吗？指针引用比数组索引更有效吗？为什么将循环求和的结果放到一个本地变量中，会比将其放到一个通过引用传递过来的参数中，运行起来快很多呢？为什么只是简单地重新排列一个算数表达式中的括号就能让函数运行得更快</li>
+<li>理解链接时出现的错误：一些最令人困扰的程序错误往往都与链接器操作有关，尤其是试图构建大型的软件系统时。比如，链接器报告说它无法解析一个引用，这是什么意思？静态变量和全局变量的区别是什么？如果在不同的C文件中定义了名字相同的两个全局变量会发生什么？静态库和动态库的区别是什么？在命令行上排列库的顺序有什么影响？最严重的是，为什么有些链接错误直到运行时才会出现</li>
+<li>避免安全漏洞：多年来，缓冲区溢出错误是造成大多数网络和<code>Internet</code>服务器上安全漏洞的主要原因。存在这些错误是因为很少有程序员能够理解需要限制从不受信任的源接收数据的数量和格式。学习安全编程的第一步就是理解数据和控制信息存储在程序栈上的方式会引起的后果</li>
+</ul>
+<h1 id="处理器读并解释内存指令"><a href="#处理器读并解释内存指令" class="headerlink" title="处理器读并解释内存指令"></a>处理器读并解释内存指令</h1><p>此刻，<code>hello.c</code>源程序已经被编译系统翻译成了可执行目标文件<code>hello</code>，并被存放在磁盘上。要想在Unix系统上运行该可执行文件，将其文件名输入到称为<code>shell</code>的应用程序中：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> ./hello</span></span><br><span class="line">hello world</span><br></pre></td></tr></table></figure>
+
+<p><code>shell</code>是一个命令行解释器，它输出一个提示符，等待输入一个命令行，然后执行这个命令。如果该命令的第一个单词不是一个内置的<code>shell</code>命令，那么<code>shell</code>就会假设这是一个可执行文件的名字，它将加载并运行这个文件。在此例中，<code>shell</code>加载并运行<code>hello</code>程序，然后等待程序终止，<code>hello</code>程序在屏幕上输出它的消息，然后终止，<code>shell</code>随后输出一个命令提示符，等待下一个输入的命令行。</p>
+<h2 id="系统的硬件组成"><a href="#系统的硬件组成" class="headerlink" title="系统的硬件组成"></a>系统的硬件组成</h2><p>为了理解运行<code>hello</code>程序时发生了什么，我们需要了解一个典型系统的硬件组织，如图<code>1-4</code>所示：</p>
+<p><img src="/1-4.png"></p>
+<ul>
+<li><p>总线：贯穿整个系统的是一组电子管道，称作总线，它携带信息字节并负责在各个部件间传递。通常总线被设计成传送定长的字节块，也就是字<code>(word)</code>。字中的字节数<code>(即字长)</code>是一个基本的系统参数，各个系统中都不尽相同。现在的大多数机器字长要么是4个字节<code>(32位)</code>，要么是8字节<code>(64位)</code></p>
+</li>
+<li><p>I&#x2F;O设备：I&#x2F;O<code>(输入/输出)</code>设备是系统与外部世界的联系通道。示例系统包括四个I&#x2F;O设备：作为用户输入的键盘和鼠标、作为用户输出的显示器以及用于长期存储数据和程序的磁盘驱动器<code>(磁盘)</code>。最开始，可执行程序<code>hello</code>就存放在磁盘上。每个I&#x2F;O设备都通过一个控制器或适配器与I&#x2F;O总线相连。控制器和适配器之间的区别主要在于它们的封装方式。控制器是I&#x2F;O设备本身或者系统的主印制电路板<code>(主板)</code>上的芯片组。而适配器则是一块插在主板插槽上的卡。它们的功能都是在I&#x2F;O总线和I&#x2F;O设备之间传递信息</p>
+</li>
+<li><p>主存：主存是一个临时存储设备，在处理器执行程序时，用来存放程序和程序处理的数据。从物理上来说，主存是由一组动态随机存取存储器<code>(DRAM)</code>芯片组成的。从逻辑来说，存储器是一个线性的字节数组，每个字节都有其唯一的地址<code>(数组索引)</code>，这些地址是从零开始的。一般来说，组成程序的每条机器指令都由不同数量的字节构成。与C程序变量相对应的数据项的大小是根据类型变化的。比如，在运行Linux的<code>x86-64</code>机器上，<code>short</code>类型的数据需要2个字节，<code>int</code>和<code>float</code>类型需要4个字节，而<code>long</code>和<code>double</code>类型需要8个字节</p>
+</li>
+<li><p>处理器：中央处理单元<code>(CPU)</code>，简称处理器，是解释<code>(或执行)</code>储存在主存中的指令的引擎。处理器的核心是一个大小为一个字的存储设备<code>(或寄存器)</code>，称为程序计数器<code>(PC)</code>。在任何时刻，<code>PC</code>都指向主存中的某条机器语言指令<code>(即含有该条指令的地址)</code>。从系统通电开始，直到系统断电，处理器一直在不断地执行程序计数器指向的指令，再更新程序计数器，使其指向下一条指令。处理器看上去是按照一个非常简单的指令执行模型来操作的，这个模型是由指令集架构决定的。在这个模型中，指令按照严格的顺序执行，而执行一条指令包含执行一系列的步骤。处理器从程序计数器指向的内存处读取指令，解释指令中的位，执行该指令指示的简单操作，然后更新<code>PC</code>，使其指向下一条指令，而这条指令并不一定和在内存中的刚刚执行的指令相邻。这样的简单操作并不多，它们围绕着主存、寄存器文件<code>(register file)</code>和算术&#x2F;逻辑单元<code>(ALU)</code>进行。寄存器文件是一个小的存储设备，由一些单个字长的寄存器组成，每个寄存器都有唯一的名字。<code>ALU</code>计算新的数据和地址值。下面是一些简单操作的例子，<code>CPU</code>在指令的要求下可能会执行这些操作：</p>
+<ul>
+<li>加载：从主存复制一个字节或者一个字到寄存器，以覆盖寄存器原来的内容</li>
+<li>存储：从寄存器复制一个字节或者一个字到主存的某个位置，以覆盖这个位置上原来的内容</li>
+<li>操作：把两个寄存器的内容复制到<code>ALU</code>，<code>ALU</code>对这两个字做算术运算，并将结果存放到一个寄存器中，以覆盖该寄存器中原来的内容</li>
+<li>跳转：从指令本身中抽取一个字，并将这个字复制到程序计数器<code>(PC)</code>中，以覆盖<code>PC</code>中原来的值</li>
+</ul>
+<p>处理器看上去是它的指令集架构的简单实现，但是实际上现代处理器使用了非常复杂的机制来加速程序的执行。因此，我们将处理器的指令集架构和处理器的微体系结构区分开来：指令集架构描述的是每条机器代码指令的效果；而微体系结构描述的是处理器实际上是如何实现的</p>
+</li>
+</ul>
+<h2 id="运行hello程序"><a href="#运行hello程序" class="headerlink" title="运行hello程序"></a>运行hello程序</h2><p>初始时，<code>shell</code>程序执行它的指令，等待我们输入一个命令。当我们在键盘上输入字符串<code>./hello</code>后，<code>shell</code>程序将字符逐一读入寄存器，再把它存放到内存中，如图<code>1-5</code>所示：</p>
+<p><img src="/1-5.png"></p>
+<p>当我们在键盘上敲回车键时，<code>shell</code>程序就知道我们已经结束了命令的输入。然后<code>shell</code>执行一系列指令来加载可执行的<code>hello</code>文件，这些指令将<code>hello</code>目标文件中的代码和数据从磁盘复制到主存。数据包括最终会被输出的字符串<code>hello, world\n</code>。利用直接存储器存取<code>(DMA)</code>技术，数据可以不通过处理器而直接从磁盘达到主存，如图<code>1-6</code>所示：</p>
+<p><img src="/1-6.png"></p>
+<p>一旦目标文件<code>hello</code>中的代码和数据被加载到主存，处理器就开始执行<code>hello</code>程序的<code>main</code>程序中的机器语言指令。这些指令将<code>hello, world\n</code>字符串中的字节从主存复制到寄存器文件，再从寄存器文件中复制到显示设备，最终显示在屏幕上，如图<code>1-7</code>所示：</p>
+<p><img src="/1-7.png"></p>
+<h1 id="高速缓存至关重要"><a href="#高速缓存至关重要" class="headerlink" title="高速缓存至关重要"></a>高速缓存至关重要</h1><p>系统花费了大量的时间把信息从一个地方挪到另一个地方。<code>hello</code>程序的机器指令最初是存放在磁盘上，当程序加载时，它们被复制到主存；当处理器运行程序时，指令又从主存复制到处理器。像相似地，数据串<code>hello, world\n</code>开始时在磁盘上，然后被复制到主存，最后从主存上复制到显示设备。从程序员的角度来看，这些复制就是开销，减慢了程序真正的工作。因此，系统设计者的一个主要目标就是使这些复制操作尽可能快地完成。</p>
+<p>根据机械原理，较大的存储设备要比较小的存储设备运行得慢，而快速设备的造价远高于同类的低速设备。比如说，一个典型系统上的磁盘驱动器可能比主存大1000倍，但是对处理器而言，从磁盘驱动器上读取一个字的时间开销要比从主存中读取的开销大1000万倍。类似地，一个典型的寄存器文件只存储几百字节的信息，而主存里可存放几十亿字节。然而，处理器从寄存器文件中读数据比从主存中读取几乎要快100倍，更麻烦的是，随着半导体技术的进步，这种处理器与主存之间的差距还在持续增大。加快处理器的运行速度比加快主存的运行速度要容易和便宜得多。</p>
+<p>针对这种处理器与主存之间的差异，系统设计者采用了更小更快的存储设备，称为高速缓存存储器<code>(cache memory)</code>，作为暂时的集结区域，存放处理器近期可能会需要的信息。一个典型系统中的高速缓存存储器如图<code>1-8</code>所示：</p>
+<p><img src="/1-8.png"></p>
+<p>位于处理器芯片上的<code>L1</code>高速缓存的容量可以达到数万字节，访问速度几乎和访问寄存器文件一样快。一个容量为数十万到数百万字节的更大的<code>L2</code>高速缓存通过一条特殊的总线连接到处理器。进程访问<code>L2</code>高速缓存的时间要比访问<code>L1</code>高速缓存的时间长5倍，但是这仍然比访问主存的时间快5到10倍。<code>L1</code>和<code>L2</code>高速缓存是用一种叫做静态随机访问存储器<code>(SRAM)</code>的硬件技术实现的。比较新的、处理能力更强大的系统甚至有三级高速缓存：<code>L1</code>、<code>L2</code>和<code>L3</code>。系统可以获得一个很大的存储器，同时访问速度也很快，原因是利用了高速缓存的局部性原理，即程序具有访问局部区域里的数据和代码的趋势。通过让高速缓存器里存放可能经常访问的数据，大部分的内存操作都能在快速的高速缓存中完成。</p>
+<h1 id="存储设备层次结构"><a href="#存储设备层次结构" class="headerlink" title="存储设备层次结构"></a>存储设备层次结构</h1><p>在处理器和一个较大较慢的设备<code>(例如主存)</code>之间插入一个更小更快的存储设备<code>(例如高速缓存)</code>的想法已经成为一个普遍的观念。实际上，每个计算机系统中的存储设备都被组织成一个存储器层次结构，如图<code>1-9</code>所示：</p>
+<p><img src="/1-9.png"></p>
+<p>在这个层次结构中，从上至下，设备的访问速度越来越慢、容量越来越大，并且每字节的造价也越来越便宜。寄存器文件在层次结构中位于最顶部，也就是第0级或记为<code>L0</code>。存储器层次结构的主要思想是上一层的存储器作为低一层存储器的高速缓存。因此，寄存器文件就是<code>L1</code>的高速缓存，<code>L1</code>是<code>L2</code>的高速缓存，<code>L2</code>是<code>L3</code>的高速缓存，<code>L3</code>是主存的高速缓存，而主存又是磁盘的高速缓存。在某些具有分布式文件系统的网络系统中，本地磁盘就是存储在其他系统中磁盘上的数据的高速缓存。正如可以运用不同的高速缓存的知识来提高程序性能一样，程序员同样可以利用对整个存储器层次结构的理解来提高程序性能。</p>
+<h1 id="操作系统管理硬件"><a href="#操作系统管理硬件" class="headerlink" title="操作系统管理硬件"></a>操作系统管理硬件</h1><p>当<code>shell</code>加载和运行<code>hello</code>程序时，以及<code>hello</code>程序输出自己的消息时，<code>shell</code>和<code>hello</code>程序都没有直接访问键盘、显示器、磁盘或者主存。取而代之的是，它们依靠操作系统提供的服务。我们可以把操作系统看成是应用程序和硬件之间插入的一层软件，所有应用程序对硬件的操作尝试都必须通过操作系统，如图<code>1-10</code>所示：</p>
+<p><img src="/1-10.png"></p>
+<p>操作系统有两个基本功能：</p>
+<ul>
+<li>防止硬件被失控的应用程序滥用</li>
+<li>向应用程序提供更简单一致的机制来控制复杂而又通常大不相同的低级硬件设备</li>
+</ul>
+<p>操作系统通过几个基本的抽象概念<code>(进程、虚拟内存和文件)</code>来实现这两个功能。文件是对I&#x2F;O设备的抽象表示，虚拟内存是对主存和磁盘I&#x2F;O设备的抽象表示，进程则是对处理器、主存和I&#x2F;O设备的抽象表示，如图<code>1-11</code>所示：</p>
+<p><img src="/1-11.png"></p>
+<h2 id="进程"><a href="#进程" class="headerlink" title="进程"></a>进程</h2><p>像<code>hello</code>这样的程序在现代系统上运行时，操作系统会提供一种假象，就好像系统上只有这个程序在运行程序看上去是独占地使用处理器、主存和I&#x2F;O设备。处理器看上去就像在不间断地一条接一条地执行程序中的指令，即该程序的代码和数据是系统内存中唯一的对象。这些假象是通过进程的概念来实现的，进程是计算机科学中最重要和最成功的概念之一。</p>
+<p>进程是操作系统对一个正在运行的程序的一种抽象。在一个系统上可以同时运行多个进程，而每个进程都好像在独占地使用硬件。而并发运行，则是说一个进程的指令和另一个进程的指令是交错执行的。在大多数系统中，需要运行的进程数是多于可以运行它们的<code>CPU</code>个数的。传统系统在一个时刻只能执行一个程序，而先进的多核处理器同时能够执行多个程序。无论是在单核还是多核操作系统中，一个CPU看上去都像是在并发地执行多个进程，这是通过处理器在进程间切换来实现的。操作系统实现这种交错执行的机制称为上下文切换。</p>
+<p>操作系统保持跟踪进程运行所需的所有状态信息。这种状态，也就是上下文，包括许多信息，比如<code>PC</code>和寄存器文件的当前值，以及主存的内容。在任何一个时刻，单处理系统都只能执行一个进程的代码。当操作系统决定要把控制权从当前进程转移到某个新进程时，就会进行上下文切换，即保存当前进程的上下文、恢复新进程的上下文，然后将控制权传递到新进程。新进程就会从它上次停止的地方开始。</p>
+<p>示例场景中有两个并发的进程：<code>shell</code>进程和<code>hello</code>进程。最开始，只有<code>shell</code>进程在运行，即等待命令行上的输入。当我们让它运行<code>hello</code>程序时，<code>shell</code>通过调用一个专门的函数，即系统调用，来执行我们的请求，系统调用会将控制权传递给操作系统。操作系统保存<code>shell</code>进程的上下文，创建一个新的<code>hello</code>进程及其上下文，然后将控制权传给新的<code>hello</code>进程。<code>hello</code>进程终止后，操作系统恢复<code>shell</code>进程的上下文，并将控制权传回给它，<code>shell</code>进程会继续等待下一个命令行输入。</p>
+<p>从一个进程到另一个进程的转换是由操作系统内核<code>(kernel)</code>管理的。内核是操作系统代码常驻内存的部分。当应用程序需要操作系统的某些操作时，比如读写文件，它就执行一条特殊的系统调用<code>(system call)</code>指令，将控制权传递给内核。然后内核执行被请求的操作并返回给应用程序，如图<code>1-12</code>所示：</p>
+<p><img src="/1-12.png"></p>
+<p>注意，内核不是一个独立的进程。相反，它是系统管理全部进程所用代码和数据结构的集合。实现进程这个抽象概念需要低级硬件和操作系统软件之间的紧密合作。</p>
+<h2 id="线程"><a href="#线程" class="headerlink" title="线程"></a>线程</h2><p>在现代操作系统中，一个进程实际上可以由多个称为线程的执行单元组成，每个线程都运行在进程的上下文中，并共享同样的代码和全局数据。由于网络服务器中对并行处理的需求，线程成为越来越重要的编程模型，因此多线程之间比多进程之间更容易共享数据，也因为线程一般来说都比进程更高效。当有多处理器可用的时候，多线程也是一种使得程序可以运行得更快的方法。</p>
+<h2 id="虚拟内存"><a href="#虚拟内存" class="headerlink" title="虚拟内存"></a>虚拟内存</h2><p>虚拟内存是一个抽象概念，它为每个进程提供了一个假象，即每个进程都在独占地使用主存。每个进程看到的内存都是一致的，称为虚拟地址空间。Linux进程的虚拟地址空间<code>(其他Unix系统的设计也与此类似)</code>如图<code>1-13</code>所示：</p>
+<p><img src="/1-13.png"></p>
+<p>在Linux中，地址空间最上面的区域是保留给操作系统中的代码和数据的，这对所有进程来说都是一样的。地址空间的底部区域存放用户进程定义的代码和数据。注意，图中的地址是从下往上增大的。每个进程看到的虚拟地址空间由大量准确定义的区构成，每个区都有专门的功能：</p>
+<ul>
+<li>程序代码和数据：对所有进程来说，代码是从同一固定地址开始的，紧接着的是和C全局变量相对应的数据位置。代码和数据区是直接按照可执行目标文件的内容初始化的，在示例中就是可执行文件<code>hello</code></li>
+<li>堆：代码和数据区后紧随着的是运行时堆。代码和数据区在进程一开始时就被指定了大小，与此不同，当调用像<code>malloc</code>和<code>free</code>这样的C标准库函数时，堆可以在运行时动态地扩展和收缩</li>
+<li>共享库：大约在地址空间的中间部分是一块用来存放像C标准库和数学库这样的共享库的代码和数据的区域。共享库的概念非常强大，也相当难懂</li>
+<li>栈：位于用户虚拟地址空间顶部的是用户栈，编译器用它来实现函数调用。和堆一样，用户栈在程序执行期间可以动态地扩展和收缩。特别地，每次我们调用一个函数时，栈就会增长；从一个函数返回时，栈就会收缩</li>
+<li>内核虚拟内存：地址空间顶部的区域是为内核保留的。不允许应用程序读写这个区域的内容或者直接调用内核代码定义的函数，相反，它们必须调用内核来执行这些操作</li>
+</ul>
+<p>虚拟内存的运作需要硬件和操作系统软件之间精密复杂的交互，包括对处理器生成的每个地址的硬件翻译。基本思想是把一个进程虚拟内存的内容存储在磁盘上，然后用主存作为磁盘的高速缓存。</p>
+<h2 id="文件"><a href="#文件" class="headerlink" title="文件"></a>文件</h2><p>文件就是字节序列，仅此而已。每个I&#x2F;O设备，包括磁盘、键盘、显示器，甚至网络，都可以看成是文件。系统中的所有输入输出都是通过使用一小组称为Unix I&#x2F;O的系统函数调用读写文件来实现的。</p>
+<p>文件这个简单而精致的概念是非常强大的，因为它向应用程序提供了一个统一的视图，来看待系统中可能含有的所有各式各样的I&#x2F;O设备。例如，处理磁盘文件内容的应用程序员可以非常幸福，因为他们无须了解具体的磁盘技术。进一步说，同一个程序可以在使用不同磁盘技术的不同系统上运行。</p>
+<h1 id="系统之间利用网络通信"><a href="#系统之间利用网络通信" class="headerlink" title="系统之间利用网络通信"></a>系统之间利用网络通信</h1><p>系统漫游至此，我们一直是把系统视为一个孤立的硬件和软件的集合体。实际上，现代系统经常通过网络和其它系统连接到一起。从一个单独的系统来看，网络可视为一个I&#x2F;O设备，如图<code>1-14</code>所示：</p>
+<p><img src="/1-14.png"></p>
+<p>当系统从主存复制一串字节到网络适配器时，数据流经过网络到达另一台机器，而不是比如说到达本地磁盘驱动器。相似地，系统可以读取从其他机器发送来的数据，并把数据复制到自己的主存。</p>
+<p>随着<code>Internet</code>这样的全球网络的出现，从一台主机复制信息到另外一台主机已经成为计算机系统最重要的用途之一。比如，像电子邮件、即时通信、万维网、<code>FTP</code>和<code>telent</code>这样的应用程序都是基于网络复制信息的功能。回到<code>hello</code>示例，我们可以使用熟悉的<code>telnet</code>应用在一个远程主机上运行<code>hello</code>程序。假设用本地主机上的<code>telnet</code>客户端连接远程主机上的<code>telnet</code>服务器。在我们登录到远程主机并运行<code>shell</code>后，远端的<code>shell</code>就在等待接收输入命令。此后在远端运行<code>hello</code>程序包括如图<code>1-15</code>所示的五个基本步骤：</p>
+<p><img src="/1-15.png"></p>
+<p>当我们在<code>telnet</code>客户端键入<code>hello</code>字符串并敲下回车键后，客户端软件就会将这个字符串发送到<code>telnet</code>的服务器。<code>telnet</code>服务器从网络上接收到这个字符串后，会把它传递给远端<code>shell</code>程序。接下来，远端<code>shell</code>运行<code>hello</code>程序，并将输出行返回给<code>telnet</code>服务器。最后，<code>telnet</code>服务器通过网络把输出串转发给<code>telnet</code>客户端，客户端就将输出串输出到我们的本地终端上。</p>
+<h1 id="重要主题"><a href="#重要主题" class="headerlink" title="重要主题"></a>重要主题</h1><p>系统是硬件和系统软件互相交织的集合体，它们必须共同协作以达到运行应用程序的最终目的。本书的余下部分会讲述硬件和软件的详细内容，通过了解这些详细内容，可以写出更快速、更可靠和更安全的程序。作为本章的结束，在此强调几个贯穿计算机系统所有方面的重要概念。</p>
+<h2 id="Amdahl定律"><a href="#Amdahl定律" class="headerlink" title="Amdahl定律"></a>Amdahl定律</h2><p><code>Gene Amdahl</code>，计算领域的早期先锋之一，对提升系统某一部分性能所带来的效果做出了简单却有见地的观察。这个观察被称为<code>Amdahl</code>定律<code>(Amdahl&#39;s law)</code>。该定律的主要思想是，当我们对系统的某一部分加速时，其对系统整体性能的影响取决于该部分的重要性和加速程度。若系统执行某应用程序需要时间为T<sub>old</sub>。假设系统某部分所需执行时间与该时间的比例为α，而该部分性能提升比例为k。即该部分初始所需时间为αT<sub>old</sub>，现在所需时间为αT<sub>old</sub>&#x2F;k。因此，总的执行时间应为：</p>
+<p><img src="/f-1.png"></p>
+<p>由此，可以计算加速比S&#x3D;T<sub>old</sub>&#x2F;T<sub>new</sub>为：</p>
+<p><img src="/f-2.png"></p>
+<p><code>Amdahl</code>定律的主要观点为：要想显著加速整个系统，必须提升全系统中相当大的部分的速度。</p>
+<h2 id="并发和并行"><a href="#并发和并行" class="headerlink" title="并发和并行"></a>并发和并行</h2><p>数字计算机的整个历史中，有两个需求是驱动进步的动力：一个是我们想要计算机做得更多；另一个是我们想要计算机运行得更快。当处理器能够同时做更多事情时，这两个因素都会改进。我们用的术语并发<code>(concurrency)</code>是一个通用的概念，指一个同时具有多个活动的系统；而术语并行<code>(parallelism)</code>指的是用并发来使一个系统运行得更快。并行可以在计算机系统的多个抽象层次上运用。</p>
+<h3 id="线程级并发"><a href="#线程级并发" class="headerlink" title="线程级并发"></a>线程级并发</h3><p>构建在进程这个抽象之上，我们能够设计出同时有多个程序执行的系统，这就导致了并发。使用线程，我们甚至能够在一个进程中执行多个控制流。传统意义上，这种并发执行只是模逆出来的，是通过使一台计算机在它正在执行的进程间快速切换来实现的。在以前，即使处理器必须在多个任务间切换，大多数实际的计算也都是由一个处理器来完成的。这种配置称为单处理器系统。</p>
+<p>当构建一个由单操作系统内核控制的多处理器组成的系统时，就得到了一个多处理器系统。随着多核处理器和超线程<code>(hyperthreading)</code>的出现，这种系统才变得常见。多核处理器是将多个<code>CPU</code>集成到一个集成电路芯片上。一个典型的多核处理器的组织结构如图<code>1-17</code>所示：</p>
+<p><img src="/1-17.png"></p>
+<p>超线程，有时称为同时多线程<code>(simultaneous multi-threading)</code>，是一项允许一个<code>CPU</code>执行多个控制流的技术。它涉及到<code>CPU</code>某些硬件有多个备份，比如程序计数器和寄存器文件，而其他的硬件部分只有一份，比如执行浮点算术运算的单元。常规的处理器需要大约20000个时间周期做不同线程间的转换，而超线程的处理器可以在单个周期的基础上决定要执行哪一个线程。这使得<code>CPU</code>能够更好地利用它的处理资源。比如，假设一个线程必须等到某些数据被装载到高速缓存中，那<code>CPU</code>就可以继续去执行另一个线程。</p>
+<p>多处理器的使用可以从两个方面提高系统性能。首先，它减少了在执行多个任务时模拟并发的需要。其次，它可以使应用程序运行得更快，当然，这必须要求程序是以多线程方式来书写的，这些线程可以并行地高效执行。</p>
+<h3 id="指令级并行"><a href="#指令级并行" class="headerlink" title="指令级并行"></a>指令级并行</h3><p>在较低的抽象层次上，现代处理器可以同时执行多条指令的属性称为指令级并行。早期的微处理器，如1978年的<code>Intel 8086</code>，需要多个时钟周期来执行一条指令。最近的处理器可以保持每个时钟周期2到4条指令的执行速率。其实每条指令从开始到结束需要长得多的时间，大约20个或者更多周期，但是处理器使用了非常多的聪明技巧来同时处理多达100条指令，比如流水线。在流水线中，将执行一条指令所需要的活动划分成不同的步骤，将处理器的硬件组织成一系列的阶段，每个阶段执行一个步骤。这些阶段可以并行地操作，用来处理不同指令的不同部分。</p>
+<p>如果处理器可以达到比一个周期一条指令更快的执行速率，就称之为超标量<code>(superscalar)</code>处理器。大多数现代处理器都支持超标量操作。</p>
+<h3 id="单指令、多数据并行"><a href="#单指令、多数据并行" class="headerlink" title="单指令、多数据并行"></a>单指令、多数据并行</h3><p>在最低层次上，许多现代处理器拥有特殊的硬件，允许一条指令产生多个可以并行执行的操作，这种方式称为单指令、多数据，即<code>SIMD</code>并行。例如，较新几代的<code>Intel</code>和<code>AMD</code>处理器都具有并行地对8对单精度浮点数<code>(C数据类型float)</code>做加法的指令。</p>
+<p>提供这些<code>SIMD</code>指令多是为了提高处理影像、声音和视频数据应用的执行速度。虽然有些编译器会试图从C程序中自动抽取<code>SIMD</code>并行性，但是更可靠的方法是用编译器支持的特殊的向量数据类型来写程序，比如<code>GCC</code>就支持向量数据类型。</p>
+<h2 id="计算机系统中抽象的重要性"><a href="#计算机系统中抽象的重要性" class="headerlink" title="计算机系统中抽象的重要性"></a>计算机系统中抽象的重要性</h2><p>抽象的使用是计算机科学中最为重要的概念之一。例如，为一组函数规定一个简单的应用程序接口<code>(API)</code>就是一个很好的编程习惯，程序员无须了解它内部的工作便可以使用这些代码。不同的编程语言提供不同形式和等级的抽象支持，例如<code>Java</code>类的声明和C语言的函数原型。计算机系统中使用的几个抽象如图<code>1-18</code>所示：</p>
+<p><img src="/1-18.png"></p>
+<p>在处理器里，指令集架构提供了对实际处理器硬件的抽象。使用抽象，机器代码程序表现得就好像运行在一个一次只执行一条指令的处理器上。底层的硬件远比抽象描述的要复杂精细，它并行地执行多条指令，但又总是与那个简单有序的模型保持一致。只要执行模型一样，不同的处理器实现也能执行同样的机器代码，而又提高不同的开销和性能。文件是对I&#x2F;O设备的抽象，虚拟内存是对程序存储器的抽象，进程是对一个正在进行的程序的抽象，而虚拟机提供对整个计算机的抽象，包括操作系统、处理器和程序。</p>
+<h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><p>计算机系统是由硬件和系统软件组成的，它们共同协作以运行应用程序。计算机内部的信息被表示为一组组的位，它们依据上下文有不同的解释方式。程序被其他程序翻译成不同的形式，开始时是<code>ASCII</code>文本，然后被编译器和链接器翻译成二进制可执行文件。</p>
+<p>处理器读取并解释存放在主存里的二进制指令。因为计算机花费了大量的时间在内存、I&#x2F;O设备和<code>CPU</code>寄存器之间复制数据，所以将系统中的存储设备划分成层次结构——<code>CPU</code>寄存器在顶部，接着是多层的硬件高速缓存存储器、<code>DRAM</code>主存和磁盘存储器。在层次模型中，位于更高层的存储设备比低层的存储设备要更快，单位比特造价也更高。层次结构中较高层次的存储设备可以作为较低层次设备的高速缓存。通过理解和运用这种存储层次结构的知识，程序员可以优化C程序的性能。</p>
+<p>操作系统内核是应用程序和硬件之间的媒介，它提供三个基本的抽象：</p>
+<ul>
+<li>文件是对I&#x2F;O设备的抽象</li>
+<li>虚拟内存是对主存和磁盘的抽象</li>
+<li>进程是处理器、主存和I&#x2F;O设备的抽象</li>
+</ul>
+<p>最后，网络提供了计算机系统之间通信的手段。从特殊系统的角度来看，网络就是一种I&#x2F;O设备。</p>
+<h1 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h1><ul>
+<li>Computer Systems: A Programmer’s Perspective, 3&#x2F;E</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/CSAPP/" rel="tag"><i class="fa fa-tag"></i> CSAPP</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/htb-whatdoesthefsay/" rel="prev" title="HTB What does the f say">
+                  <i class="fa fa-chevron-left"></i> HTB What does the f say
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lu0k</span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <script size="250" alpha="0.5" zIndex="-1" src="https://cdn.jsdelivr.net/npm/ribbon.js@1.0.2/dist/ribbon.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>
