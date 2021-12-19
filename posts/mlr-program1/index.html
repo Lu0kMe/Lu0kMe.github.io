@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-lu0k.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-lu0k.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-lu0k.png">
+  <link rel="mask-icon" href="/images/lu0k.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"lu0k.github.io","root":"/","images":"/images","scheme":"Gemini","version":"8.7.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+<meta name="description" content="内容简介计算机执行机器代码，用字节序列编码低级的操作，包括处理数据、管理内存、读写存储设备上的数据，以及利用网络通信。编译器基于编程语言的规则、目标机器的指令集和操作系统遵循的惯例，经过一系列的阶段生成机器代码。GCC C语言编译器以汇编代码的形式产生输出，汇编代码是机器代码的文本表示，给出程序中的每一条指令。然后GCC调用汇编器和链接器，根据汇编代码生成可执行的机器代码。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="程序的机器级表示(一)">
+<meta property="og:url" content="https://lu0k.github.io/posts/mlr-program1/index.html">
+<meta property="og:site_name" content="Lu0k">
+<meta property="og:description" content="内容简介计算机执行机器代码，用字节序列编码低级的操作，包括处理数据、管理内存、读写存储设备上的数据，以及利用网络通信。编译器基于编程语言的规则、目标机器的指令集和操作系统遵循的惯例，经过一系列的阶段生成机器代码。GCC C语言编译器以汇编代码的形式产生输出，汇编代码是机器代码的文本表示，给出程序中的每一条指令。然后GCC调用汇编器和链接器，根据汇编代码生成可执行的机器代码。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://lu0k.github.io/3-1.png">
+<meta property="og:image" content="https://lu0k.github.io/3-2.png">
+<meta property="og:image" content="https://lu0k.github.io/3-3.png">
+<meta property="og:image" content="https://lu0k.github.io/3-4.png">
+<meta property="og:image" content="https://lu0k.github.io/3-5.png">
+<meta property="og:image" content="https://lu0k.github.io/3-6.png">
+<meta property="og:image" content="https://lu0k.github.io/3-8.png">
+<meta property="og:image" content="https://lu0k.github.io/3-9.png">
+<meta property="article:published_time" content="2021-12-18T16:00:00.000Z">
+<meta property="article:modified_time" content="2021-12-19T10:02:52.107Z">
+<meta property="article:author" content="Lu0k">
+<meta property="article:tag" content="CSAPP">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://lu0k.github.io/3-1.png">
+
+
+<link rel="canonical" href="https://lu0k.github.io/posts/mlr-program1/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://lu0k.github.io/posts/mlr-program1/","path":"posts/mlr-program1/","title":"程序的机器级表示(一)"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>程序的机器级表示(一) | Lu0k</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">Lu0k</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Lu0k's Blog</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%86%85%E5%AE%B9%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">内容简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8E%86%E5%8F%B2%E8%A7%82%E7%82%B9"><span class="nav-number">2.</span> <span class="nav-text">历史观点</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%A8%8B%E5%BA%8F%E7%BC%96%E7%A0%81"><span class="nav-number">3.</span> <span class="nav-text">程序编码</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%BA%E5%99%A8%E7%BA%A7%E4%BB%A3%E7%A0%81"><span class="nav-number">3.1.</span> <span class="nav-text">机器级代码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81%E7%A4%BA%E4%BE%8B"><span class="nav-number">3.2.</span> <span class="nav-text">代码示例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B3%E4%BA%8E%E6%A0%BC%E5%BC%8F%E7%9A%84%E6%B3%A8%E8%A7%A3"><span class="nav-number">3.3.</span> <span class="nav-text">关于格式的注解</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E6%A0%BC%E5%BC%8F"><span class="nav-number">4.</span> <span class="nav-text">数据格式</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%AE%BF%E9%97%AE%E4%BF%A1%E6%81%AF"><span class="nav-number">5.</span> <span class="nav-text">访问信息</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%93%8D%E4%BD%9C%E6%95%B0%E6%8C%87%E7%A4%BA%E7%AC%A6"><span class="nav-number">5.1.</span> <span class="nav-text">操作数指示符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E4%BC%A0%E9%80%81%E6%8C%87%E4%BB%A4"><span class="nav-number">5.2.</span> <span class="nav-text">数据传送指令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8E%8B%E5%85%A5%E5%92%8C%E5%BC%B9%E5%87%BA%E6%A0%88%E6%95%B0%E6%8D%AE"><span class="nav-number">5.3.</span> <span class="nav-text">压入和弹出栈数据</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Reference"><span class="nav-number">6.</span> <span class="nav-text">Reference</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-overview">
+            <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Lu0k"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Lu0k</p>
+  <div class="site-description" itemprop="description">谦虚学习!</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">80</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">33</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/lu0k" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;lu0k" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/Lu0kMe" title="Twitter → https:&#x2F;&#x2F;twitter.com&#x2F;Lu0kMe" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://lu0k.github.io/posts/mlr-program1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Lu0k">
+      <meta itemprop="description" content="谦虚学习!">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Lu0k">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          程序的机器级表示(一)
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-12-19 00:00:00" itemprop="dateCreated datePublished" datetime="2021-12-19T00:00:00+08:00">2021-12-19</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Reading-Notes/" itemprop="url" rel="index"><span itemprop="name">Reading Notes</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="内容简介"><a href="#内容简介" class="headerlink" title="内容简介"></a>内容简介</h1><p>计算机执行机器代码，用字节序列编码低级的操作，包括处理数据、管理内存、读写存储设备上的数据，以及利用网络通信。编译器基于编程语言的规则、目标机器的指令集和操作系统遵循的惯例，经过一系列的阶段生成机器代码。GCC C语言编译器以汇编代码的形式产生输出，汇编代码是机器代码的文本表示，给出程序中的每一条指令。然后GCC调用汇编器和链接器，根据汇编代码生成可执行的机器代码。</p>
+<span id="more"></span>
+
+<p>当我们用高级语言编程的时候<code>(例如C语言, Java语言)</code>，机器屏蔽了程序的细节，即机器级的实现。与此相反，当用汇编代码编程的时候，程序员必须指定程序用来执行计算的低级指令。高级语言提供的抽象级别比较高，大多数时候，在这种抽象级别上工作效率会更高，也更可靠。编译器提供的类型检查能够帮助我们发现许多程序错误，并能保证按照一致的方式来引用和处理数据。通常情况下，使用现代的优化编译器产生的代码至少与一个熟练的汇编语言程序员手工编写的代码一样有效。最大的优点是，用高级语言编写的程序可以在很多不同的机器上编译和执行，而汇编代码则是与特定机器密切相关的。</p>
+<p>即使编译器承担了生成汇编代码的大部分工作，对于严谨的程序员来说，能够阅读和理解汇编代码仍是一项很重要的功能。以适当的命令行选项调用编译器，编译器就会产生一个以汇编代码形式表示的输出文件。通过阅读这些汇编代码，我们能够理解编译器的优化能力，并分析代码中隐含的低效率。</p>
+<p>在本章中，我们将详细学习一种具体的汇编语言，了解如何将C程序编译成这种形式的机器代码。阅读编译器产生的汇编代码，需要具备的技能不同于手工编写汇编代码。我们必须了解典型的编译器在将C程序结构变换成机器代码时所做的转换。相对于C代码表示的计算操作，优化编译器能够重新排列执行顺序，消除不必要的计算，用快速操作替换慢速操作，甚至将递归计算变换成迭代计算。我们的表述基于<code>x86-64</code>，它是现在笔记本电脑和台式机中最常见处理器的机器语言，也是驱动大型数据中心和超级计算机的最常见处理器的机器语言。这种语言历史悠久，演化至今的结果是得到一个相当奇特的设计，有些特性只有从历史的观点来看才有意义，它还具有提供向后兼容的特性，而现代编译器和操作系统早已不再使用这些特性。我们将关注GCC和Linux使用的那些特性，这样可以避免<code>x86-64</code>的大量复杂性和许多隐秘特性。</p>
+<p>我们在技术讲解之前，先快速浏览C语言、汇编代码以及机器代码之间的关系。然后介绍<code>x86-64</code>的细节，从数据的表示和处理以及控制的实现开始。了解如何实现C语言中的控制结构，如<code>if</code>、<code>while</code>和<code>switch</code>语句。之后，我们会讲到过程的实现，包括程序如何维护一个运行栈来支持过程间数据和控制的传递，以及局部变量的存储。接着，我们会考虑在机器级如何实现像数组、结构和联合这样的数据结构。有了这些机器级编程的背景知识，我们会讨论内存访问越界的问题，以及系统容易遭受缓冲区溢出攻击的问题。在这一部分的结尾，我们会给出一些用GDB调试器检查机器级程序运行时行为的技巧。</p>
+<h1 id="历史观点"><a href="#历史观点" class="headerlink" title="历史观点"></a>历史观点</h1><p>Intel处理器俗称<code>x86</code>，经历了一个长期的、不断进化的发展过程。开始时，它是第一代单芯片、16位微处理器之一，由于当时集成电路水平十分有限，其中做了很多妥协。以后，它不断地成长，利用进步的技术满足更高性能和支持更高级操作系统的需求。以下列举了一些Intel处理器的模型，以及它们的一些关键特性，特别是影响机器级编程的特性。我们用实现这些处理器所需要的晶体管数量来说明演变过程的复杂性。其中，<code>K</code>表示1000，<code>M</code>表示1000000，<code>G</code>表示1000000000：</p>
+<ul>
+<li><code>8086(1978年, 29K个晶体管)</code>：第一代单芯片、16位微处理器之一</li>
+<li><code>80286(1982年, 134K个晶体管)</code>：增加了更多寻址模式<code>(已废弃)</code></li>
+<li><code>i386(1985年, 275K个晶体管)</code>：将体系结构扩展到32位，增加了平坦寻址模式</li>
+<li><code>i486(1989年, 1.2M个晶体管)</code>：改善了性能，同时将浮点单元集成到了处理器芯片上，指令集没有明显改变</li>
+<li><code>Pentium(1993年, 3.1M个晶体管)</code>：改善了性能，对指令集进行小的扩展</li>
+<li><code>PentiumPro(1995年, 5.5M个晶体管)</code>：引入全新的处理器设计，在内部称为<code>P6</code>微体系结构，指令集中增加了条件传送<code>(conditional move)</code>类指令</li>
+<li><code>Pentium/MMX(1997年, 4.5M个晶体管)</code>：增加了一类新的处理整数向量的指令，每个数据大小可以是1、2或4个字节，每个向量总长64位</li>
+<li><code>Pentium Ⅱ(1997年, 7M个晶体管)</code>：<code>P6</code>微体系结构的延伸</li>
+<li><code>Pentium Ⅲ(1999年, 8.2M个晶体管)</code>：引入了<code>SSE</code>，这是一类处理整数或浮点数向量的指令，每个数据大小可以是1、2或4个字节，打包成128位的向量。由于芯片上包括了二级高速缓存，这种芯片后来的版本最多使用了24M个晶体管</li>
+<li><code>Pentium 4(2000年, 42M个晶体管)</code>：<code>SSE</code>扩展到了<code>SSE2</code>，增加了新的数据类型<code>(包括双精度浮点数)</code>，以及针对这些格式的144条新指令，有了这些扩展，编译器可以使用<code>SSE</code>指令<code>(而不是x87指令)</code>，来编译浮点代码</li>
+<li><code>Pentium 4E(2004年, 125M个晶体管)</code>：增加了超线程<code>(hyperthreading)</code>，这种技术可以在一个处理器上同时运行两个程序，还增加了<code>EMT64T</code>，它是Intel对AMD提出的<code>IA32</code>的64位扩展的实现，称之为<code>x86-64</code></li>
+<li><code>Core 2(2006年, 291M个晶体管)</code>：第一个多核微处理器，不支持超线程</li>
+<li><code>Core i7(2008年, 781M个晶体管)</code>：既支持超线程，也有多核，最初的版本支持每个核上执行两个程序，每个芯片上最多四个核</li>
+<li><code>Core i7(2011年, 1.17G个晶体管)</code>：引入了<code>AVX</code>，这是对<code>SSE</code>的扩展，支持把数据封装进256位的向量</li>
+<li><code>Core i7(2013年, 1.4G个晶体管)</code>：将<code>AVX</code>扩展至<code>AVX2</code>，增加了更多的指令和指令格式</li>
+</ul>
+<p>每个后继处理器的设计都是向后兼容的——较早版本上编译的代码可以在较新的处理器上运行。正如我们看到的那样，为了保持这种进化传统，指令集中有许多非常奇怪的东西。Intel处理器系列有好几个名字，包括<code>IA32</code>，以及最新的<code>Intel64</code>，即<code>x86-64</code>。最常用的名字是<code>x86</code>，我们用它指代整个系列，也反映了直到<code>i486</code>处理器命名的惯例。</p>
+<h1 id="程序编码"><a href="#程序编码" class="headerlink" title="程序编码"></a>程序编码</h1><p>假设一个C程序，有两个文件<code>p1.c</code>和<code>p2.c</code>。我们用Unix命令行编译这些代码：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> gcc -Og -o p p1.c p2.c</span></span><br></pre></td></tr></table></figure>
+
+<p>命令<code>gcc</code>指的就是GCC C编译器。这是Linux上默认的编译器，我们也可以简单地用<code>cc</code>来启动它。编译选项<code>-Og</code>告诉编译器使用会生成符合原始C代码整体结构的机器代码的优化等级。使用较高级别优化产生的代码会严重变形，以至于产生的机器代码和初始源代码之间的关系非常难以理解。因此我们会使用<code>-Og</code>优化作为学习工具，然后当我们增加优化级别时，再看会发生什么。实际上，从得到的程序的性能考虑，较高级别的优化<code>(例如, 以选项-O1或-O2指定)</code>被认为是较好的选择。</p>
+<p>实际上<code>gcc</code>命令调用了一整套的程序，将源代码转化成可执行代码。首先，C预处理器扩展源代码，插入所有使用<code>#include</code>命令指定的文件，并扩展所有用<code>#define</code>声明指定的宏。其次，编译器产生两个源文件的汇编代码，名字分别为<code>p1.s</code>和<code>p2.s</code>。接下来，汇编器会将汇编代码转化为二进制目标文件代码文件<code>p1.o</code>和<code>p2.o</code>。目标代码是机器代码的一种形式，它包含所有指令的二进制表示，但是还没有填入全局值的地址。最后，链接器将两个目标代码文件与实现库函数的代码合并，并产生最终的可执行代码文件<code>p(由命令行指示符-o p指定的)</code>。可执行代码是我们要考虑的机器代码的第二种形式，也就是处理器执行的代码格式。</p>
+<h2 id="机器级代码"><a href="#机器级代码" class="headerlink" title="机器级代码"></a>机器级代码</h2><p>计算机系统使用了多种不同形式的抽象，利用更简单的抽象模型来隐藏实现的细节。对于机器级编程来说，其中两种抽象尤为重要。第一种是由指令集体系结构或指令集架构<code>(ISA, Instruction Set Architecture)</code>来定义机器级程序的格式和行为，它定义了处理器状态、指令的格式，以及每条指令对状态的影响。大多数<code>ISA</code>，包括<code>x86-64</code>，将程序的行为描述成好像每条指令都是按顺序执行的，一条指令结束后，下一条再开始。处理器的硬件远比描述的精细复杂，它们并发地执行许多指令，但是可以采取措施保证整体行为与<code>ISA</code>指定的顺序执行的行为完全一致。第二种抽象是，机器级程序使用的内存地址是虚拟地址，提供的内存模型看上去是一个非常大的字节数组。</p>
+<p>在整个编译过程，编译器会完成大部分的工作，将把用C语言提供的相对比较抽象的执行模型表示的程序转化成处理器执行的非常基本的指令。汇编代码表示非常接近于机器代码。与机器代码的二进制格式相比，汇编代码的主要特点是它用可读性更好的文本格式表示。能够理解汇编代码以及它与原始C代码的联系，是理解计算机如何执行程序的关键一步。<code>x86-64</code>的机器代码和原始的C代码差别非常大。一些通常对C语言程序员隐藏的处理器状态都是可见的：</p>
+<ul>
+<li>程序计数器<code>(PC, %rip)</code>：给出将要执行的下一条指令在内存中的地址</li>
+<li>整数寄存器：包含16个命名的位置，分别存储64位的值。这些寄存器可以存储地址<code>(对应C语言的指针)</code>或整数数据。有的寄存器被用来记录某些重要的程序状态，而其他的寄存器用来保存临时数据，例如过程的参数和局部变量，以及函数的返回值</li>
+<li>条件码寄存器：保存着最近执行的算术或逻辑指令的状态信息。它们用来实现控制或数据流中的条件变化，比如说用来实现<code>if</code>和<code>while</code>语句</li>
+<li>向量寄存器：可以存放一个或多个整数或浮点数值</li>
+</ul>
+<p>虽然C语言提供了一种模型，可以在内存中声明和分配各种数据类型的对象，但是机器代码只是简单地将内存看成一个很大的、按字节寻址的数组。C语言中的聚合数据类型，例如数组和结构，在机器代码中用一组连续的字节来表示。即使是对标量数据类型，汇编代码也不区分有符号或无符号整数，不区分各种类型的指针，甚至不区分指针和整数。</p>
+<p>程序内存包含：程序的可执行机器代码，操作系统需要的一些信息，用来管理过程调用和返回的运行时栈，以及用户分配的内存块<code>(比如说用malloc库函数分配的)</code>。正如前面提到的，程序内存用虚拟地址来寻址。在任意给定的时刻，只有有限的一部分虚拟地址被认为是合法的。例如，<code>x86-64</code>的虚拟地址是由64位的字来表示的，在目前的实现中，这些地址的高16位必须设置为0，所以一个地址实际上能够指定的是2<sup>48</sup>或256TB范围内的一个字节。较为典型的程序只会访问几兆字节或几千兆字节的数据。操作系统负责管理虚拟地址空间，将虚拟地址翻译成实际处理器内存中的物理地址。</p>
+<p>一条机器指令只执行一个非常基本的操作。例如，将存放在寄存器中的两个数字相加，在存储器和寄存器之间传送数据，或是条件分支转移到新的指令地址。编译器必须产生这些指令的序列，从而实现程序结构。</p>
+<h2 id="代码示例"><a href="#代码示例" class="headerlink" title="代码示例"></a>代码示例</h2><p>假设我们写了一个C语言代码文件<code>mstore.c</code>，包含如下的函数定义：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">long</span> <span class="title">mult2</span><span class="params">(<span class="keyword">long</span> ,<span class="keyword">long</span>)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">multstore</span><span class="params">(<span class="keyword">long</span> x, <span class="keyword">long</span> y, <span class="keyword">long</span> *dest)</span></span>&#123;</span><br><span class="line">    <span class="keyword">long</span> t = mult2(x, y);</span><br><span class="line">    *dest = t;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在命令行上使用<code>-S</code>选项，查看C语言编译器产生的汇编代码：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> gcc -Og -S mstore.c</span></span><br></pre></td></tr></table></figure>
+
+<p>这会使GCC运行编译器，产生一个汇编文件<code>mstore.s</code>，但是不做其他进一步的工作。汇编代码文件包含各种声明，包括下面几行：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">multstore:</span><br><span class="line">	endbr64</span><br><span class="line">	pushq   %rbx</span><br><span class="line">	movq    %rdx, %rbx</span><br><span class="line">	call    mult2</span><br><span class="line">	movq    %rax, (%rbx)</span><br><span class="line">	popq    %rbx</span><br><span class="line">	ret</span><br></pre></td></tr></table></figure>
+
+<p>上面代码中每个缩进去的行都对应一条机器指令。这段代码已经除去了所有关于局部变量名或者数据类型的信息。如果使用<code>-c</code>命令行选项，GCC会编译并汇编该代码：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> gcc -Og -c mstore.c</span></span><br></pre></td></tr></table></figure>
+
+<p>这就会产生目标代码文件<code>mstore.o</code>，它是二进制格式的，所以无法直接查看。机器执行的程序只是一个字节序列，它是对一系列指令的编码。机器对产生这些指令的源代码几乎一无所知。</p>
+<p>要查看机器代码文件的内容，有一类称为反汇编器<code>(disassembler)</code>的程序非常有用。这些程序根据机器代码产生一种类似于汇编代码的格式。在Linux系统中，带<code>-d</code>命令行标志的程序<code>objdump</code>可以充当这个角色：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> objdump -d mstore.o</span></span><br><span class="line">mstore.o:     file format elf64-x86-64</span><br><span class="line">Disassembly of section .text:</span><br><span class="line">0000000000000000 &lt;multstore&gt;:</span><br><span class="line">   0:   f3 0f 1e fa             endbr64</span><br><span class="line">   4:   53                      push   %rbx</span><br><span class="line">   5:   48 89 d3                mov    %rdx,%rbx</span><br><span class="line">   8:   e8 00 00 00 00          callq  d &lt;multstore+0xd&gt;</span><br><span class="line">   d:   48 89 03                mov    %rax,(%rbx)</span><br><span class="line">  10:   5b                      pop    %rbx</span><br><span class="line">  11:   c3                      retq</span><br></pre></td></tr></table></figure>
+
+<p>其中一些关于机器代码和它的反汇编表示的特性值得注意：</p>
+<ul>
+<li><code>x86-64</code>的指令长度从1到15个字节不等，常用的指令以及操作数较少的指令所需的字节数少，而那些不太常用或操作数较多的指令所需字节数较多</li>
+<li>设计指令格式的方法是，从某个给定位置开始，可以将字节唯一地解码成机器指令</li>
+<li>反汇编器只是基于机器代码文件中的字节序列来确定汇编代码。它不需要访问该程序的源代码或汇编代码</li>
+<li>反汇编器使用的指令命名规则与GCC生成的汇编代码使用的有些细微的差别。</li>
+</ul>
+<p>生成实际可执行的代码需要对一组目标代码文件运行链接器，而这一组目标代码文件中必须含有一个<code>main</code>函数。假设在文件<code>main.c</code>中有下面这样的函数：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">multstore</span><span class="params">(<span class="keyword">long</span>, <span class="keyword">long</span>, <span class="keyword">long</span> *)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="keyword">long</span> d;</span><br><span class="line">	multstore(<span class="number">2</span>, <span class="number">3</span>, &amp;d);</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">&quot;2 * 3 --&gt; %ld\n&quot;</span>, d);</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">long</span> <span class="title">mult2</span><span class="params">(<span class="keyword">long</span> a, <span class="keyword">long</span> b)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">long</span> s = a * b;</span><br><span class="line">	<span class="keyword">return</span> s;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>用如下方法生成可执行文件<code>prog</code>：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> gcc -Og -o prog main.c mstore.c</span></span><br></pre></td></tr></table></figure>
+
+<p>反汇编查看，包含下面代码：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">0000000000400540 &lt;multstore&gt;:</span><br><span class="line">    400540:       53                      push   %rbx</span><br><span class="line">    400541:       48 89 d3                mov    %rdx,%rbx</span><br><span class="line">    400544:       e8 e7 ff ff ff          callq  40058b &lt;mult2&gt;</span><br><span class="line">    400549:       48 89 03                mov    %rax,(%rbx)</span><br><span class="line">    40054c:       5b                      pop    %rbx</span><br><span class="line">    40054d:       c3                      retq</span><br><span class="line">    40054e:       90                      nop</span><br><span class="line">    40054f:       90                      nop</span><br></pre></td></tr></table></figure>
+
+<p>这段代码与<code>mstore.c</code>反汇编产生的代码几乎完全一样。其中一个主要的区别是左边列出的地址不同——链接器将这段代码的地址移到了一段不同的地址范围中。第二个不同之处在于链接器填上了<code>callq</code>指令调用函数<code>mult2</code>需要使用的地址。链接器的任务之一就是为函数调用找到匹配的函数的可执行代码的位置。最后一个区别是多了两行代码<code>(最后两行)</code>。这两条指令对程序没有影响，因为它们出现在返回指令后面，插入这些指令是为了使函数代码变为16字节，使得就存储器系统性能而言，能够更好地放置下一个代码块。</p>
+<h2 id="关于格式的注解"><a href="#关于格式的注解" class="headerlink" title="关于格式的注解"></a>关于格式的注解</h2><p>GCC产生的汇编代码对我们来说有点难读。一方面，它包含一些我们不需要关心的信息，另一方面，它不提供任何程序的描述或它是如何工作的描述。以<code>mstore.s</code>为例：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">        .file   &quot;mstore.c&quot;</span><br><span class="line">        .text</span><br><span class="line">        .globl  multstore</span><br><span class="line">        .type   multstore, @function</span><br><span class="line">multstore:</span><br><span class="line">.LFB0:</span><br><span class="line">        .cfi_startproc</span><br><span class="line">        endbr64</span><br><span class="line">        pushq   %rbx</span><br><span class="line">        .cfi_def_cfa_offset 16</span><br><span class="line">        .cfi_offset 3, -16</span><br><span class="line">        movq    %rdx, %rbx</span><br><span class="line">        call    mult2@PLT</span><br><span class="line">        movq    %rax, (%rbx)</span><br><span class="line">        popq    %rbx</span><br><span class="line">        .cfi_def_cfa_offset 8</span><br><span class="line">        ret</span><br><span class="line">        .cfi_endproc</span><br><span class="line">.LFE0:</span><br><span class="line">        .size   multstore, .-multstore</span><br><span class="line">        .ident  &quot;GCC: (Ubuntu 9.3.0-17ubuntu1~20.04) 9.3.0&quot;</span><br><span class="line">        .section        .note.GNU-stack,&quot;&quot;,@progbits</span><br><span class="line">        .section        .note.gnu.property,&quot;a&quot;</span><br><span class="line">        .align 8</span><br><span class="line">        .long    1f - 0f</span><br><span class="line">        .long    4f - 1f</span><br><span class="line">        .long    5</span><br><span class="line">0:</span><br><span class="line">        .string  &quot;GNU&quot;</span><br><span class="line">1:</span><br><span class="line">        .align 8</span><br><span class="line">        .long    0xc0000002</span><br><span class="line">        .long    3f - 2f</span><br><span class="line">2:</span><br><span class="line">        .long    0x3</span><br><span class="line">3:</span><br><span class="line">        .align 8</span><br><span class="line">4:</span><br></pre></td></tr></table></figure>
+
+<p>所有以<code>.</code>开头的行都是指导汇编器和链接器工作的伪指令。我们通常可以忽略这些行。另一方面，也没有关于指令的用途以及它们与源代码之间关系的解释说明。通常我们只会给出与讨论内容相关的代码行。</p>
+<h1 id="数据格式"><a href="#数据格式" class="headerlink" title="数据格式"></a>数据格式</h1><p>由于是从16位体系结构扩展成32位的，Intel用术语字<code>(Word)</code>表示16位数据类型。因此，称32位数为双字，称64位数为四字。图<code>3-1</code>给出了C语言基本数据类型对应的<code>x86-64</code>表示：</p>
+<p><img src="/3-1.png"></p>
+<p>标准<code>int</code>值存储为双字。指针存储为8字节的四字，64位机器本来就预期如此。<code>x86-64</code>中，数据类型<code>long</code>实现为64位，允许表示的值范围较大。本章代码示例中的大部分都使用了指针和<code>long</code>数据类型，所以都是四字操作。<code>x86-64</code>指令集同样包括完整的针对字节、字和双字的指令。</p>
+<p>浮点数主要有两种形式：单精度<code>(4字节)</code>值，对应于C语言数据类型<code>float</code>；双精度<code>(8字节)</code>值，对应于C语言数据类型<code>double</code>。<code>x86</code>家族的微处理器历史上实现过对一种特殊的80位<code>(10字节)</code>浮点格式进行全套的浮点运算。可以在C程中用声明<code>long double</code>来指定这种格式。不过我们不建议使用这种格式，它不能移植到其他类型的机器上，而且实现的硬件也不如单精度和双精度算术运算的高效。</p>
+<h1 id="访问信息"><a href="#访问信息" class="headerlink" title="访问信息"></a>访问信息</h1><p>一个<code>x86-64</code>的中央处理单元<code>(CPU)</code>包含一组16个存储64位值的通用目的寄存器，这些寄存器用来存储整数数据和指针。图<code>3-2</code>显示了这16个寄存器：</p>
+<p><img src="/3-2.png"></p>
+<p>图中嵌套的方框表明，指令可以对这16个寄存器的低位字节中存放的不同大小的数据进行操作。字节级操作可以访问最低的字节，16位操作可以访问最低的2个字节，32位操作可以访问最低的4个字节，而64位操作可以访问整个寄存器。在后面的章节中，我们会展现很多指令，复制和生成1字节、2字节、4字节和8字节值。当这些指令以寄存器作为目标时，对于生成小于8字节结果的指令，寄存器中剩下的字节会怎么样，对此有两条规则：</p>
+<ul>
+<li>生成1字节和2字节数字的指令会保持剩下的字节不变</li>
+<li>生成4字节数字的指令会把高位4个字节置为0</li>
+</ul>
+<p>在常见的程序里不同的寄存器扮演着不同的角色，其中最特别的是栈指针<code>%rsp</code>，用来指明运行时栈的结束位置。有些指令会明确地读写这个寄存器。另外15个寄存器的用法更灵活，少量指令会使用某些特定的寄存器。更重要的是，有一组标准的编程规范控制着如何使用寄存器来管理栈、传递函数参数、从函数的返回值，以及存储布局和临时数据。</p>
+<h2 id="操作数指示符"><a href="#操作数指示符" class="headerlink" title="操作数指示符"></a>操作数指示符</h2><p>大多数指令有一个或多个操作数<code>(operand)</code>，指示出执行一个操作中要使用的源数据值，以及放置结果的目的位置。<code>x86-64</code>支持多种操作数格式。如图<code>3-3</code>所示：</p>
+<p><img src="/3-3.png"></p>
+<p>源数据值可以以常数形式给出，或是从寄存器或内存中读出，结果可以存放在寄存器或内存中。因此，各种不同的操作数的可能性被分为三种类型：</p>
+<ul>
+<li>立即数<code>(immediate)</code>：用来表示常数值。在ATT格式的汇编代码中，立即数的书写方式是<code>$</code>后面跟一个用标准C表示法表示的整数，不同的指令允许的立即数值范围不同，汇编器会自动选择最紧凑的方式进行数值编码</li>
+<li>寄存器<code>(register)</code>：表示某个寄存器的内容，16个寄存器的低位1字节、2字节、4字节或8字节中的一个作为操作数，这些字节数分别对应于8位、16位、32位或64位。我们用r<sub>a</sub>来表示任意寄存器<code>a</code>，用引用R[r<sub>a</sub>]来表示它的值，这是将寄存器集合看成一个数组<code>R</code>，用寄存器标识符作为索引。</li>
+<li>内存引用：根据计算出来的地址<code>(通常称为有效地址)</code>访问某个内存位置</li>
+</ul>
+<p>在图<code>3-3</code>中，有多种不同的寻址模式，允许不同形式的内存引用。表中底部用语法Imm(r<sub>b</sub>, r<sub>i</sub>, s)表示的是最常用的形式。这样的引用有四个组成部分：</p>
+<ul>
+<li>立即数偏移 Imm</li>
+<li>基址寄存器 r<sub>b</sub>，64位寄存器</li>
+<li>变址寄存器 r<sub>i</sub>，64位寄存器</li>
+<li>比例因子 s，必须是1、2、4或8</li>
+</ul>
+<p>有效地址被计算为Imm + R[r<sub>b</sub>] + R[r<sub>i</sub>] * s，引用数组元素时，会用到这种通用形式。其他形式都是这种通用形式的特殊情况，只是省略了某些部分，当引用数组和结构元素时，比较复杂的寻址模式是很有用的。</p>
+<h2 id="数据传送指令"><a href="#数据传送指令" class="headerlink" title="数据传送指令"></a>数据传送指令</h2><p>最频繁使用的指令是将数据从一个位置复制到另一个位置的指令。操作数表示的通用性使得一条简单的数据传送指令能够完成在许多机器中要好几条不同指令才能完成的功能。我们会介绍多种不同的数据传送指令，它们或者源和目的类型不同，或者执行的转换不同，或者具有的一些副作用不同。</p>
+<p>图<code>3-4</code>列出的是最简单形式的数据传送指令——<code>MOV</code>类。这些指令把数据从源位置复制到目的位置，不做任何变化。<code>MOV</code>类由四条指令组成：<code>movb</code>、<code>movw</code>、<code>movl</code>和<code>movq</code>。这些指令都执行相同的操作；主要区别在于它们操作的数据大小不同：分别是1、2、4和8字节。</p>
+<p><img src="/3-4.png"></p>
+<p>源操作数指定的值是一个立即数，存储在寄存器中或者内存中。目的操作数指定一个位置，要么是一个寄存器，要么是一个内存地址。<code>x86-64</code>加了一条限制，传送指令的两个操作数不能都指向内存位置。将一个值从一个内存位置复制到另一个内存位置需要两条指令——第一条指令将源值加载到寄存器中，第二条将该寄存器值写入目的位置。大多数情况中，<code>MOV</code>指令只会更新目的操作数指定的那些寄存器字节或内存位置。唯一的例外是<code>movl</code>指令以寄存器作为目的时，它会把该寄存器的高位4字节设置为0.造成这个例外的原因是<code>x86-64</code>采用的惯例，即任何为寄存器生成32位值的指令都会把该寄存器的高位部分置成0。</p>
+<p><img src="/3-5.png"></p>
+<p>图<code>3-5</code>和<code>3-6</code>记录的两类数据移动处理指令，在将较小的源值复制到较大的目的时使用。所有这些指令都把数据从源<code>(在寄存器或内存中)</code>复制到目的寄存器。<code>MOVZ</code>类中的指令把目的中剩余的字节填充为0，而<code>MOVS</code>类中的指令通过符号扩展来填充，把源操作数的最高位进行复制。可以观察到，每条指令名字的最后两个字符都是大小指示符：第一个字符指定源的大小，而第二个指明目的的大小。</p>
+<p><img src="/3-6.png"></p>
+<p>注意图<code>3-5</code>中并没有一条明确的指令把4字节源值零扩展到8字节目的。这样的指令逻辑上应该被命名为<code>movzlq</code>，但是并没有这样的指令。不过，这样的数据传送可以用以寄存器为目的的<code>movl</code>指令来实现。这一技术利用的属性是，生成4字节值并以寄存器作为目的的指令会把高4字节置为0。对于64位的目标，所有三种源类型都有对应的符号扩展传送，而只有两种较小的源类型有零扩展传送。图<code>3-6</code>还给出了<code>cltq</code>指令，这条指令没有操作数：它总是以寄存器<code>%eax</code>作为源，<code>%rax</code>作为符号扩展结果的目的。它的效果与指令<code>movslq %eax, %rax</code>完全一致，不过编码更紧凑。</p>
+<h2 id="压入和弹出栈数据"><a href="#压入和弹出栈数据" class="headerlink" title="压入和弹出栈数据"></a>压入和弹出栈数据</h2><p>最后两个数据传送操作可以将数据压入程序栈中，以及从程序栈中弹出数据，如图<code>3-8</code>所示：</p>
+<p><img src="/3-8.png"></p>
+<p>栈在处理过程调用中起到至关重要的作用，栈是一种数据结构，可以添加或者删除值，不过要遵循后进先出的原则。通过<code>push</code>操作把数据压入栈中，通过<code>pop</code>操作删除数据；它有一个属性：弹出的值永远是最近被压入而且仍然在栈中的值。栈可以实现为一个数组，总是从数组的一端插入和删除元素。这一端被称为栈顶。在<code>x86-64</code>中，程序栈存放在内存中的某个区域。如图<code>3-9</code>所示，栈向下增长，这样一来，栈顶元素的地址是所有栈中元素地址中最低的。栈指针<code>%rsp</code>保存着栈顶元素的地址。</p>
+<p><img src="/3-9.png"></p>
+<p><code>pushq</code>指令的功能是把数据压入到栈上，而<code>popq</code>指令是弹出数据。这些指令都只有一个操作数——压入的数据源和弹出的数据目的。将一个四字值压入栈中，首先要将栈指针减8，然后将值写到新的栈顶地址；弹出一个四字的操作包括从栈顶位置读出数据，然后将栈指针加8。因为栈和程序代码以及其他形式的程序数据都是放在同一内存中，所以程序可以用标准的内存寻址方法访问栈的任意位置。</p>
+<h1 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h1><ul>
+<li><a target="_blank" rel="noopener" href="https://csapp.cs.cmu.edu/"><code>Computer Systems: A Programmer&#39;s Perspective, 3/E</code></a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/CSAPP/" rel="tag"><i class="fa fa-tag"></i> CSAPP</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/ram-info2/" rel="prev" title="信息的表示和处理(下)">
+                  <i class="fa fa-chevron-left"></i> 信息的表示和处理(下)
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lu0k</span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <script size="250" alpha="0.5" zIndex="-1" src="https://cdn.jsdelivr.net/npm/ribbon.js@1.0.2/dist/ribbon.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>
