@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-lu0k.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-lu0k.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-lu0k.png">
+  <link rel="mask-icon" href="/images/lu0k.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"lu0k.github.io","root":"/","images":"/images","scheme":"Gemini","version":"8.7.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+<meta name="description" content="内容简介计算机执行机器代码，用字节序列编码低级的操作，包括处理数据、管理内存、读写存储设备上的数据，以及利用网络通信。编译器基于编程语言的规则、目标机器的指令集和操作系统遵循的惯例，经过一系列的阶段生成机器代码。GCC C语言编译器以汇编代码的形式产生输出，汇编代码是机器代码的文本表示，给出程序中的每一条指令。然后GCC调用汇编器和链接器，根据汇编代码生成可执行的机器代码。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="程序的机器级表示(四)">
+<meta property="og:url" content="https://lu0k.github.io/posts/mlr-program4/index.html">
+<meta property="og:site_name" content="Lu0k">
+<meta property="og:description" content="内容简介计算机执行机器代码，用字节序列编码低级的操作，包括处理数据、管理内存、读写存储设备上的数据，以及利用网络通信。编译器基于编程语言的规则、目标机器的指令集和操作系统遵循的惯例，经过一系列的阶段生成机器代码。GCC C语言编译器以汇编代码的形式产生输出，汇编代码是机器代码的文本表示，给出程序中的每一条指令。然后GCC调用汇编器和链接器，根据汇编代码生成可执行的机器代码。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://lu0k.github.io/struct.png">
+<meta property="og:image" content="https://lu0k.github.io/align1.png">
+<meta property="og:image" content="https://lu0k.github.io/align2.png">
+<meta property="og:image" content="https://lu0k.github.io/align3.png">
+<meta property="og:image" content="https://lu0k.github.io/3-39.png">
+<meta property="og:image" content="https://lu0k.github.io/3-40.png">
+<meta property="og:image" content="https://lu0k.github.io/3-42.png">
+<meta property="og:image" content="https://lu0k.github.io/3-43.png">
+<meta property="og:image" content="https://lu0k.github.io/3-44.png">
+<meta property="article:published_time" content="2021-12-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-01-01T14:44:21.100Z">
+<meta property="article:author" content="Lu0k">
+<meta property="article:tag" content="CSAPP">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://lu0k.github.io/struct.png">
+
+
+<link rel="canonical" href="https://lu0k.github.io/posts/mlr-program4/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://lu0k.github.io/posts/mlr-program4/","path":"posts/mlr-program4/","title":"程序的机器级表示(四)"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>程序的机器级表示(四) | Lu0k</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">Lu0k</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Lu0k's Blog</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%86%85%E5%AE%B9%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">内容简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BC%82%E8%B4%A8%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84"><span class="nav-number">2.</span> <span class="nav-text">异质数据结构</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%93%E6%9E%84"><span class="nav-number">2.1.</span> <span class="nav-text">结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%81%94%E5%90%88"><span class="nav-number">2.2.</span> <span class="nav-text">联合</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E5%AF%B9%E9%BD%90"><span class="nav-number">2.3.</span> <span class="nav-text">数据对齐</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%9C%BA%E5%99%A8%E7%BA%A7%E7%A8%8B%E5%BA%8F"><span class="nav-number">3.</span> <span class="nav-text">机器级程序</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%90%86%E8%A7%A3%E6%8C%87%E9%92%88"><span class="nav-number">3.1.</span> <span class="nav-text">理解指针</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GDB%E8%B0%83%E8%AF%95%E5%99%A8"><span class="nav-number">3.2.</span> <span class="nav-text">GDB调试器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%86%85%E5%AD%98%E8%B6%8A%E7%95%8C%E5%BC%95%E7%94%A8%E5%92%8C%E7%BC%93%E5%86%B2%E5%8C%BA%E6%BA%A2%E5%87%BA"><span class="nav-number">3.3.</span> <span class="nav-text">内存越界引用和缓冲区溢出</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AF%B9%E6%8A%97%E7%BC%93%E5%86%B2%E5%8C%BA%E6%BA%A2%E5%87%BA"><span class="nav-number">3.4.</span> <span class="nav-text">对抗缓冲区溢出</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%88%E9%9A%8F%E6%9C%BA%E5%8C%96"><span class="nav-number">3.4.1.</span> <span class="nav-text">栈随机化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%88%E7%A0%B4%E5%9D%8F%E6%A3%80%E6%B5%8B"><span class="nav-number">3.4.2.</span> <span class="nav-text">栈破坏检测</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%99%90%E5%88%B6%E5%8F%AF%E6%89%A7%E8%A1%8C%E4%BB%A3%E7%A0%81%E5%8C%BA"><span class="nav-number">3.4.3.</span> <span class="nav-text">限制可执行代码区</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%94%AF%E6%8C%81%E5%8F%98%E9%95%BF%E6%A0%88%E5%B8%A7"><span class="nav-number">3.5.</span> <span class="nav-text">支持变长栈帧</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Reference"><span class="nav-number">4.</span> <span class="nav-text">Reference</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-overview">
+            <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Lu0k"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Lu0k</p>
+  <div class="site-description" itemprop="description">谦虚学习!</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">93</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">33</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/lu0k" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;lu0k" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/Lu0kMe" title="Twitter → https:&#x2F;&#x2F;twitter.com&#x2F;Lu0kMe" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://lu0k.github.io/posts/mlr-program4/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Lu0k">
+      <meta itemprop="description" content="谦虚学习!">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Lu0k">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          程序的机器级表示(四)
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2022-01-01 00:00:00" itemprop="dateCreated datePublished" datetime="2022-01-01T00:00:00+08:00">2022-01-01</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Reading-Notes/" itemprop="url" rel="index"><span itemprop="name">Reading Notes</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="内容简介"><a href="#内容简介" class="headerlink" title="内容简介"></a>内容简介</h1><p>计算机执行机器代码，用字节序列编码低级的操作，包括处理数据、管理内存、读写存储设备上的数据，以及利用网络通信。编译器基于编程语言的规则、目标机器的指令集和操作系统遵循的惯例，经过一系列的阶段生成机器代码。GCC C语言编译器以汇编代码的形式产生输出，汇编代码是机器代码的文本表示，给出程序中的每一条指令。然后GCC调用汇编器和链接器，根据汇编代码生成可执行的机器代码。</p>
+<span id="more"></span>
+
+<h1 id="异质数据结构"><a href="#异质数据结构" class="headerlink" title="异质数据结构"></a>异质数据结构</h1><p>C语言提供了两种将不同类型的对象组合到一起创建数据类型的机制：结构<code>(structure)</code>，用关键<code>struct</code>来声明，将多个对象集合到一个单位中；联合<code>(union)</code>，用关键字<code>union</code>来声明，允许用几种不同的类型来引用一个对象。</p>
+<h2 id="结构"><a href="#结构" class="headerlink" title="结构"></a>结构</h2><p>C语言的<code>struct</code>声明创建一个数据类型，将可能不同类型的对象聚合到一个对象中。用名字来引用结构的各个组成部分。类似于数组的实现，结构的所有组成部分都存放在内存中一段连续的区域内，而指向结构的指针就是结构第一个字节的地址。编译器维护关于每个结构类型的信息，指示每个字段<code>(field)</code>的字节偏移。它以这些偏移作为内存引用指令中的位移，从而产生对结构元素的引用。</p>
+<p>考虑如下结构声明：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">rec</span> &#123;</span></span><br><span class="line">    <span class="keyword">int</span> i;</span><br><span class="line">    <span class="keyword">int</span> j;</span><br><span class="line">    <span class="keyword">int</span> a[<span class="number">2</span>];</span><br><span class="line">    <span class="keyword">int</span> *p;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>这个结构包括4个字段：两个4字节<code>int</code>、一个由两个类型为<code>int</code>的元素组成的数组和一个8字节整型指针，总共是24个字节：</p>
+<p><img src="/struct.png"></p>
+<p>可以观察到，数组<code>a</code>是嵌入到这个结构中的。上图中顶部的数字给出的是各个字段相对于结构开始处的字节偏移。为了访问结构的字段，编译器产生的代码要将结构的地址加上适当的偏移。例如，假设<code>struct rec*</code>类型的变量<code>r</code>放在寄存器<code>%rdi</code>中。那么下面的代码将元素<code>r-&gt;i</code>复制到元素<code>r-&gt;j</code>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">; Registers: r in %rdi</span><br><span class="line">movl (%rdi), %eax    ; Get r-&gt;i</span><br><span class="line">movl %eax, 4(%rdi)   ; Store in r-&gt;j</span><br></pre></td></tr></table></figure>
+
+<p>因为字段<code>i</code>的偏移量为0，所以这个字段的地址就是<code>r</code>的值。为了存储到字段<code>j</code>，代码要将<code>r</code>的地址加上偏移量4。要产生一个指向结构内部对象的指针，我们只需将结构的地址加上该字段的偏移量。例如，只用加上偏移量<code>8+4*1=12</code>，就可以得到指针<code>&amp;(r-&gt;a[1])</code>。对于在寄存器<code>%rdi</code>中的指针<code>r</code>和在寄存器<code>%rsi</code>中的长整数变量<code>i</code>，我们可以用一条指令产生指针<code>&amp;(r-&gt;a[i])</code>的值：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">; Registers: r in %rdi, i %rsi</span><br><span class="line">leaq 8(%rdi,%rsi,4), %rax    ; Set %rax to &amp;r-&gt;a[i]</span><br></pre></td></tr></table></figure>
+
+<p>下面的示例实现语句<code>r-&gt;p=&amp;r-&gt;a[r-&gt;i+r-&gt;j]</code>，开始时<code>r</code>在寄存器<code>%rdi</code>中：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">; Registers: r in %rdi</span><br><span class="line">movl 4(%rdi), %eax           ; Get r-&gt;j</span><br><span class="line">addl (%rdi), %eax            ; Add r-&gt;i</span><br><span class="line">cltq                         ; Extend to 8 bytes</span><br><span class="line">leaq 8(%rdi,%rax,4), %rax    ; Compute &amp;r-&gt;a[r-&gt;i + r-&gt;j]</span><br><span class="line">movq %rax, 16(%rdi)          ; Store in r-&gt;p</span><br></pre></td></tr></table></figure>
+
+<p>综上所述，结构的各个字段的选取完全是在编译时处理的，机器代码不包含关于字段声明或字段名字的信息。</p>
+<h2 id="联合"><a href="#联合" class="headerlink" title="联合"></a>联合</h2><p>联合提供了一种方式，能够规避C语言的类型系统，允许以多种类型来引用一个对象。联合声明的语法与结构的语法一样，只不过语义相差比较大。它们是用不同的字段来引用相同的内存块。考虑下面的声明：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">S3</span> &#123;</span></span><br><span class="line">    <span class="keyword">char</span> c;</span><br><span class="line">    <span class="keyword">int</span> i[<span class="number">2</span>];</span><br><span class="line">    <span class="keyword">double</span> v;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="class"><span class="keyword">union</span> <span class="title">U3</span> &#123;</span></span><br><span class="line">    <span class="keyword">char</span> c;</span><br><span class="line">    <span class="keyword">int</span> i[<span class="number">2</span>];</span><br><span class="line">    <span class="keyword">double</span> v;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>在一台<code>x86-64</code>Linux机器上编译时，字段的偏移量、数据类型<code>S3</code>和<code>U3</code>的完整大小如下：</p>
+<table>
+<thead>
+<tr>
+<th align="center">类型</th>
+<th align="center"><code>c</code></th>
+<th align="center"><code>i</code></th>
+<th align="center"><code>v</code></th>
+<th align="center">大小</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">S3</td>
+<td align="center">0</td>
+<td align="center">4</td>
+<td align="center">16</td>
+<td align="center">24</td>
+</tr>
+<tr>
+<td align="center">U3</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">8</td>
+</tr>
+</tbody></table>
+<p>对于类型<code>union U3*</code>的指针<code>p</code>，<code>p-&gt;i[0]</code>和<code>p-&gt;v</code>引用的都是数据结构的起始位置。还可以观察到，一个联合的总大小等于它最大字段的大小。</p>
+<p>在一些下上文中，联合十分有用。但是，它也能引起一些讨厌的错误，因为它们绕过了C语言类型系统提供的安全措施。一种应用情况是，我们事先知道对一个数据结构中的两个不同字段的使用是互斥的，那么将这两个字段声明为联合的一部分，而不是结构的一部分，会减小分配空间的总量。</p>
+<p>例如，假设我们想实现一个二叉树的数据结构，每个叶子节点都有两个<code>double</code>类型的数据值，而每个内部节点都有指向两个孩子节点的指针，但是没有数据。如果声明如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">node_s</span> &#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">node_s</span> *<span class="title">left</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">node_s</span> *<span class="title">right</span>;</span></span><br><span class="line">    <span class="keyword">double</span> data[<span class="number">2</span>];</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>那么每个节点需要32个字节，每种类型的节点都要浪费一半的字节。相反，如果我们如下声明一个节点：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">union</span> <span class="title">node_u</span> &#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">        <span class="class"><span class="keyword">union</span> <span class="title">node_u</span> *<span class="title">left</span>;</span></span><br><span class="line">        <span class="class"><span class="keyword">union</span> <span class="title">node_u</span> *<span class="title">right</span>;</span></span><br><span class="line">    &#125; internal;</span><br><span class="line">    <span class="keyword">double</span> data[<span class="number">2</span>];</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>那么，每个节点就只需要16个字节。如果<code>n</code>是一个指针，指向<code>union node_u*</code>类型的节点，我们用<code>n-&gt;data[0]</code>和<code>n-&gt;data[1]</code>来引用叶子节点的数据，而用<code>n-&gt;internal.left</code>和<code>n-&gt;internal.right</code>来引用内部节点的孩子。<br>不过，如果这样编码，就没有办法来确定一个给定的节点到底是叶子节点，还是内部节点。通常的方法是引入一个枚举类型，定义这个联合中可能的不同选择，然后再创建一个结构，包含一个标签字段和这个联合：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">enum</span> &#123;</span> N_LEAF, N_INTERNAL &#125; <span class="keyword">nodetype_t</span>;</span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">node_t</span> &#123;</span></span><br><span class="line">    <span class="keyword">nodetype_t</span> type;</span><br><span class="line">    <span class="class"><span class="keyword">union</span> &#123;</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">            <span class="class"><span class="keyword">struct</span> <span class="title">node_t</span> *<span class="title">left</span>;</span></span><br><span class="line">            <span class="class"><span class="keyword">struct</span> <span class="title">node_t</span> *<span class="title">right</span>;</span></span><br><span class="line">        &#125; internal;</span><br><span class="line">        <span class="keyword">double</span> data[<span class="number">2</span>];</span><br><span class="line">    &#125; info;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>这个结构总共需要24个字节：<code>type</code>是4个字节，<code>info.internal.left</code>和<code>info.internal.right</code>各要8个字节，或者是<code>info.data</code>要16个字节。我们后面很快会谈到，在字段<code>type</code>和联合的元素之间需要4个字节的填充，所以整个结构大小为<code>4+4+16=24</code>。在这种情况中，相对于给代码造成的麻烦，使用联合带来的节省是很小的。对于有较多字段的数据结构，这样的节省会更加吸引人。</p>
+<p>联合还可以用来访问不同数据类型的位模式。例如，假设我们使用简单的强制类型转换将一个<code>double</code>类型的值<code>d</code>转换为<code>unsigned long</code>类型的值<code>u</code>：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">unsigned</span> <span class="keyword">long</span> u = (<span class="keyword">unsigned</span> <span class="keyword">long</span>) d;</span><br></pre></td></tr></table></figure>
+
+<p>值<code>u</code>会是<code>d</code>的整数表示。除了<code>d</code>的值为<code>0.0</code>的情况以外，<code>u</code>的位表示会与<code>d</code>的很不一样，再看下面这段代码，从一个<code>double</code>产生一个<code>unsigned long</code>类型的值：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">unsigned</span> <span class="keyword">long</span> <span class="title">double2bits</span><span class="params">(<span class="keyword">double</span> d)</span> </span>&#123;</span><br><span class="line">    <span class="class"><span class="keyword">union</span> &#123;</span></span><br><span class="line">        <span class="keyword">double</span> d;</span><br><span class="line">        <span class="keyword">unsigned</span> <span class="keyword">long</span> u;</span><br><span class="line">    &#125; temp;</span><br><span class="line">    temp.d = d;</span><br><span class="line">    <span class="keyword">return</span> temp.u;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>在这段代码中，我们以一种数据类型来存储联合中的参数，又以另一种数据类型来访问它。结果会是<code>u</code>具有和<code>d</code>一样的位表示，包括符号位字段、指数和尾数，如<code>3.11</code>节中描述的那样。<code>u</code>的数值与<code>d</code>的数值没有任何关系，除了<code>d</code>等于<code>0.0</code>的情况。</p>
+<p>当用联合来将各种不同大小的数据类型结合到一起时，字节顺序问题就变得很重要了。例如，假设我们写了一个过程，它以两个4字节的<code>unsigned</code>的位模式，创建一个8字节的<code>double</code>：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">double</span> <span class="title">uu2double</span><span class="params">(<span class="keyword">unsigned</span> word0, <span class="keyword">unsigned</span> word1)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="class"><span class="keyword">union</span> &#123;</span></span><br><span class="line">        <span class="keyword">double</span> d;</span><br><span class="line">        <span class="keyword">unsigned</span> u[<span class="number">2</span>];</span><br><span class="line">    &#125; temp;</span><br><span class="line">    temp.u[<span class="number">0</span>] = word0;</span><br><span class="line">    temp.u[<span class="number">1</span>] = word1;</span><br><span class="line">    <span class="keyword">return</span> temp.d;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在<code>x86-64</code>这样的小端法机器上，参数<code>word0</code>是<code>d</code>的低位4个字节，而<code>word1</code>是高位4个字节。在大端法机器上，这两个参数的角色刚好相反。</p>
+<h2 id="数据对齐"><a href="#数据对齐" class="headerlink" title="数据对齐"></a>数据对齐</h2><p>许多计算机系统对基本数据类型的合法地址做出了一些限制，要求某种类型对象的地址必须是某个值<code>K(通常是2、4或8)</code>的倍数。这种对齐限制简化了形成处理器和内存系统之间接口的硬件设计。例如，假设一个处理器总是从内存中取8个字节，则地址必须为8的倍数。如果我们能保证将所有的<code>double</code>类型数据的地址对齐成8的倍数，那么就可以用一个内存操作来读或者写值了。否则，我们可能需要执行两次内存访问，因为对象可能被分放在两个8字节内存块中。</p>
+<p>无论数据是否对齐，<code>x86-64</code>硬件都能正确工作。不过，<code>Intel</code>还是建议要对齐数据以提高内存系统的性能。对齐原则是任何<code>K</code>字节的基本对象的地址必须是<code>K</code>的倍数。可以看到这条原则会得到如下对齐：</p>
+<table>
+<thead>
+<tr>
+<th align="center"><code>K</code></th>
+<th align="center">类型</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">1</td>
+<td align="center">char</td>
+</tr>
+<tr>
+<td align="center">2</td>
+<td align="center">short</td>
+</tr>
+<tr>
+<td align="center">4</td>
+<td align="center">int, float</td>
+</tr>
+<tr>
+<td align="center">8</td>
+<td align="center">long,  double, char*</td>
+</tr>
+</tbody></table>
+<p>确保每种数据类型都是按照指定方式来组织和分配，即每种类型的对象都满足它的对齐限制，就可以保证实施对齐。编译器在汇编代码中放人命令，指明全局数据所需的对齐。例如，<code>3.6.8</code>节开始的跳转表的汇编代码声明在第2行包含下面这样的命令：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.align 8</span><br></pre></td></tr></table></figure>
+
+<p>这就保证了它后面的数据<code>(在此，是跳转表的开始)</code>的起始地址是8的倍数。因为每个表项长8个字节，后面的元素都会遵守8字节对齐的限制。对于包含结构的代码，编译器可能需要在字段的分配中插人间隙，以保证每个结构元素都满足它的对齐要求。而结构本身对它的起始地址也有一些对齐要求。比如下面的结构声明：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">S1</span> &#123;</span></span><br><span class="line">    <span class="keyword">int</span> i;</span><br><span class="line">    <span class="keyword">char</span> c;</span><br><span class="line">    <span class="keyword">int</span> j;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>假设编译器用最小的9字节分配，画出图来是这样的：</p>
+<p><img src="/align1.png"></p>
+<p>它是不可能满足字段<code>i(偏移为0)</code>和<code>j(偏移为5)</code>的4字节对齐要求的。取而代之地，编译器在字段<code>c</code>和<code>j</code>之间插入一个3字节的间隙<code>(在此用蓝色阴影示)</code>：</p>
+<p><img src="/align2.png"></p>
+<p>结果，<code>j</code>的偏移量为8，而整个结构的大小为12字节。此外，编译器必须保证任何<code>struct S1*</code>类型的指针<code>p</code>都满足4字节对齐。用我们前面的符号，设指针<code>p</code>的值为x<sub>p</sub>。那么，x<sub>p</sub>必须是4的倍数。这就保证了<code>p-&gt;i(地址</code>x<sub>p</sub><code>)</code>和<code>p-&gt;j(地址</code>x<sub>p</sub><code>+8)</code>都满足它们的4字节对齐要求。</p>
+<p>另外，编译器结构的末尾可能需要一些填充，这样结构数组中的每个元素都会满足它的对齐要求。例如，考虑下面这个结构声明：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">S2</span> &#123;</span></span><br><span class="line">    <span class="keyword">int</span> i;</span><br><span class="line">    <span class="keyword">int</span> j;</span><br><span class="line">    <span class="keyword">char</span> c;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>如果我们将这个结构打包成9个字节，只要保证结构的起始地址满足4字节对齐，我们仍然能够保证满足字段<code>i</code>和<code>j</code>的对齐要求。不过，考虑下面的声明：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">S2</span> <span class="title">d</span>[4];</span></span><br></pre></td></tr></table></figure>
+
+<p>分配9个字节，不可能满足<code>d</code>的每个元素的对齐要求，因为这些元素的地址分别为x<sub>d</sub>、x<sub>d</sub>+9、x<sub>d</sub>+18和x<sub>d</sub>+27。相反，编译器会为结构<code>S2</code>分配12个字节，最后3个字节是浪费的空间：</p>
+<p><img src="/align3.png"></p>
+<p>这样一来，<code>d</code>的元素的地址分别为x<sub>d</sub>、x<sub>d</sub>+12、x<sub>d</sub>+24和x<sub>d</sub>+36。只要x<sub>d</sub>是4的倍数，所有的对齐限制就都可以满足了。</p>
+<h1 id="机器级程序"><a href="#机器级程序" class="headerlink" title="机器级程序"></a>机器级程序</h1><p>到目前为止，我们已经分别讨论机器级代码如何实现程序的控制部分和如何实现不同的数据结构。在本节中，我们会看看数据和控制如何交互。首先，深人审视一下指针，它是C编程语言中最重要的概念之一，但是许多程序员对它的理解都非常浅显。我们复习符号调试器GDB的使用，用它仔细检查机器级程序的详细运行。接下来，看看理解机器级程序如何帮助我们研究缓冲区溢出，这是现实世界许多系统中一种很重要的安全漏洞。最后，查看机器级程序如何实现函数要求的栈空间大小在每次执行时都可能不同的情况。</p>
+<h2 id="理解指针"><a href="#理解指针" class="headerlink" title="理解指针"></a>理解指针</h2><p>指针是C语言的一个核心特色。它们以一种统一方式，对不同数据结构中的元素产生引用。对于编程新手来说，指针总是会带来很多的困惑，但是基本概念其实非常简单。在此，我们重点介绍一些指针和它们映射到机器代码的关键原则。</p>
+<ul>
+<li><p>每个指针都对应一个类型。这个类型表明该指针指向的是哪一类对象。以下面的指针声明为例：<code>int *ip; char **cpp;</code>。变量<code>ip</code>是一个指向<code>int</code>类型对象的指针，而<code>cpp</code>指针指向的对象自身就是一个指向<code>char</code>类型对象的指针。通常，如果对象类型为<code>T</code>，那么指针的类型为<code>T*</code>。特殊的<code>void*</code>类型代表通用指针。比如说，<code>malloc</code>函数返回一个通用指针，然后通过显式强制类型转换或者赋值操作那样的隐式强制类型转换，将它转换成一个有类型的指针。指针类型不是机器代码中的一部分；它们是C语言提供的一种抽象，帮助程序员避免寻址错误</p>
+</li>
+<li><p>每个指针都有一个值。这个值是某个指定类型的对象的地址。特殊的<code>NULL(0)</code>值表示该指针没有指向任何地方</p>
+</li>
+<li><p>指针用<code>&amp;</code>运算符创建。这个运算符可以应用到任何<code>lvalue</code>类的C表达式上，<code>lvalue</code>意指可以出现在赋值语句左边的表达式。这样的例子包括变量以及结构、联合和数组的元素。我们已经看到，因为<code>leaq</code>指令是设计用来计算内存引用的地址的，<code>&amp;</code>运算符的机器代码实现常常用这条指令来计算表达式的值</p>
+</li>
+<li><p><code>*</code>操作符用于间接引用指针。其结果是一个值，它的类型与该指针的类型一致。间接引用是用内存引用来实现的，要么是存储到一个指定的址，要么是从指定的地址读取</p>
+</li>
+<li><p>数组与指针紧密联系。一个数组的名字可以像一个指针变量一样引用<code>(但是不能修改)</code>。数组引用<code>(例如a[3])</code>与指针运算和间接引用<code>(例如*(a+3))</code>有一样的效果。数组引用和指针运算都需要用对象大小对偏移量进行伸缩。当我们写表达式<code>p+i</code>，这里指针<code>p</code>的值为<code>p</code>，得到的地址计算为<code>p+L·i</code>，这里<code>L</code>是与<code>p</code>相关联的数据类型的大小</p>
+</li>
+<li><p>将指针从一种类型强制转换成另一种类型，只改变它的类型，而不改变它的值。强制类型转换的一个效果是改变指针运算的伸缩。例如，如果<code>p</code>是一个<code>char*</code>类型的指针，它的值为<code>p</code>，那么表达式<code>(int*)p+7</code>计算为<code>p+28</code>，而<code>(int*)(p+7)</code>计算为<code>p+7(强制类型转换的优先级高于加法)</code></p>
+</li>
+<li><p>指针也可以指向函数。这提供了一个很强大的存储和向代码传递引用的功能，这些引用可以被程序的某个其他部分调用。例如，函数<code>int fun(int x, int *p);</code>，然后，我们可以声明一个指针<code>fp</code>，将它赋值为这个函数，代码为<code>int (*fp)(int int *); fp = fun;</code>，然后用这个指针来调用这个函数<code>int y = 1; int result = fp(3, &amp;y);</code>，函数指针的值是该函数机器代码表示中第一条指令的地址</p>
+</li>
+</ul>
+<h2 id="GDB调试器"><a href="#GDB调试器" class="headerlink" title="GDB调试器"></a>GDB调试器</h2><p>GNU的调试器GDB提供了许多有用的特性，支持机器级程序的运行时评估和分析。对于本书中的示例和练习，我们试图通过阅读代码，来推断出程序的行为。有了GDB，可以观察正在运行的程序，同时又对程序的执行有相当的控制，这使得研究程序的行为变为可能。</p>
+<p>图<code>3-39</code>给出了一些GDB命令的例子，帮助研究机器级<code>x86-64</code>程序。先运行<code>OBJDUMP</code>来获得程序的反汇编版本，是很有好处的。我们的示例都基于对文件<code>prog</code>运行GDB，程序的描述和反汇编见<code>3.2.3</code>节。我们用下面的命令行来启动GDB：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">linux&gt;</span><span class="bash"> gdb prog</span></span><br></pre></td></tr></table></figure>
+
+<p>通常的方法是在程序中感兴趣的地方附近设置断点。断点可以设置在函数入口后面，或是一个程序的地址处。程序在执行过程中遇到一个断点时，程序会停下来，并将控制返回给用户。在断点处，我们能够以各种方式查看各个寄存器和内存位置。我们也可以单步跟踪程序，一次只执行几条指令，或是前进到下一个断点。</p>
+<p><img src="/3-39.png"></p>
+<p>正如我们的示例表明的那样，GDB的命令语法有点晦涩，但是在线帮助信息<code>(用GDB的help命令调用)</code>能克服这些毛病。相对于使用命令行接口来访问GDB，许多程序员更愿意使用DDD，它是GDB的一个扩展，提供了图形用户界面。</p>
+<h2 id="内存越界引用和缓冲区溢出"><a href="#内存越界引用和缓冲区溢出" class="headerlink" title="内存越界引用和缓冲区溢出"></a>内存越界引用和缓冲区溢出</h2><p>我们已经看到，C语言对于数组引用不进行任何边界检查，而且局部变量和状态信息<code>(例如保存的寄存器值和返回地址)</code>都存放在栈中。这两种情况结合到一起就能导致严重的程序错误，对越界的数组元素的写操作会破坏存储在栈中的状态信息。当程序使用这个被破坏的状态，试图重新加载寄存器或执行<code>ret</code>指令时，就会出现很严重的错误。</p>
+<p>一种特别常见的状态破坏称为缓冲区溢出<code>(buffer overflow)</code>。通常，在栈中分配某个字符数组来保存一个字符串，但是字符串的长度超出了为数组分配的空间。下面这个程序示例就说明了这个问题：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* Implementation of library function gets() */</span></span><br><span class="line"><span class="function"><span class="keyword">char</span> *<span class="title">gets</span><span class="params">(<span class="keyword">char</span> *s)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> c;</span><br><span class="line">    <span class="keyword">char</span> *dest = s;</span><br><span class="line">    <span class="keyword">while</span> ((c = getchar()) != <span class="string">&#x27;\n&#x27;</span> &amp;&amp; c != EOF)</span><br><span class="line">        *dest++ = c;</span><br><span class="line">    <span class="keyword">if</span> (c == EOF &amp;&amp; dest == s)</span><br><span class="line">        <span class="comment">/* No characters read */</span></span><br><span class="line">        <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">    *dest++ = <span class="string">&#x27;\0&#x27;</span>; <span class="comment">/* Terminate string */</span></span><br><span class="line">    <span class="keyword">return</span> s;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/* Read input line and write it back */</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">echo</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">char</span> buf[<span class="number">8</span>]; <span class="comment">/* Way too small! */</span></span><br><span class="line">    gets(buf);</span><br><span class="line">    <span class="built_in">puts</span>(buf);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>前面的代码给出了库函数<code>gets</code>的一个实现，用来说明这个函数的严重问题。它从标准输入读入一行，在遇到一个回车换行字符或某个错误情况时停止。它将这个字符串复制到参数<code>s</code>指明的位置，并在字符串结尾加上<code>null</code>字符。在函数<code>echo</code>中，我们使用了<code>gets</code>，这个函数只是简单地从标准输入中读入一行，再把它回送到标准输出。</p>
+<p><code>gets</code>的问题是它没有办法确定是否为保存整个字符串分配了足够的空间。在<code>echo</code>示例中，我们故意将缓冲区设得非常小——只有8个字节长。任何长度超过7个字符的字符串都会导致写越界。检查GCC为<code>echo</code>产生的汇编代码，看看栈是如何组织的：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">; void echo()</span><br><span class="line">echo:</span><br><span class="line">    subq $24, %rsp     ; Allocate 24 bytes on stack</span><br><span class="line">    movq %rsp, %rdi    ; Compute buf as %rsp</span><br><span class="line">    call gets          ; Call gets</span><br><span class="line">    movq %rsp, %rdi    ; Compute buf as %rsp</span><br><span class="line">    call puts          ; Call puts</span><br><span class="line">    addq $24, %rsp     ; Deallocate stack space</span><br><span class="line">    ret                ; Return</span><br></pre></td></tr></table></figure>
+
+<p>图<code>3-40</code>画出了<code>echo</code>执行时栈的组织。</p>
+<p><img src="/3-40.png"></p>
+<p>该程序把栈指针减去了24<code>(第2行)</code>，在栈上分配了24个字节。字符数组<code>buf</code>位于栈顶，可以看到，<code>%rsp</code>被复制到<code>%rdi</code>作为调用<code>gets</code>和<code>puts</code>的参数。这个调用的参数和存储的返回指针之间的16字节是未被使用的。只要用户输入不超过7个字符，gets返回的字符串<code>(包括结尾的null)</code>就能够放进为<code>buf</code>分配的空间里。不过，长一些的字符串就会导致<code>gets</code>覆盖栈上存储的某些信息。随着字符串变长，下面的信息会被破坏：</p>
+<table>
+<thead>
+<tr>
+<th align="center">输入的字符数量</th>
+<th align="center">附加的被破坏的状态</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">0~7</td>
+<td align="center">无</td>
+</tr>
+<tr>
+<td align="center">9~23</td>
+<td align="center">未被使用的栈空间</td>
+</tr>
+<tr>
+<td align="center">24~31</td>
+<td align="center">返回地址</td>
+</tr>
+<tr>
+<td align="center">32+</td>
+<td align="center">caller中保存的状态</td>
+</tr>
+</tbody></table>
+<p>字符串到23个字符之前都没有严重的后果，但是超过以后，返回指针的值以及更多可能的保存状态会被破坏。如果存储的返回地址的值被破坏了，那么<code>ret</code>指令<code>(第8行)</code>会导致程序跳转到一个完全意想不到的位置。如果只看C代码，根本就不可能看出会有上面这些行为。只有通过研究机器代码级别的程序才能理解像<code>gets</code>这样的函数进行的内存越界写的影响。</p>
+<p>我们的<code>echo</code>代码很单，但是有点太随意了。更好一点的版本是使用<code>fgets</code>函数，它包括一个参数，限制待读入的最大字节数。通常，使用<code>gets</code>或其他任何能导致存储溢出的函数，都是不好的编程习惯。不幸的是，很多常用的库函数，包括<code>strcpy</code>、<code>strcat</code>和<code>sprintf</code>，都有一个属性——不需要告诉它们目标缓冲区的大小，就产生一个字节序列<code>[97]</code>。这样的情况就会导致缓冲区溢出漏洞。</p>
+<p>缓冲区溢出的一个更加致命的使用就是让程序执行它本来不愿意执行的函数。这是一种最常见的通过计算机网络攻击系统安全的方法。通常，输入给程序一个字符串，这个字符串包含一些可执行代码的字节编码，称为攻击代码<code>(exploit code)</code>，另外，还有一些字节会用一个指向攻击代码的指针覆盖返回地址。那么，执行<code>ret</code>指令的效果就是跳转到攻击代码。</p>
+<p>在一种攻击形式中，攻击代码会使用系统调用启动一个<code>shell</code>程序，给攻击者提供一组操作系统函数。在另一种攻击形式中，攻击代码会执行一些未授权的任务，修复对栈的破坏，然后第二次执行<code>ret</code>指令，<code>(表面上)</code>正常返回到调用者。</p>
+<p>让我们来看一个例子，在1988年11月，著名的<code>Internet</code>蠕虫病毒通过<code>Internet</code>以四种不同的方法获取对许多计算机的访问。一种是对<code>finger</code>守护进程<code>fingerd</code>的缓冲区溢出攻击，<code>fingerd</code>服务<code>FINGER</code>命令请求。通过以一个适当的字符串调用<code>FINGER</code>，蠕虫可以使远程的守护进程缓冲区溢出并执行一段代码，让蠕虫访问远程系统。一旦蠕虫获得了对系统的访问，它就能自我复制，几乎完全地消耗掉机器上所有的计算资源。结果，在安全专家制定出如何消除这种蠕虫的方法之前，成百上千的机器实际上都瘫痪了。这种蠕虫的始作俑者最后被抓住并被起诉。时至今日，人们还是不断地发现遭受缓冲区溢出攻击的系统安全漏洞，这更加突显了仔细编写程序的必要性。任何到外部环境的接口都应该是<code>防弹的</code>，这样，外部代理的行为才不会导致系统出现错误。</p>
+<h2 id="对抗缓冲区溢出"><a href="#对抗缓冲区溢出" class="headerlink" title="对抗缓冲区溢出"></a>对抗缓冲区溢出</h2><p>缓冲区溢出攻击的普遍发生给计算机系统造成了许多的麻烦。现代的编译器和操作系统实现了很多机制，以避免遭受这样的攻击，限制入侵者通过缓冲区溢出攻击获得系统控制的方式。在本节中，我们会介绍一些Linux上最新GCC版本所提供的机制。</p>
+<h3 id="栈随机化"><a href="#栈随机化" class="headerlink" title="栈随机化"></a>栈随机化</h3><p>为了在系统中插入攻击代码，攻击者既要插入代码，也要插入指向这段代码的指针，这个指针也是攻击字符串的一部分。产生这个指针需要知道这个字符串放置的栈地址。在过去，程序的栈地址非常容易预测。对于所有运行同样程序和操作系统版本的系统来说，在不同的机器之间，栈的位置是相当固定的。因此，如果攻击者可以确定一个常见的<code>Web</code>服务器所使用的栈空间，就可以设计一个在许多机器上都能实施的攻击。以传染病来打个比方，许多系统都容易受到同一种病毒的攻击，这种现象常被称作安全单一化<code>(securitymonoculture)</code>。</p>
+<p>栈随机化的思想使得栈的位置在程序每次运行时都有变化。因此，即使许多机器都运行同样的代码，它们的栈地址都是不同的。实现的方式是：程序开始时，在栈上分配一段<code>0~n</code>字节之间的随机大小的空间，例如，使用分配函数<code>alloca</code>在栈上分配指定字节数量的空间。程序不使用这段空间，但是它会导致程序每次执行时后续的栈位置发生了变化。分配的范围<code>n</code>必须足够大，才能获得足够多的栈地址变化，但是又要足够小，不至于浪费程序太多的空间。下面的代码是一种确定<code>典型的</code>栈地址的方法：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">long</span> local;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;local at %p\n&quot;</span>, &amp;local);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这段代码只是简单地打印出<code>main</code>函数中局部变量的地址。在32位Linux上运行这段代码10000次，这个地址的变化范围为<code>0xff7fc59c</code>到<code>0xffffd09c</code>，范围大小大约是2<sup>23</sup>。在更新一点儿的机器上运行64位Linux，这个地址的变化范围为<code>0x7fff0001b698</code>到<code>0x7ffffffaa4a8</code>，范围大小大约是2<sup>32</sup>。</p>
+<p>在Linux系统中，栈随机化已经变成了标准行为。它是更大的一类技术中的一种，这类技术称为地址空间布局随机化<code>(Address-Space Layout Randomization)</code>，或者简称ASLR。采用ASLR，每次运行时程序的不同部分，包括程序代码、库代码、栈、全局变量和堆数据，都会被加载到内存的不同区域。这就意味着在一台机器上运行一个程序，与在其他机器上运行同样的程序，它们的地址映射大相径庭。这样才能够对抗一些形式的攻击。</p>
+<p>然而，一个执著的攻击者总是能够用蛮力克服随机化，他可以反复地用不同的地址进行攻击。一种常见的把戏就是在实际的攻击代码前插入很长一段的<code>nop(读作no op, nooperatioin的缩写)</code>指令。执行这种指令除了对程序计数器加一，使之指向下一条指令之外，没有任何的效果。只要攻击者能够猜中这段序列中的某个地址，程序就会经过这个序列，到达攻击代码。这个序列常用的术语是<code>空操作雪橇(nop sled)</code>，意思是程序会滑过这个序列。如果我们建立一个256个字节的<code>nop sled</code>，那么枚举2<sup>15</sup><code>=32768</code>个起始地址，就能破解<code>n=</code>2<sup>23</sup>的随机化，这对于一个顽固的攻击者来说，是完全可行的。对于64位的情况，要尝试枚举2<sup>24</sup><code>=16777216</code>就有点儿令人畏惧了。我们可以看到栈随机化和其他一些ASLR技术能够增加成功攻击一个系统的难度，因而大大降低了病毒或者蠕虫的传播速度，但是也不能提供完全的安全保障。</p>
+<h3 id="栈破坏检测"><a href="#栈破坏检测" class="headerlink" title="栈破坏检测"></a>栈破坏检测</h3><p>计算机的第二道防线是能够检测到何时栈已经被破坏。我们在<code>echo</code>函数示例<code>(图3-40)</code>中看到，破坏通常发生在当超越局部缓冲区的边界时。在C语言中，没有可靠的方法来防止对数组的越界写。但是，我们能够在发生了越界写的时候，在造成任何有害结果之前，尝试检测到它。</p>
+<p>最近的GCC版本在产生的代码中加入了一种栈保护者<code>(stack protector)</code>机制，来检测缓冲区越界。其思想是在栈帧中任何局部缓冲区与栈状态之间存储一个特殊的金丝雀<code>(canary)</code>值，如图<code>3-42</code>所示。这个金丝雀值，也称为哨兵值<code>(guard value)</code>，是在程序每次运行时随机产生的，因此，攻击者没有简单的办法能够知道它是什么。在恢复寄存器状态和从函数返回之前，程序检查这个金丝雀值是否被该函数的某个操作或者该函数调用的某个函数的某个操作改变了。如果是的，那么程序异常中止。</p>
+<p><img src="/3-42.png"></p>
+<p>最近的GCC版本会试着确定一个函数是否容易遭受栈溢出攻击，并且自动插入这种溢出检测。实际上，对于前面的栈溢出展示，我们不得不用命令行选项<code>-fno-stack-protector</code>来阻止GCC产生这种代码。当不用这个选项来编译<code>echo</code>函数时，也就是允许使用栈保护者，得到下面的汇编代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">; void echo()</span><br><span class="line">echo:</span><br><span class="line">    subq $24, %rsp         ; Allocate 24 bytes on stack</span><br><span class="line">    movq %fs:40, %rax      ; Retrieve canary</span><br><span class="line">    movq %rax, 8(%rsp)     ; Store on stack</span><br><span class="line">    xorl %eax, %eax        ; Zero out register</span><br><span class="line">    movq %rsp, %rdi        ; Compute buf as %rsp</span><br><span class="line">    call gets              ; Call gets</span><br><span class="line">    movq %rsp, %rdi        ; Compute buf as %rsp</span><br><span class="line">    call puts              ; Call puts</span><br><span class="line">    movq 8(%rsp), %rax     ; Retrieve canary</span><br><span class="line">    xorq %fs:40, %rax      ; Compare to stored value</span><br><span class="line">    je .L9                 ; If =, goto ok</span><br><span class="line">    call __stack_chk_fail  ; Stack corrupted!</span><br><span class="line">.L9:                     ; ok:</span><br><span class="line">   addq $24, %rsp          ; Deallocate stack space</span><br><span class="line">   ret</span><br></pre></td></tr></table></figure>
+
+<p>这个版本的函数从内存中读出一个值<code>(第3行)</code>，再把它存放在栈中相对于<code>%rsp</code>偏移量为8的地方。指令参数<code>%fs:40</code>指明金丝雀值是用段寻址<code>(segmented addressing)</code>从内存中读入的，段寻址机制可以追溯到80286的寻址，而在现代系统上运行的程序中已经很少见到了。将金丝雀值存放在一个特殊的段中，标志为<code>只读</code>，这样攻击者就不能覆盖存储的金丝雀值。在恢复寄存器状态和返回前，函数将存储在栈位置处的值与金丝雀值做比较<code>(通过第11行的xorq指令)</code>。如果两个数相同，<code>xorq</code>指令就会得到0，函数会按照正常的方式完成。非零的值表明栈上的金丝雀值被修改过，那么代码就会调用一个错误处理例程。</p>
+<p>栈保护很好地防止了缓冲区溢出攻击破坏存储在程序栈上的状态。它只会带来很小的性能损失，特别是因为GCC只在函数中有局部<code>char</code>类型缓冲区的时候才插入这样的代码。当然，也有其他一些方法会破坏一个正在执行的程序的状态，但是降低栈的易受攻击性能够对抗许多常见的攻击策略。</p>
+<h3 id="限制可执行代码区"><a href="#限制可执行代码区" class="headerlink" title="限制可执行代码区"></a>限制可执行代码区</h3><p>最后一招是消除攻击者向系统中插入可执行代码的能力。一种方法是限制哪些内存区域能够存放可执行代码。在典型的程序中，只有保存编译器产生的代码的那部分内存才需要是可执行的。其他部分可以被限制为只允许读和写。正如第9章中会看到的，虚拟内存空间在逻辑上被分成了页<code>(page)</code>，典型的每页是2048或者4096个字节。硬件支持多种形式的内存保护，能够指明用户程序和操作系统内核所允许的访问形式。许多系统允许控制三种访问形式：读<code>(从内存读数据)</code>、写<code>(存储数据到内存)</code>和执行<code>(将内存的内容看作机器级代码)</code>。以前，<code>x86</code>体系结构将读和执行访问控制合并成一个1位的标志，这样任何被标记为可读的页也都是可执行的。栈必须是既可读又可写的，因而栈上的字节也都是可执行的。已经实现的很多机制，能够限制一些页是可读但是不可执行的，然而这些机制通常会带来严重的性能损失。</p>
+<p>最近，AMD为它的64位处理器的内存保护引入了<code>NX(No-Execute, 不执行)</code>位，将读和执行访问模式分开，<code>Intel</code>也跟进了。有了这个特性，栈可以被标记为可读和可写，但是不可执行，而检查页是否可执行由硬件来完成，效率上没有损失。</p>
+<p>有些类型的程序要求动态产生和执行代码的能力。例如，即时<code>(just-in-time)</code>编译技术为解释语言<code>(例如Java)</code>编写的程序动态地产生代码，以提高执行性能。是否能够将可执行代码限制在由编译器在创建原始程序时产生的那个部分中，取决于语言和操作系统。</p>
+<p>我们讲到的这些技术——随机化、栈保护和限制哪部分内存可以存储可执行代码——是用于最小化程序缓冲区溢出攻击漏洞三种最常见的机制。它都具有这样的属性，即不需要程序员做任何特殊的努力，带来的性能代价都非常小，甚至没有。单独每一种机制都降低了漏洞的等级，而组合起来，它们变得更加有效。不幸的是，仍然有方法能够攻击计算机，因而蠕虫和病毒继续危害着许多机器的完整性。</p>
+<h2 id="支持变长栈帧"><a href="#支持变长栈帧" class="headerlink" title="支持变长栈帧"></a>支持变长栈帧</h2><p>到目前为止，我们已经检查了各种函数的机器级代码，但它们有一个共同点，即编译器能够预先确定需要为栈帧分配多少空间。但是有些函数，需要的局部存储是变长的。例如，当函数调用<code>alloca</code>时就会发生这种情况。<code>alloca</code>是一个标准库函数，可以在栈上分配任意字节数量的存储。当代码声明一个局部变长数组时，也会发生这种情况。</p>
+<p>图<code>3-43a</code>的代码给出了一个包含变长数组的例子。该函数声明了<code>n</code>个指针的局部数组<code>p</code>，这里<code>n</code>由第一个参数给出。这要求在栈上分配<code>8n</code>个字节，这里<code>n</code>的值每次调用该函数时都会不同。因此编译器无法确定要给该函数的栈帧分配多少空间。此外，该程序还产生一个对局部变量<code>i</code>的地址引用，因此该变量必须存储在栈中。在执行过程中，程序必须能够访问局部变量<code>i</code>和数组<code>p</code>中的元素。返回时，该函数必须释放这个栈帧，并将栈指针设置为存储返回地址的位置。</p>
+<p><img src="/3-43.png"></p>
+<p>为了管理变长栈帧，<code>x86-64</code>代码使用寄存器<code>%rbp</code>作为帧指针<code>(frame pointer)(有时称 为基指针(base pointer)，这也是%rbp中bp两个字母的由来)</code>。当使用帧指针时，栈帧的组织结构与图<code>3-44</code>中函数<code>vframe</code>的情况一样。可以看到代码必须把<code>%rbp</code>之前的值保存到栈中，因为它是一个被调用者保存寄存器。然后在函数的整个执行过程中，都使得<code>%rbp</code>指向那个时刻栈的位置，然后用固定长度的局部变量<code>(例如i)</code>相对于<code>%rbp</code>的偏移量来引用它们。</p>
+<p><img src="/3-44.png"></p>
+<p>图<code>3-43b</code>是GCC为函数<code>vframe</code>生成的部分代码。在函数的开始，代码建立栈帧，并为数组<code>p</code>分配空间。首先把<code>%rbp</code>的当前值压入栈中，将<code>%rbp</code>设置为指向当前的栈位置<code>(第2~3行)</code>。然后，在栈上分配16个字节，其中前8个字节用于存储局部变量<code>i</code>，而后8个字节是未被使用的。接着，为数组p分配空间<code>(第5~11行)</code>。当程序到第11行的时候，已经<code>(1)</code>在栈上分配了<code>8n</code>字节，并<code>(2)</code>在已分配的区域内放置好数组<code>p</code>，至少有<code>8n</code>字节可供其使用。</p>
+<p>初始化循环的代码展示了如何引用局部变量<code>i</code>和<code>p</code>的例子。第13行表明数组元素<code>p[i]</code>被设置为<code>q</code>。该指令用寄存器<code>%rcx</code>中的值作为<code>p</code>的起始地址。我们可以看到修改局部变量<code>i(第15行)</code>和读局部变量<code>(第17行)</code>的例子。<code>i</code>的地址是引用<code>-8(%rbp)</code>，也就是相对于帧指针偏移量为<code>-8</code>的地方。</p>
+<p>在函数的结尾，<code>leave</code>指令将帧指针恢复到它之前的值<code>(第20行)</code>。这条指令不需要参数，等价于执行下面两条指令：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">movq %rbp, %rsp    ; Set stack pointer to beginning of frame</span><br><span class="line">popq %rbp          ; Restore saved %rbp and set stack ptr</span><br><span class="line">                   ; to end of caller’s frame</span><br></pre></td></tr></table></figure>
+
+<p>也就是，首先把栈指针设置为保存<code>%rbp</code>值的位置，然后把该值从栈中弹出到<code>%rbp</code>。这个指令组合具有释放整个栈帧的效果。</p>
+<p>在较早版本的<code>x86</code>代码中，每个函数调用都使用了帧指针。而现在，只在栈帧长可变的情况下才使用，就像函数<code>vframe</code>的情况一样。历史上，大多数编译器在生成<code>IA32</code>代码时会使用帧指针。最近的GCC版本放弃了这个惯例。可以看到把使用帧指针的代码和不使用帧指针的代码混在一起是可以的，只要所有的函数都把<code>%rbp</code>当做被调用者保存寄存器来处理即可。</p>
+<h1 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h1><ul>
+<li><a target="_blank" rel="noopener" href="https://csapp.cs.cmu.edu/"><code>Computer Systems: A Programmer&#39;s Perspective, 3/E</code></a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/CSAPP/" rel="tag"><i class="fa fa-tag"></i> CSAPP</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/htb-vipere/" rel="prev" title="HTB Vipere">
+                  <i class="fa fa-chevron-left"></i> HTB Vipere
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Lu0k</span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <script size="250" alpha="0.5" zIndex="-1" src="https://cdn.jsdelivr.net/npm/ribbon.js@1.0.2/dist/ribbon.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>
