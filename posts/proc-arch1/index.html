@@ -20,28 +20,28 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"lu0k.github.io","root":"/","images":"/images","scheme":"Gemini","version":"8.7.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
-<meta name="description" content="Here&#39;s something encrypted, password is required to continue reading.">
+<meta name="description" content="内容简介处理器必须执行一系列指令，每条指令执行某个简单操作，例如两个数相加。指令被编码为由一个或多个字节序列组成的二进制格式。一个处理器支持的指令和指令的字节级编码称为它的指令集体系结构(ISA, Instruction-Set Architecture)。ISA在编译器编写者和处理器设计人员之间提供了一个概念抽象层，编译器编写者只需要知道允许哪些指令，以及它们是如何编码的；而处理器设计者必须建造">
 <meta property="og:type" content="article">
-<meta property="og:title" content="HTB Infiltration">
-<meta property="og:url" content="https://lu0k.github.io/posts/htb-infiltration/index.html">
+<meta property="og:title" content="处理器体系结构(一)">
+<meta property="og:url" content="https://lu0k.github.io/posts/proc-arch1/index.html">
 <meta property="og:site_name" content="Lu0k">
-<meta property="og:description" content="Here&#39;s something encrypted, password is required to continue reading.">
+<meta property="og:description" content="内容简介处理器必须执行一系列指令，每条指令执行某个简单操作，例如两个数相加。指令被编码为由一个或多个字节序列组成的二进制格式。一个处理器支持的指令和指令的字节级编码称为它的指令集体系结构(ISA, Instruction-Set Architecture)。ISA在编译器编写者和处理器设计人员之间提供了一个概念抽象层，编译器编写者只需要知道允许哪些指令，以及它们是如何编码的；而处理器设计者必须建造">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2022-01-05T16:00:00.000Z">
-<meta property="article:modified_time" content="2022-01-06T15:22:02.108Z">
+<meta property="article:published_time" content="2022-01-07T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-01-08T10:56:52.075Z">
 <meta property="article:author" content="Lu0k">
-<meta property="article:tag" content="OSINT">
+<meta property="article:tag" content="CSAPP">
 <meta name="twitter:card" content="summary">
 
 
-<link rel="canonical" href="https://lu0k.github.io/posts/htb-infiltration/">
+<link rel="canonical" href="https://lu0k.github.io/posts/proc-arch1/">
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://lu0k.github.io/posts/htb-infiltration/","path":"posts/htb-infiltration/","title":"HTB Infiltration"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://lu0k.github.io/posts/proc-arch1/","path":"posts/proc-arch1/","title":"处理器体系结构(一)"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>HTB Infiltration | Lu0k</title>
+<title>处理器体系结构(一) | Lu0k</title>
   
 
 
@@ -135,7 +135,7 @@
 
   <aside class="sidebar">
 
-    <div class="sidebar-inner sidebar-overview-active">
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
       <ul class="sidebar-nav">
         <li class="sidebar-nav-toc">
           文章目录
@@ -148,6 +148,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%86%85%E5%AE%B9%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">内容简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Reference"><span class="nav-number">2.</span> <span class="nav-text">Reference</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -222,7 +223,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://lu0k.github.io/posts/htb-infiltration/">
+    <link itemprop="mainEntityOfPage" href="https://lu0k.github.io/posts/proc-arch1/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">
@@ -235,7 +236,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          HTB Infiltration
+          处理器体系结构(一)
         </h1>
 
         <div class="post-meta-container">
@@ -246,7 +247,7 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2022-01-06 00:00:00" itemprop="dateCreated datePublished" datetime="2022-01-06T00:00:00+08:00">2022-01-06</time>
+      <time title="创建时间：2022-01-08 00:00:00" itemprop="dateCreated datePublished" datetime="2022-01-08T00:00:00+08:00">2022-01-08</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -254,7 +255,7 @@
       </span>
       <span class="post-meta-item-text">分类于</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/HTB-Challenges/" itemprop="url" rel="index"><span itemprop="name">HTB Challenges</span></a>
+          <a href="/categories/Read-Notes/" itemprop="url" rel="index"><span itemprop="name">Read Notes</span></a>
         </span>
     </span>
 
@@ -268,22 +269,20 @@
     
     
     <div class="post-body" itemprop="articleBody">
-        <div class="hbe hbe-container" id="hexo-blog-encrypt" data-wpm="Oh, this is an invalid password. Check and try again, please." data-whm="OOPS, these decrypted content may changed, but you can still have a look.">
-  <script id="hbeData" type="hbeData" data-hmacdigest="6e52d5677f76110753e7f31336323997a5d166025dc24f2af25400f8c5852779">aa3dceef8c7ec1ff4c6cc2cd0ebda29e622d96147f506011efaa4bf18f423bc560911100b22564c6b0c12c5d4cc4a2354cea84ad4d5befbb182c73f072ece84f729e571df5e6df3e6108bc521048df56aaf8c3232ee97904a11ec42b9559a8855be5b70db28d72da8cb9d7c17cd414cc47c4f632f80b5e2e191ca9baa103dbca9778db15f024c630c7ea6e9b1decd444676c365a6ebb20e9d6c7492037aef8cd9ad45751efc033388f6325ab0021ca6eca7f69d02525dec3a7e4184758c7790e45acaf16f1d760a940bdbc5bcb788552fadf1519d44d01ffcc9ab3f305eed465c5d15d9d0e8c8e13b3db97cd5979bc721335223bab9c18e7ba34301fe13f24a3c2445f649034db8f50bd3215cbb7a14fa27f3ca19149b9a689e93527e5973f6e1143bc827f45abda67e541743db2eba2a9ab1e5b10651dd61fb6251297c10792c1c6a3c713572cd3f815edab2de575005f6509acd0ec817d3d67105d2ec0bc50513ab9763d4d82c21098a337502735a7b20006a9fe177275b2f60c52a376a806ad6acf33939dc2cde7baa7f9a6103a546d78fbbc04b7bca615cfeb3ff107b5e3781ad4b4eacaac41d1afd2b9b1cf68d857e0ebfd380ee303c7b390db1961573a81d5347298e72ad5914d1bae0a76d14c7d7ba07665f5f8ad6191c69d8a36740a98e4c36d39568ba718b412ae16f5365d1ef61cab3022ff1f01762266272329bdfdd222519fb858caf13ee00d0a997372ef1f42af05e773afad7adb5edad79e130b6073892434f8c792060b182921135f1a35ae5139a341dbe4c40c827a0cbc5b2dd5570fbf75d51007c24016d7557d3655d6cf8739208e832fd36a9cdd29e8021f319596791766fd5cdde3c8fba7719185edc63adc99bc31e10049643bdeddf282cbd04d39d1f7448235540a611bc1e7037d6be68f81ca37f7c6450f31b0cda1c86a518a5f6b4141be8a2129adb6cb1a10940029c74c6d4c4f9dbf33b0c358d84599154eb4855333bc287df4bfac79b86927d7ebfd0f25b412bd9004119de32eb9db85fba2be824e09b2e6b169b02e1a9bdc51e8e79f59641258848f682e52a394a79372e022ee6a6f5f0e06b9d20ec48f75990724be3b5d97afae1f9ab0761cf36f3f7bdb0d39f89455c97d472eea5d4b55a5baf53fd6161015bc05743c7804b6ce6ceee05b688110bf9cab4a60c6ebe119f2f7f8c2bcc0d528a557be48504cf3059090c38be0e6e86377d1264ef0b44482553b4420ebe2098d27d81656e60dc704ae3378aaea9c706bb7ce0736832f01b5d2ea9959ea152796e9a538f11a7c2e4ed9025a7254088048e6ce23d763b00ce5425ca0bdcd74a2ed27073930aec3825144f607a5c6b7b90c8c7509688195d8a632974a0daaa99d8e436bcd4057df126826f5ef7bbe2d1efbfc08c09504e6455f45a8dc75cef61c4371834a1be707c32dbcd6131058767e2b9d6dba7b89f1b9788edf3696eb8e19c148f3d8b7dac3103f37aec1b75299a1edca01830efdb288f7a82bbf9c4ae3286eb3abccf097b07453364124529959b6bb0268c6b10b368bdc6c0ae15ce96ae81a382fde767aa2ac6f9af42d5638abd0729f029e137f38cd1a9680f2dccad3da6220b1ba1fa7027b30be9a4802f44ec0dea8705498a708f1c3beee9507de79e8c3abfc3bc139ef11786a090769424a78b7be4f2132ab31a78939bfa5a0ceaa9c9ff005a62c5a9b0b314e595360e906f38216efe6f258f66477bc9fc817981f98f607fbdb2b1488c0b80437090b7c69b9efb27e863a3328046433db7b38809532ecc59c98e6fbb51f1764411b7defcd3877fe2f3d153a0ae8b332a9f78fb5bb5486f67edd336a3c96997ed6317fd0a0a719e87c65358fbd1baecebfc7ce8380af322d4d497f5b4a05db9583589caeb3c8c1c5f56967af378d8683acc6cc3cdd2c2d6b3bc3972caf77f0792e732d8e158a9d861b6d2e1e5f9c22f8638af6f8de4540c0f8187084d1672466fcabe3065ee4580a51c38676c8598a2a4d4a29fcc52369f6341676bf45e90f1396d6091c1922e5b9f4cfc31da754f6677aa71228ec8f311cff41364cc674272a034fc516462d6b6f1c8c5d3753450a485a0210c34252ff12069a9faad4b9328e8fc0d20d8a70e4489bd16bc1aeca4db333391c8a5c78dac7c50c1d4fcd93547e7de0017012f9fb1096e7dcd98fd1edeb4de55e8e376e0a0b62c9787a4497d4b21a0b4fe5e8807b269ff31a342a860348b33d97c985676ea5103e195f44a73038e8b274720b5fff9672bb698e77cb3481b9715191c066ca696f6d13277b93e3f599818d6e1593106671bb10b9e97809c00448b83d019ac2d826197340f0198e66adc021a28f25d984704f8fad19fe02761e91d68941578f70959af6ddf4e202a29e621d437f437e25732b896edf00d75f76ad7fff8e583a8be723a2a71f40c562da1754acf6bf22cb7985724fd7bfd7d2938204141f6c9b009e3e72146f05bc68cecf36731abb8f892c8fef341707e7476bd0d56a43c3cd3aa4a3318a0b58f5f52a1389827760200434caa8cbb80b602371f3e3f13eee71b323afd4485262f55c4cc4d5b7018874f4ee853e84b158ce3d00d3481e440932046718af8afa937a164a5b236b451d95a7740abfd9bf5a20efe09f0c3da848ca50d96ac5eb68d408d863e7c55e1d3ae24c45d9fa8476623a93e4f6785d046ac4a6b65926d0ad0badfbd50160f265314a31e9d21069b5d3ba12523e94509b6614eb8c85552aa4e9b039d49d97be461159a1580e87b311b4138898959f9f1c028e6e3368965fe85ed2031d99f8b94b07604bf2e6ea4eefcd63fc8e0dce144aa1f7f0d6851e51545c01706ceebbbe1c3836e9f99ed785658ed2837f35638a501caf31b09744e9e9df36e5432ddca604e3e602cb179b136f47d92820806096172a1cde984c243a1a2b21fb7e4d6267df547569a48f1d231d8d45f954a717c23db42eacdfbb4e5b6e5fd2d487b10a2138f95c1764a505c4c909332cd4c4bccef2aae86918a88d9cf183a45a34f953257771ac69ad9a3af4f845ccbc31d6c86ffd998595f4ad2002d9b5221f759cd40346137ecdde8bd19cff372dab4e9692c596e8a5d0025c6a0771b5e55c8faf0dbca009805cf37adc7e122d4aaf6f4365d758ea67dc200ac531c878221d6412f29be562952e09e422db85f1a47e46f599b428fa4f6f8cfa9c548dd29b6a1d9b50a06e4953972160f3f0a664616117430fd489acc6372009b3056f9708134a3c9c16992f6e09fff0a7164f16e7b04ea4006cf4d9b8872d7bb8d678eec5b560b5a98e45bf1ef6d264195e2d153f4da0ef36971460ca20d44b0e1c2f12f3241b7654912ce3717074d189df1dde3a24bfdbf462d262d17c117a57fe5a</script>
-  <div class="hbe hbe-content">
-    <div class="hbe hbe-input hbe-input-xray">
-      <input class="hbe hbe-input-field hbe-input-field-xray" type="password" id="hbePass">
-      <label class="hbe hbe-input-label hbe-input-label-xray" for="hbePass">
-        <span class="hbe hbe-input-label-content hbe-input-label-content-xray">Hey, password is required here.</span>
-      </label>
-      <svg class="hbe hbe-graphic hbe-graphic-xray" width="300%" height="100%" viewBox="0 0 1200 60" preserveAspectRatio="none">
-        <path d="M0,56.5c0,0,298.666,0,399.333,0C448.336,56.5,513.994,46,597,46c77.327,0,135,10.5,200.999,10.5c95.996,0,402.001,0,402.001,0"></path>
-        <path d="M0,2.5c0,0,298.666,0,399.333,0C448.336,2.5,513.994,13,597,13c77.327,0,135-10.5,200.999-10.5c95.996,0,402.001,0,402.001,0"></path>
-      </svg>
-    </div>
-  </div>
-</div>
-<script data-pjax src="/lib/hbe.js"></script><link href="/css/hbe.style.css" rel="stylesheet" type="text/css">
+        <h1 id="内容简介"><a href="#内容简介" class="headerlink" title="内容简介"></a>内容简介</h1><p>处理器必须执行一系列指令，每条指令执行某个简单操作，例如两个数相加。指令被编码为由一个或多个字节序列组成的二进制格式。一个处理器支持的指令和指令的字节级编码称为它的指令集体系结构<code>(ISA, Instruction-Set Architecture)</code>。<code>ISA</code>在编译器编写者和处理器设计人员之间提供了一个概念抽象层，编译器编写者只需要知道允许哪些指令，以及它们是如何编码的；而处理器设计者必须建造出执行这些指令的处理器。</p>
+<span id="more"></span>
+
+<p>本章将简要介绍处理器硬件的设计。我们将研究一个硬件系统执行某种<code>ISA</code>指令的方式。这会使你能更好地理解计算机是如何工作的，以及计算机制造商们面临的技术挑战。一个很重要的概念是，现代处理器的实际工作方式可能跟<code>ISA</code>隐含的计算模型大相径庭。<code>ISA</code>模型看上去应该是顺序指令执行，也就是先取出一条指令，等到它执行完毕，再开始下一条。然而，与一个时刻只执行一条指令相比，通过同时处理多条指令的不同部分，处理器可以获得更高的性能。为了保证处理器能得到同顺序执行相同的结果，人们采用了一些特殊的机制。在计算机科学中，用巧妙的方法在提高性能的同时又保持一个更简单、更抽象模型的功能，这种思想是众所周知的。在<code>Web</code>浏览器或平衡二叉树和哈希表这样的信息检索数据结构中使用缓存，就是这样的例子。</p>
+<p>本章首先定义一个简单的指令集，作为我们处理器实现的运行示例。因为受<code>x86-64</code>指令集的启发，它被俗称为<code>x86</code>，所以我们称我们的指令集为<code>Y86-64</code>指令集。与<code>x86-64</code>相比，<code>Y86-64</code>指令集的数据类型、指令和寻址方式都要少一些。它的字节级编码也比较简单，机器代码没有相应的<code>x86-64</code>代码紧凑，不过设计它的<code>CPU</code>译码逻辑也要简单一些。虽然<code>Y86-64</code>指令集很简单，它仍然足够完整，能让我们写一些处理整数的程序。设计一个实现<code>Y86-64</code>的处理器要求我们解决许多处理器设计者同样会面对的问题。</p>
+<p>接下来会提供一些数字硬件设计的背景。我们会描述处理器中使用的基本构件块，以及它们如何连接起来和操作。这些介绍是建立在第2章对布尔代数和位级操作的讨论的基础上的。我们还将介绍一种描述硬件系统控制部分的简单语言，<code>HCL(Hardware Control Language，硬件控制语言)</code>。然后，用它来描述我们的处理器设计。即使你已经有了一些逻辑设计的背景知识，也应该读读这个部分以了解我们的特殊符号表示方法。</p>
+<p>作为设计处理器的第一步，我们给出一个基于顺序操作、功能正确但是有点不实用的<code>Y86-64</code>处理器。这个处理器每个时钟周期执行一条完整的<code>Y86-64</code>指令。所以它的时钟必须足够慢，以允许在一个周期内完成所有的动作。这样一个处理器是可以实现的，但是它的性能远远低于同样的硬件应该能达到的性能。</p>
+<p>以这个顺序设计为基础，我们进行一系列的改造，创建一个流水线化的处理器<code>(pipe-lined processor)</code>。这个处理器将每条指令的执行分解成五步，每个步骤由一个独立的硬件部分或阶段<code>(stage)</code>来处理。指令步经流水线的各个阶段，且每个时钟周期有一条新指令进入流水线。所以，处理器可以同时执行五条指令的不同阶段。为了使这个处理器保留<code>Y86-64 ISA</code>的顺序行为，就要求处理很多冒险或冲突<code>(hazard)</code>情况，冒险就是一条指令的位置或操作数依赖于其他仍在流水线中的指令。</p>
+<p>我们设计了一些工具来研究和测试处理器设计。其中包括<code>Y86-64</code>的汇编器、在你的机器上运行<code>Y86-64</code>程序的模拟器，还有针对两个顺序处理器设计和一个流水线化处理器设计的模拟器。这些设计的控制逻辑用<code>HCL</code>符号表示的文件描述。通过编辑这些文件和重新编译模拟器，你可以改变和扩展模拟器行为。我们还提供许多练习，包括实现新的指令和修改机器处理指令的方式。还提供测试代码以帮助你评价修改的正确性。这些练习将极大地帮助你理解所有这些内容，也能使你更理解处理器设计者面临的许多不同的设计选择。</p>
+<p><code>ARCH: VLOG</code>给出了用<code>Verilog</code>硬件描述语言描述的流水线化的<code>Y86-64</code>处理器。其中包括为基本的硬件构建块和整个的处理器结构创建模块。我们自动地将控制逻辑的<code>HCL</code>描述翻译成<code>Verilog</code>。首先用我们的模拟器调试<code>HCL</code>描述，能消除很多在硬件设计中会出现的棘手的问题。给定一个<code>Verilog</code>描述，有商业和开源工具来支持模拟和逻辑合成<code>(logic synthesis)</code>，产生实际的微处理器电路设计。</p>
+<h1 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h1><ul>
+<li><a target="_blank" rel="noopener" href="https://csapp.cs.cmu.edu/"><code>Computer Systems: A Programmer&#39;s Perspective, 3/E</code></a></li>
+</ul>
+
     </div>
 
     
@@ -292,21 +291,18 @@
 
     <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/OSINT/" rel="tag"><i class="fa fa-tag"></i> OSINT</a>
+              <a href="/tags/CSAPP/" rel="tag"><i class="fa fa-tag"></i> CSAPP</a>
           </div>
 
         
 
           <div class="post-nav">
             <div class="post-nav-item">
-                <a href="/posts/htb-idexposed/" rel="prev" title="HTB ID Exposed">
-                  <i class="fa fa-chevron-left"></i> HTB ID Exposed
+                <a href="/posts/htb-wehavealeak/" rel="prev" title="HTB We Have a Leak">
+                  <i class="fa fa-chevron-left"></i> HTB We Have a Leak
                 </a>
             </div>
             <div class="post-nav-item">
-                <a href="/posts/htb-wehavealeak/" rel="next" title="HTB We Have a Leak">
-                  HTB We Have a Leak <i class="fa fa-chevron-right"></i>
-                </a>
             </div>
           </div>
     </footer>
