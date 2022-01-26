@@ -20,25 +20,27 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"lu0k.github.io","root":"/","images":"/images","scheme":"Gemini","version":"8.7.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
-<meta name="description" content="谦虚学习!">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Lu0k">
-<meta property="og:url" content="https://lu0k.github.io/archives/2021/11/page/2/index.html">
+<meta name="description" content="Here&#39;s something encrypted, password is required to continue reading.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HTB Overflow">
+<meta property="og:url" content="https://lu0k.github.io/posts/htb-overflow/index.html">
 <meta property="og:site_name" content="Lu0k">
-<meta property="og:description" content="谦虚学习!">
+<meta property="og:description" content="Here&#39;s something encrypted, password is required to continue reading.">
 <meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-01-25T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-01-26T11:29:36.122Z">
 <meta property="article:author" content="Lu0k">
 <meta name="twitter:card" content="summary">
 
 
-<link rel="canonical" href="https://lu0k.github.io/archives/2021/11/page/2/">
+<link rel="canonical" href="https://lu0k.github.io/posts/htb-overflow/">
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":false,"lang":"zh-CN","comments":"","permalink":"","path":"archives/2021/11/page/2/index.html","title":""}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://lu0k.github.io/posts/htb-overflow/","path":"posts/htb-overflow/","title":"HTB Overflow"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>归档 | Lu0k</title>
+<title>HTB Overflow | Lu0k</title>
   
 
 
@@ -208,233 +210,106 @@
 </noscript>
 
 
-    <div class="main-inner archive posts-collapse">
+    <div class="main-inner post posts-expand">
 
 
   
+
+
+<div class="post-block">
   
   
-  <div class="post-block">
-    <div class="post-content">
-      <div class="collection-title">
-        
-        <span class="collection-header">很好! 目前共计 118 篇日志。 继续努力。</span>
-      </div>
 
-      
-    <div class="collection-year">
-      <span class="collection-header">2021</span>
-    </div>
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://lu0k.github.io/posts/htb-overflow/">
 
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-      <div class="post-meta-container">
-        <time itemprop="dateCreated"
-              datetime="2021-11-20T00:00:00+08:00"
-              content="2021-11-20">
-          11-20
-        </time>
-      </div>
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Lu0k">
+      <meta itemprop="description" content="谦虚学习!">
+    </span>
 
-      <div class="post-title">
-          <a class="post-title-link" href="/posts/int-sec/" itemprop="url">
-            <span itemprop="name">整数安全</span>
-          </a>
-      </div>
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Lu0k">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          HTB Overflow
+        </h1>
 
-      
-    </header>
-  </article>
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
 
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-      <div class="post-meta-container">
-        <time itemprop="dateCreated"
-              datetime="2021-11-19T00:00:00+08:00"
-              content="2021-11-19">
-          11-19
-        </time>
-      </div>
+      <time title="创建时间：2022-01-26 00:00:00" itemprop="dateCreated datePublished" datetime="2022-01-26T00:00:00+08:00">2022-01-26</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/HTB-Machines/" itemprop="url" rel="index"><span itemprop="name">HTB Machines</span></a>
+        </span>
+    </span>
 
-      <div class="post-title">
-          <a class="post-title-link" href="/posts/htb-lunacrypt/" itemprop="url">
-            <span itemprop="name">HTB LunaCrypt</span>
-          </a>
-      </div>
+  
+</div>
 
-      
-    </header>
-  </article>
+        </div>
+      </header>
 
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-      <div class="post-meta-container">
-        <time itemprop="dateCreated"
-              datetime="2021-11-18T00:00:00+08:00"
-              content="2021-11-18">
-          11-18
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/posts/htb-lostmodulus/" itemprop="url">
-            <span itemprop="name">HTB Lost Modulus</span>
-          </a>
-      </div>
-
-      
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-      <div class="post-meta-container">
-        <time itemprop="dateCreated"
-              datetime="2021-11-17T00:00:00+08:00"
-              content="2021-11-17">
-          11-17
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/posts/htb-rlotto/" itemprop="url">
-            <span itemprop="name">HTB RLotto</span>
-          </a>
-      </div>
-
-      
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-      <div class="post-meta-container">
-        <time itemprop="dateCreated"
-              datetime="2021-11-16T00:00:00+08:00"
-              content="2021-11-16">
-          11-16
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/posts/htb-nuclearsale/" itemprop="url">
-            <span itemprop="name">HTB Nuclear Sale</span>
-          </a>
-      </div>
-
-      
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-      <div class="post-meta-container">
-        <time itemprop="dateCreated"
-              datetime="2021-11-15T00:00:00+08:00"
-              content="2021-11-15">
-          11-15
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/posts/syscall-api/" itemprop="url">
-            <span itemprop="name">系统调用与API</span>
-          </a>
-      </div>
-
-      
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-      <div class="post-meta-container">
-        <time itemprop="dateCreated"
-              datetime="2021-11-14T00:00:00+08:00"
-              content="2021-11-14">
-          11-14
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/posts/runtime-lib/" itemprop="url">
-            <span itemprop="name">运行库简析</span>
-          </a>
-      </div>
-
-      
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-      <div class="post-meta-container">
-        <time itemprop="dateCreated"
-              datetime="2021-11-13T00:00:00+08:00"
-              content="2021-11-13">
-          11-13
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/posts/mem-layout/" itemprop="url">
-            <span itemprop="name">程序的内存布局</span>
-          </a>
-      </div>
-
-      
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-      <div class="post-meta-container">
-        <time itemprop="dateCreated"
-              datetime="2021-11-12T00:00:00+08:00"
-              content="2021-11-12">
-          11-12
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/posts/htb-xorxorxor/" itemprop="url">
-            <span itemprop="name">HTB XorXorXor</span>
-          </a>
-      </div>
-
-      
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-      <div class="post-meta-container">
-        <time itemprop="dateCreated"
-              datetime="2021-11-11T00:00:00+08:00"
-              content="2021-11-11">
-          11-11
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/posts/htb-twoforone/" itemprop="url">
-            <span itemprop="name">HTB TwoForOne</span>
-          </a>
-      </div>
-
-      
-    </header>
-  </article>
-
-
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <div class="hbe hbe-container" id="hexo-blog-encrypt" data-wpm="Oh, this is an invalid password. Check and try again, please." data-whm="OOPS, these decrypted content may changed, but you can still have a look.">
+  <script id="hbeData" type="hbeData" data-hmacdigest="daabf1e498c6954f1ebcd8caaffd7f2e9edcd9d4e1f57a9cf09e9cc835ff39fa">a5b9d9d2a3f2a58bd0c7fd6a96e18899f44f3392121fb450cc01edffab809d5797e34bfbfc763d10a6084ea5849db72b5630c34370b0193f389afccfc9b98e6b40c09784fbf62e2db25b0d972663d20c62e5448ed943ef6fbff4e3d681e2e946eb49022cea4133e3f2674c2ff67b33ef8caed9241f08e409e66cfa93cdd252d0b9ac7cf3ca357d8ecaeffea0e0f9e647a2c357a80fbccf7b57f4fb6e39c084c8637a624a7cd68e58bedd72f1bcb5acefa95ffdaf3a96e960fc89ac039d7fb85cfa103c993474d81453825eb21c04712caef00ced6e3e5bb0f003046490f356a699e81e09ed13e996371dd5af3376ab9b8ea452b2ddf0d23d263b10aa62da7770b3173a901cc23d5d77c271a1a06b5e1e41f333c723cc69954bf0a80cfa4691202a58858e86746a2fdd14e28b9ea4c51a74206a381e71ca883157b167742532ff227d0fe634ee13452301cc48bb1226deea44d66d0fbd5d9c6f53fbe546bd61f18f7236209d75698cf8d229959bc77deda12e0dd55c6f32a24172d2684dd4730c1ed7069312bcbf84927744b17e7f12e476b22d6aee02170c938e4fae50308f56deca05fdb501e1fcb777208cb7eb0c39b71b1656a25f74c1d6e8f8651ddc0e6d0b137739d6a3b0699f33ab61dcda17e69c91c0dc26bcee801c4076e6e1dffce7e216f030f8f539e1396ad78cf765b50bc4f4a2f1c5313fdee97eb0d37ade346da247d19aee964ed0b466eb454e6f7dc034a644969e3ad65e20f711bcab5ccbc7ad28229d4098fd1682170b72a5cddbc082c391da8d963d3a4f837cbb864a85ff8eb33682e0f96fe43ce4a9b8b0951f5318dec5eb471c61c9849b989511a0f203c671d5fe33c43714a47f3132dba8a81bf420ef8b9bba67fbb1602a0d52063cd85f4434b2717e975e2b1ff9b89861908ff2785e378fe0980520211dfee77b2456567bca24b3a28476be6a95b02cb16895b21376abdbcdd87b363e0686023d826d7b85d91caaf55dfab797434c263b24aa81a99db44a430575718273bb9bd5a6ce8862aed1a7b1b470ecf2d05707a71627fee841aa012b5423ad0716c1aaef6c47f5e18c0943c8d1044a0e4f1fbe87faa7ca77b0880ce6382cc8584d45142fbf473f9b8d6b62169f89e7a26a8626b6491e21ba852ed20f40b72b0d131a1ec0c1ecf58570356c3139ec1cfc4b6dc639dda3e33739d93af53593ee34ddc9c5c5d8a271d414c7efc4e881d5df37b034f5d094b749a569efca1ea8d219f733daac7dc016b4e61aa82eb6cdfa6cdf1fbbbd49453309e231c50e38971b31b599210df9bf7227d5db1690b94ac14b75790098a18a289c214e1d62416a6dd3681deb97491a9e1b58aff13ca52891a4f4f5793b2e17c3659711dc57a3cce53885635c71763f21ed6abfb6dd6e7544cf4799a52b31ab17e9b8feeae5f024be16158f43317543ddb1532453670ba0cd9a86878f0bd0542ee19ecf8994b28aa228553cbc4ed993eb3049cdb6780f58b40e5e4fe37e0447a0a1cc995ef552fbd6c42da4d10e8f5fbd2631e18547cb1a24f40145958edd6162e2938f2b1c11c0f96ce93a5a3b267687f3c0a95887d89853e025866ea43239e524eb2d80755d4bb30744c12a7741ce648da75276d369260695f50542ab8b6b7dc9e1ab35e2583c93327600acbc48e7fcbdf6eeaf3f2f8a717391430ca5cc8029bcd605d40e1ca72816773a6fecfdbc059212ef6e068d43e5f2fc1d99572dccf461f71f9c2c63cf5b81f5303b806149ad29ec9c8c5a960fe6a81fdc268aad93e343f8c8a5993a0ff1b7e5534b206b831915eaccb23070493a9801181cf80f0498a7de9bf0619e122dd75d54f4c23612ec1cfdfcae3a6bf0e89dab49f905b3428505619b9b0833696fdb0dfee662a8603169e3902877936d49c6f34cebe533762011689b95a26883c4985e3001f84df5f7edfa3484c0ed6dc41753b25567ab506ffb0e10d8ad7de72b83045054930ac741083badc9762799711c7b2adbb2862f23ada1050a04a412ce173e2be022b6c2d04f871219180d4cefa616fc97d33a96537e15050caade4d45cac21316b837f9a9d2f5c26e23e1798e2d0a359feee5939b8e886847f389c58e6bf37f64d971bea611324abb694d240bd0d686baabad1942ead48a8f6cb0357f0ba7f755a6a228b9b0befe45e5d5151a42d6c13b74143183e416b922bf7b4f9ee1e8cc2884b7589081dc33f06b8a4baedd1affaabe4abb7c0d90f5e2368c2d79dfc4f4279bf5fc4dbffcd0b1754d20bf81f5e0c5d42208f185d7363c0c44b0adf48fdd68abc4d372d11990ae4319da8d4824dfee651c13c55566e2ceeebda52b6a7f5c88a3dfeac69bd7d43d91d4033284e5651fd893cc</script>
+  <div class="hbe hbe-content">
+    <div class="hbe hbe-input hbe-input-xray">
+      <input class="hbe hbe-input-field hbe-input-field-xray" type="password" id="hbePass">
+      <label class="hbe hbe-input-label hbe-input-label-xray" for="hbePass">
+        <span class="hbe hbe-input-label-content hbe-input-label-content-xray">Hey, password is required here.</span>
+      </label>
+      <svg class="hbe hbe-graphic hbe-graphic-xray" width="300%" height="100%" viewBox="0 0 1200 60" preserveAspectRatio="none">
+        <path d="M0,56.5c0,0,298.666,0,399.333,0C448.336,56.5,513.994,46,597,46c77.327,0,135,10.5,200.999,10.5c95.996,0,402.001,0,402.001,0"></path>
+        <path d="M0,2.5c0,0,298.666,0,399.333,0C448.336,2.5,513.994,13,597,13c77.327,0,135-10.5,200.999-10.5c95.996,0,402.001,0,402.001,0"></path>
+      </svg>
     </div>
   </div>
-  
-  
-  
-  <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/archives/2021/11/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/archives/2021/11/">1</a><span class="page-number current">2</span><a class="page-number" href="/archives/2021/11/page/3/">3</a><a class="extend next" rel="next" href="/archives/2021/11/page/3/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
-  </nav>
+</div>
+<script data-pjax src="/lib/hbe.js"></script><link href="/css/hbe.style.css" rel="stylesheet" type="text/css">
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/htb-hancliffe/" rel="prev" title="HTB Hancliffe">
+                  <i class="fa fa-chevron-left"></i> HTB Hancliffe
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
 
 </div>
   </main>
