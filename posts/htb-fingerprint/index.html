@@ -20,25 +20,27 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"lu0k.github.io","root":"/","images":"/images","scheme":"Gemini","version":"8.7.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
-<meta name="description" content="谦虚学习!">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Lu0k">
-<meta property="og:url" content="https://lu0k.github.io/archives/page/9/index.html">
+<meta name="description" content="Here&#39;s something encrypted, password is required to continue reading.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HTB Fingerprint">
+<meta property="og:url" content="https://lu0k.github.io/posts/htb-fingerprint/index.html">
 <meta property="og:site_name" content="Lu0k">
-<meta property="og:description" content="谦虚学习!">
+<meta property="og:description" content="Here&#39;s something encrypted, password is required to continue reading.">
 <meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-01-26T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-01-27T13:06:19.154Z">
 <meta property="article:author" content="Lu0k">
 <meta name="twitter:card" content="summary">
 
 
-<link rel="canonical" href="https://lu0k.github.io/archives/page/9/">
+<link rel="canonical" href="https://lu0k.github.io/posts/htb-fingerprint/">
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":false,"lang":"zh-CN","comments":"","permalink":"","path":"archives/page/9/index.html","title":""}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://lu0k.github.io/posts/htb-fingerprint/","path":"posts/htb-fingerprint/","title":"HTB Fingerprint"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>归档 | Lu0k</title>
+<title>HTB Fingerprint | Lu0k</title>
   
 
 
@@ -208,233 +210,106 @@
 </noscript>
 
 
-    <div class="main-inner archive posts-collapse">
+    <div class="main-inner post posts-expand">
 
 
   
+
+
+<div class="post-block">
   
   
-  <div class="post-block">
-    <div class="post-content">
-      <div class="collection-title">
-        
-        <span class="collection-header">很好! 目前共计 119 篇日志。 继续努力。</span>
-      </div>
 
-      
-    <div class="collection-year">
-      <span class="collection-header">2021</span>
-    </div>
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://lu0k.github.io/posts/htb-fingerprint/">
 
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-      <div class="post-meta-container">
-        <time itemprop="dateCreated"
-              datetime="2021-11-08T00:00:00+08:00"
-              content="2021-11-08">
-          11-08
-        </time>
-      </div>
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Lu0k">
+      <meta itemprop="description" content="谦虚学习!">
+    </span>
 
-      <div class="post-title">
-          <a class="post-title-link" href="/posts/prot-kerberos/" itemprop="url">
-            <span itemprop="name">Kerberos协议</span>
-          </a>
-      </div>
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Lu0k">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          HTB Fingerprint
+        </h1>
 
-      
-    </header>
-  </article>
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
 
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-      <div class="post-meta-container">
-        <time itemprop="dateCreated"
-              datetime="2021-11-07T00:00:00+08:00"
-              content="2021-11-07">
-          11-07
-        </time>
-      </div>
+      <time title="创建时间：2022-01-27 00:00:00" itemprop="dateCreated datePublished" datetime="2022-01-27T00:00:00+08:00">2022-01-27</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/HTB-Machines/" itemprop="url" rel="index"><span itemprop="name">HTB Machines</span></a>
+        </span>
+    </span>
 
-      <div class="post-title">
-          <a class="post-title-link" href="/posts/prot-ssl/" itemprop="url">
-            <span itemprop="name">SSL协议</span>
-          </a>
-      </div>
+  
+</div>
 
-      
-    </header>
-  </article>
+        </div>
+      </header>
 
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-      <div class="post-meta-container">
-        <time itemprop="dateCreated"
-              datetime="2021-11-06T00:00:00+08:00"
-              content="2021-11-06">
-          11-06
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/posts/prot-ipsec/" itemprop="url">
-            <span itemprop="name">IPsec协议</span>
-          </a>
-      </div>
-
-      
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-      <div class="post-meta-container">
-        <time itemprop="dateCreated"
-              datetime="2021-11-05T00:00:00+08:00"
-              content="2021-11-05">
-          11-05
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/posts/htb-space/" itemprop="url">
-            <span itemprop="name">HTB Space</span>
-          </a>
-      </div>
-
-      
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-      <div class="post-meta-container">
-        <time itemprop="dateCreated"
-              datetime="2021-11-04T00:00:00+08:00"
-              content="2021-11-04">
-          11-04
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/posts/htb-youknow0xdiablos/" itemprop="url">
-            <span itemprop="name">HTB You know 0xDiablos</span>
-          </a>
-      </div>
-
-      
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-      <div class="post-meta-container">
-        <time itemprop="dateCreated"
-              datetime="2021-11-03T00:00:00+08:00"
-              content="2021-11-03">
-          11-03
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/posts/htb-racecar/" itemprop="url">
-            <span itemprop="name">HTB Racecar</span>
-          </a>
-      </div>
-
-      
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-      <div class="post-meta-container">
-        <time itemprop="dateCreated"
-              datetime="2021-11-02T00:00:00+08:00"
-              content="2021-11-02">
-          11-02
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/posts/htb-secret/" itemprop="url">
-            <span itemprop="name">HTB Secret</span>
-          </a>
-      </div>
-
-      
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-      <div class="post-meta-container">
-        <time itemprop="dateCreated"
-              datetime="2021-11-01T00:00:00+08:00"
-              content="2021-11-01">
-          11-01
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/posts/windows-dll/" itemprop="url">
-            <span itemprop="name">Windows下的动态链接</span>
-          </a>
-      </div>
-
-      
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-      <div class="post-meta-container">
-        <time itemprop="dateCreated"
-              datetime="2021-10-31T00:00:00+08:00"
-              content="2021-10-31">
-          10-31
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/posts/linux-so/" itemprop="url">
-            <span itemprop="name">Linux共享库</span>
-          </a>
-      </div>
-
-      
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-      <div class="post-meta-container">
-        <time itemprop="dateCreated"
-              datetime="2021-10-30T00:00:00+08:00"
-              content="2021-10-30">
-          10-30
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/posts/dynamic-link/" itemprop="url">
-            <span itemprop="name">动态链接简析</span>
-          </a>
-      </div>
-
-      
-    </header>
-  </article>
-
-
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <div class="hbe hbe-container" id="hexo-blog-encrypt" data-wpm="Oh, this is an invalid password. Check and try again, please." data-whm="OOPS, these decrypted content may changed, but you can still have a look.">
+  <script id="hbeData" type="hbeData" data-hmacdigest="07c637ca55134b0d145faa4e7451495061fbc897531ddcd952f6149eefd910d9">dbf9bfc9621b97528b81182291bb4c92de15820e9e87a3a041e1a6777a5eb38719fc08105196eadfa298e0163e15ad976b7c09457c749bae588632c506b80ebf70776a90ac8261eee013c38f789b1cc88153a18c818a9f8858384583f98f0108026ceadee977443787a002590dfea4408a2c0ae17e915c017da0c4e81bed550a45e7a13b9ddde64465e2225b952d8078cd2f2080097887e7d90c143bf8cc0897b3d4c9419ac517bc6581f84f64e989467dbf02d1955d47303890169272cf9460d55888ed7cbcac2122a55f1e1bb868af219ec20a0f7008f883ba1317ba38ef816dd7b85366e48cc77f0ed7b28488ee8e34eb3c555cbe502c9012fa7f06f2ab8757621e37104b583398f8d83ea3e8b8956429bb50cca13eaefc1d2e4a37b9ae0006dfacf8aede2e23d5bd5d44759d7e89ee812a135458877463c7f8888ea83d705fc2f32b82b29004bce298dd6387532d6edb139795efdd9596f4c9533eef0fe27c9ee5f6427b23ab8da640c0d55fb25a44d17436b8f3128de2a0eaf5edd769272ad65d0fecc3249ffd495e6484dfabee7db43b81a7e1b8b750fa02e7b93783a00eeeb173ab6af8baaa699f2e73a1517552877a1269b2fa53326c1d5a65b6bb946b2e9cf513992d6f3a5355baac8d8414a442057c97796eaef00d2cd8b10b0d156cd33c99067c81e4a4d2d7070c7c4112d09e90d86b6e0b45466af150c128f641d9a9534b64a4d761b0a18d39c00384d0f4ea2625d5d26a89cdf1dd4977d380470c9eacb4a338f0113fb2eeb214521cd0a9c556feda9eeaa375517edb94302204f3107e585b96d0fc07e06f86e30737c27fabe244a0e000757e29e82400214a82121e418a13ff248ea9bfe9087433dd8736bb8e7c810dc95464db655ab18a37c4166796171eb72cb5824e36a9b56f339bd551ec6db7da05eca299e43b8385db4c48f6df6815c2dbaaefba593c69cfdee6a6aea14044185d460ebc9c73c0a84e6a7d8d04e78154051978fc9d81f453f11de7dab7f2a0bdbda577e6a877d11ad13e92e683e682a10124f27b35eb283a91df1cfc71562d2ad3b7f9dc98d7bd12b50686655d4bcd8f70fc9de062bb959534cc0fb28cc96a5fd847bb4be412448e6d7d298aefa7378ca75d21f67ee6e862defc4ae731c69e3c1957e46d1957a16cd83929935e0b99ff241fa23329202133aef610b9458ee45825c9155b25d9a8a0f190904fc1e11a4cbb4735e7044a26cf172e237d0b722aa01eeb5ab9b763bca5bb10a190b83a562d4e5cb59e286c14e7d8bc1544873e560fcfa6c44126f385686ec7c7cf57600bdc7deff1c0ebf76c46f854983092a3c91b1981f3f8e0a92297bc0836006b0ab790acb7d60920b8cf8fa565e72f7fbd3df907b2ff16e6f07a7a09bb41f57a3c147722f46ff1bd5cb01110ff4cb24f4d2f41f5f7493a6a91c2c46a7299331628c652e043f6ffa0d32c27e75ed02176dd50fc7ac6e1a8a0f7304ee72b222f85aa06f44e2f58c64cd52bce18cbda6240566caf6d25bf1ba8d7a10096498a9ed2c9c22c10ee20b3411a27cca65fe66b1437262c013f2d52172ec2b2f403059cbe702288d8d73ea12c7551bf09ea8442a631cc78b47c43f7b6da7880212fcaa90bc6a2ac15a3357692531ba0df979249c8668c16392059ed0bcc1f926b38310abe26df6aa25be3ea8cd2c8104338f479639e6d603830ebdd49be67d468d34c49979a6ed741641ed77dd39c21f81293d55ade6e5ce8fdfb72d68399842d873a499736c27a140cad22d6a6a1fdecaa5e0553f0260f079962f73b82f134e0f139e2e8b77dbdd9e371337c8645ecd444c4e5b46aa0825f9416cbe3c33902b0ae26bd7fd61171bc8b6998da35dd38a789a6c40e02206ba7ea1ebad320d7c5de645dc7a59c39531f6276a05b8ca75d9d11e0bab57a8900b1b6cfde667f0e5ed9e342a926fb5509b930634b73fa340391d5f1bf2ea78c24f69af30e242868624ead660962e61895750e5698fac783db52b4f989a71f2ed89287ec0b700edcd2263e740d498129084bcfb6f6d782fe8dd1248d9bf2850f93067e650438984b676ba7de98b973a9e223ebaa4bdd5a6d1a8d50c80ead584f01f8eaf5f7ca6df87c39baed2426ccb19438cf7499969055838a43a81b2be2d32424af7cba4ee88cf4042ef53028e2a862d4d2d4e895d8fd727c232c1da7448646ebfb0b4e9a0fd54279d552ed5e0e096c34419660c9bbdd4e23a49d60c9b411dae6d2679bc54d94e67fe92d566b6a93a8aed85267e05b9d2c44577777e3b7c38025cedd9f9f9b5cf103f5b300ec74fedaadb6baedd2aa274aa89e457b7fc7304d45ed37a4be7f914487e3058b4dcf241a5b26c370487658111d2b</script>
+  <div class="hbe hbe-content">
+    <div class="hbe hbe-input hbe-input-xray">
+      <input class="hbe hbe-input-field hbe-input-field-xray" type="password" id="hbePass">
+      <label class="hbe hbe-input-label hbe-input-label-xray" for="hbePass">
+        <span class="hbe hbe-input-label-content hbe-input-label-content-xray">Hey, password is required here.</span>
+      </label>
+      <svg class="hbe hbe-graphic hbe-graphic-xray" width="300%" height="100%" viewBox="0 0 1200 60" preserveAspectRatio="none">
+        <path d="M0,56.5c0,0,298.666,0,399.333,0C448.336,56.5,513.994,46,597,46c77.327,0,135,10.5,200.999,10.5c95.996,0,402.001,0,402.001,0"></path>
+        <path d="M0,2.5c0,0,298.666,0,399.333,0C448.336,2.5,513.994,13,597,13c77.327,0,135-10.5,200.999-10.5c95.996,0,402.001,0,402.001,0"></path>
+      </svg>
     </div>
   </div>
-  
-  
-  
-  <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/archives/page/8/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/archives/">1</a><span class="space">&hellip;</span><a class="page-number" href="/archives/page/8/">8</a><span class="page-number current">9</span><a class="page-number" href="/archives/page/10/">10</a><span class="space">&hellip;</span><a class="page-number" href="/archives/page/12/">12</a><a class="extend next" rel="next" href="/archives/page/10/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
-  </nav>
+</div>
+<script data-pjax src="/lib/hbe.js"></script><link href="/css/hbe.style.css" rel="stylesheet" type="text/css">
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/htb-overflow/" rel="prev" title="HTB Overflow">
+                  <i class="fa fa-chevron-left"></i> HTB Overflow
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
 
 </div>
   </main>
