@@ -20,25 +20,28 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"lu0k.github.io","root":"/","images":"/images","scheme":"Gemini","version":"8.7.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
-<meta name="description" content="谦虚学习!">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Lu0k">
-<meta property="og:url" content="https://lu0k.github.io/page/14/index.html">
+<meta name="description" content="Here&#39;s something encrypted, password is required to continue reading.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HTB Optimus Prime">
+<meta property="og:url" content="https://lu0k.github.io/posts/htb-optimusprime/index.html">
 <meta property="og:site_name" content="Lu0k">
-<meta property="og:description" content="谦虚学习!">
+<meta property="og:description" content="Here&#39;s something encrypted, password is required to continue reading.">
 <meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-02-08T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-02-09T13:37:37.152Z">
 <meta property="article:author" content="Lu0k">
+<meta property="article:tag" content="Crypto">
 <meta name="twitter:card" content="summary">
 
 
-<link rel="canonical" href="https://lu0k.github.io/page/14/">
+<link rel="canonical" href="https://lu0k.github.io/posts/htb-optimusprime/">
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":true,"isPost":false,"lang":"zh-CN","comments":"","permalink":"","path":"page/14/index.html","title":""}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://lu0k.github.io/posts/htb-optimusprime/","path":"posts/htb-optimusprime/","title":"HTB Optimus Prime"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>Lu0k</title>
+<title>HTB Optimus Prime | Lu0k</title>
   
 
 
@@ -208,17 +211,18 @@
 </noscript>
 
 
-    <div class="main-inner index posts-expand">
+    <div class="main-inner post posts-expand">
 
-    
+
+  
 
 
 <div class="post-block">
   
   
 
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://lu0k.github.io/posts/learn-regex/">
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://lu0k.github.io/posts/htb-optimusprime/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">
@@ -230,9 +234,9 @@
       <meta itemprop="name" content="Lu0k">
     </span>
       <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/learn-regex/" class="post-title-link" itemprop="url">正则表达式</a>
-        </h2>
+        <h1 class="post-title" itemprop="name headline">
+          HTB Optimus Prime
+        </h1>
 
         <div class="post-meta-container">
           <div class="post-meta">
@@ -242,7 +246,7 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2021-10-02 00:00:00" itemprop="dateCreated datePublished" datetime="2021-10-02T00:00:00+08:00">2021-10-02</time>
+      <time title="创建时间：2022-02-09 00:00:00" itemprop="dateCreated datePublished" datetime="2022-02-09T00:00:00+08:00">2022-02-09</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -250,7 +254,7 @@
       </span>
       <span class="post-meta-item-text">分类于</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/Others/" itemprop="url" rel="index"><span itemprop="name">Others</span></a>
+          <a href="/categories/HTB-Challenges/" itemprop="url" rel="index"><span itemprop="name">HTB Challenges</span></a>
         </span>
     </span>
 
@@ -264,31 +268,44 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <h1 id="理论基础"><a href="#理论基础" class="headerlink" title="理论基础"></a>理论基础</h1><p>正则表达式可以用形式化语言理论的方式来表达。正则表达式由常量和算子组成，它们分别表示字符串的集合和在这些集合上的运算。</p>
-<p>给定有限字母表Σ定义了下列常量：</p>
-<ul>
-<li>空集Ø表示集合Ø。</li>
-<li>空串ε表示仅包含一个<code>不含任何字符、长度为0的字符串</code>的集合。</li>
-<li>文本字符α∈Σ表示仅包含一个元素α的集合{α}。</li>
-</ul>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/posts/learn-regex/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
+        <div class="hbe hbe-container" id="hexo-blog-encrypt" data-wpm="Oh, this is an invalid password. Check and try again, please." data-whm="OOPS, these decrypted content may changed, but you can still have a look.">
+  <script id="hbeData" type="hbeData" data-hmacdigest="939481fe70e85a1a1c0cfa3820f74b57aa97930c7e41370bb46c4d0b73835a15">a7da75c5e24242f8f56ee28dd96af379978b4988d51af8e42e7476df13fc99832182a0529e2c25a77d90ab821a5b6cdd7f26e0fccae9f999fc50a73894f8c642e26149bab408ea6d53670b30edd88fac497c2910cc7b1303008543b1a868be47039c38308e999b09b8c7ada5e3f50c100559d37069264bb5235f3db53e67b5481d5dac81253c4905545ecbad70d1a1ee6bbc9ec2144dd603a1aecb1c90844585684647fa5b97fc608e47643306aaa310de49062f465012a0994673a8ae20cd989ff208ffd9c8095e943c906d03de93512cdc5ba053fc74f98ffba8f3373762104b2c971c4a8eba9659c2a19700b5fb956d53239e2518e042d985e7dc921ea66fcc6015694cff85401934eb2e62de648192fa68c30fb5936f81c7a0de64952e12534204c94b3398fc313f459c2f8852fe4153f1c8e981e22317d0fd4fc08d849693e04e3fee2308a4ec2fa2632273eae4a54fe9f7c456ec3d94b9153e366757d737ea681060da2713169952d99660392ceec846f7026a05eea02a01a4561495e36d8a183b20778e4c16d4ea76a03628f98773cd356a6eaba0a92c303e1a827c1863229de9fa35f7d033b827e362245e7d024296a05c365e25b57038ee50231f669eaf1de4928cf3efcfc3eca5111761c24681920b624914431c4026589c01627fd592547dec57a9f53a85b58fe4e67604e0daa9752e7d7a5f58419d6256032d01827fed42a395a4edb8302688c0370a9ed0e13d614356b356c9d5b92bc26b39c2d64c9891457cee954aa7ca4f76e6eb5c7ff8d39367523652803e431f1db619bcf64103f030abc1e1d7131c6b36ab3cc95afd1ce4ef25eb361aa5e911f589e4a17a796dd94916c76868645f9d2b91c9b53c3af822de3086a6da05b56649154865e0f3ab987f1fa48174a5b05dfda25108531be8fd4284b935f7e7eafd76f5964c3f986b82c42fd2dc602a20363f98f3574168727355e149f8f56ecf40707708ebbd6dbdbfdc51d08b36d41c930fc539cc3731302c961e994f190beaf17420e6997b486b3e19bc3d3d07855a9f6895a10e5e40aff3239c96a8c03576d3d42a1d0b80e5794501532e0e2d7c32cdee98a97d8e0b33d807cd14f3b04654e600c397f3dbc50e322b25a5db043fca13c3ebcdef6a7a883d9e04c24fc6c8e7033c60af69cd3ded54b830a62fc2475c098fb519efbd25ca0d1cebc9cc3ea0abfcdf4fbe469c7f0887dc4af89d83688e9d4d3cc6584bbb010d07a015dde944eec1796e6f1aae6be8a0b545c4624ad94c55f30faab8667904f5f92ee84d1807d5b16acbb058bc0ae79cbf98e0ddd907a855e2f5051a05bc01556a9a0d664a54c7e9a423cd87655882fe5459050bc923c655c8074e9ef3ff040d72b38631cb5ff14c9a0aec8738ec769afda3b4f415a85d6ff02a883e5e2e3527f694dfda87026267473825d1d0e23cbadbfe18045f9e3c5cc3593722b1eb4dc0c370d94cceb798ecc01280c91b3281fe7c560dc3d6c0d0cd1bcf5e8c8d2076653f655372f70b0c65d605ca09866cce9200dda884773245f5ed8d3bbb0e81f7c67f94346ac8ac72b63c7c61bc9b23d66cfc9d56489c97af560956c01e75949559f3ae010353bb71e78a1fae6f6cf761892af97fc39326e3b730ca59f4ed90d481ef9958b04f8f38a61e4eb33bbb534074e9432604f11c9ed1c188271089cc73d1a244d72b75a8ff4d76d607ac5c50dc73ac47b9e065a161187260b3e6d3b8a1752b66caeaf04532f5dd3e9c4ec0fc8234f453f99e984962ac56de3531e4c00fd371f42bd5034eee7771e1dd2f5c4e8b20c10a4fa32ce93b5e9ab64f9174c3b39e0d98368ba49dd86ca56c1e6f52e9efb788100ae4291d64aaf7483378931bc030f7ab685bd16d798c579ad256dcef959b82f83c6b65a9b855274bda8ca9c839713c2c0eb3ec8bef678fa9b0db</script>
+  <div class="hbe hbe-content">
+    <div class="hbe hbe-input hbe-input-xray">
+      <input class="hbe hbe-input-field hbe-input-field-xray" type="password" id="hbePass">
+      <label class="hbe hbe-input-label hbe-input-label-xray" for="hbePass">
+        <span class="hbe hbe-input-label-content hbe-input-label-content-xray">Hey, password is required here.</span>
+      </label>
+      <svg class="hbe hbe-graphic hbe-graphic-xray" width="300%" height="100%" viewBox="0 0 1200 60" preserveAspectRatio="none">
+        <path d="M0,56.5c0,0,298.666,0,399.333,0C448.336,56.5,513.994,46,597,46c77.327,0,135,10.5,200.999,10.5c95.996,0,402.001,0,402.001,0"></path>
+        <path d="M0,2.5c0,0,298.666,0,399.333,0C448.336,2.5,513.994,13,597,13c77.327,0,135-10.5,200.999-10.5c95.996,0,402.001,0,402.001,0"></path>
+      </svg>
+    </div>
+  </div>
+</div>
+<script data-pjax src="/lib/hbe.js"></script><link href="/css/hbe.style.css" rel="stylesheet" type="text/css">
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Crypto/" rel="tag"><i class="fa fa-tag"></i> Crypto</a>
+          </div>
+
         
-      
-    </div>
 
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/htb-epsilon/" rel="prev" title="HTB Epsilon">
+                  <i class="fa fa-chevron-left"></i> HTB Epsilon
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
     </footer>
   </article>
 </div>
@@ -296,77 +313,7 @@
 
 
 
-    
 
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://lu0k.github.io/posts/hello-world/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.jpg">
-      <meta itemprop="name" content="Lu0k">
-      <meta itemprop="description" content="谦虚学习!">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Lu0k">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/hello-world/" class="post-title-link" itemprop="url">Hello World</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2021-10-01 00:00:00" itemprop="dateCreated datePublished" datetime="2021-10-01T00:00:00+08:00">2021-10-01</time>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="I-am-lu0k😊"><a href="#I-am-lu0k😊" class="headerlink" title="I am lu0k😊"></a>I am lu0k😊</h1><ul>
-<li>🌱 I am currently learning InfoSec.</li>
-<li>📫 How to reach me: <a target="_blank" rel="noopener" href="https://twitter.com/Lu0kMe">lu0k (@Lu0kMe) &#x2F; Twitter</a>]</li>
-<li>😄 Pronouns: learning learning learning!</li>
-</ul>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-  <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/13/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/13/">13</a><span class="page-number current">14</span>
-  </nav>
 
 </div>
   </main>
