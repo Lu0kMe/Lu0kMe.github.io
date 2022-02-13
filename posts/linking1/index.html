@@ -20,28 +20,28 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"lu0k.github.io","root":"/","images":"/images","scheme":"Gemini","version":"8.7.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
-<meta name="description" content="Here&#39;s something encrypted, password is required to continue reading.">
+<meta name="description" content="内容简介链接(linking)是将各种代码和数据片段收集并组合成为一个单一文件的过程，这个文件可被加载(复制)到内存并执行。链接可以执行于编译时(compile time)，也就是在源代码被翻译成机器代码时；也可以执行于加载时(load time)，也就是在程序被加载器(loader)加载到内存并执行时；甚至执行于运行时(run time)，也就是由应用程序来执行。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="HTB Optimus Prime">
-<meta property="og:url" content="https://lu0k.github.io/posts/htb-optimusprime/index.html">
+<meta property="og:title" content="链接(一)">
+<meta property="og:url" content="https://lu0k.github.io/posts/linking1/index.html">
 <meta property="og:site_name" content="Lu0k">
-<meta property="og:description" content="Here&#39;s something encrypted, password is required to continue reading.">
+<meta property="og:description" content="内容简介链接(linking)是将各种代码和数据片段收集并组合成为一个单一文件的过程，这个文件可被加载(复制)到内存并执行。链接可以执行于编译时(compile time)，也就是在源代码被翻译成机器代码时；也可以执行于加载时(load time)，也就是在程序被加载器(loader)加载到内存并执行时；甚至执行于运行时(run time)，也就是由应用程序来执行。">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2022-02-08T16:00:00.000Z">
-<meta property="article:modified_time" content="2022-02-09T13:37:37.152Z">
+<meta property="article:published_time" content="2022-02-12T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-02-13T13:45:37.128Z">
 <meta property="article:author" content="Lu0k">
-<meta property="article:tag" content="Crypto">
+<meta property="article:tag" content="CSAPP">
 <meta name="twitter:card" content="summary">
 
 
-<link rel="canonical" href="https://lu0k.github.io/posts/htb-optimusprime/">
+<link rel="canonical" href="https://lu0k.github.io/posts/linking1/">
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://lu0k.github.io/posts/htb-optimusprime/","path":"posts/htb-optimusprime/","title":"HTB Optimus Prime"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://lu0k.github.io/posts/linking1/","path":"posts/linking1/","title":"链接(一)"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>HTB Optimus Prime | Lu0k</title>
+<title>链接(一) | Lu0k</title>
   
 
 
@@ -135,7 +135,7 @@
 
   <aside class="sidebar">
 
-    <div class="sidebar-inner sidebar-overview-active">
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
       <ul class="sidebar-nav">
         <li class="sidebar-nav-toc">
           文章目录
@@ -148,6 +148,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%86%85%E5%AE%B9%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">内容简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Reference"><span class="nav-number">2.</span> <span class="nav-text">Reference</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -222,7 +223,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://lu0k.github.io/posts/htb-optimusprime/">
+    <link itemprop="mainEntityOfPage" href="https://lu0k.github.io/posts/linking1/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">
@@ -235,7 +236,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          HTB Optimus Prime
+          链接(一)
         </h1>
 
         <div class="post-meta-container">
@@ -246,7 +247,7 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2022-02-09 00:00:00" itemprop="dateCreated datePublished" datetime="2022-02-09T00:00:00+08:00">2022-02-09</time>
+      <time title="创建时间：2022-02-13 00:00:00" itemprop="dateCreated datePublished" datetime="2022-02-13T00:00:00+08:00">2022-02-13</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -254,7 +255,7 @@
       </span>
       <span class="post-meta-item-text">分类于</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/HTB-Challenges/" itemprop="url" rel="index"><span itemprop="name">HTB Challenges</span></a>
+          <a href="/categories/Read-Notes/" itemprop="url" rel="index"><span itemprop="name">Read Notes</span></a>
         </span>
     </span>
 
@@ -268,22 +269,28 @@
     
     
     <div class="post-body" itemprop="articleBody">
-        <div class="hbe hbe-container" id="hexo-blog-encrypt" data-wpm="Oh, this is an invalid password. Check and try again, please." data-whm="OOPS, these decrypted content may changed, but you can still have a look.">
-  <script id="hbeData" type="hbeData" data-hmacdigest="939481fe70e85a1a1c0cfa3820f74b57aa97930c7e41370bb46c4d0b73835a15">a7da75c5e24242f8f56ee28dd96af379978b4988d51af8e42e7476df13fc99832182a0529e2c25a77d90ab821a5b6cdd7f26e0fccae9f999fc50a73894f8c642e26149bab408ea6d53670b30edd88fac497c2910cc7b1303008543b1a868be47039c38308e999b09b8c7ada5e3f50c100559d37069264bb5235f3db53e67b5481d5dac81253c4905545ecbad70d1a1ee6bbc9ec2144dd603a1aecb1c90844585684647fa5b97fc608e47643306aaa310de49062f465012a0994673a8ae20cd989ff208ffd9c8095e943c906d03de93512cdc5ba053fc74f98ffba8f3373762104b2c971c4a8eba9659c2a19700b5fb956d53239e2518e042d985e7dc921ea66fcc6015694cff85401934eb2e62de648192fa68c30fb5936f81c7a0de64952e12534204c94b3398fc313f459c2f8852fe4153f1c8e981e22317d0fd4fc08d849693e04e3fee2308a4ec2fa2632273eae4a54fe9f7c456ec3d94b9153e366757d737ea681060da2713169952d99660392ceec846f7026a05eea02a01a4561495e36d8a183b20778e4c16d4ea76a03628f98773cd356a6eaba0a92c303e1a827c1863229de9fa35f7d033b827e362245e7d024296a05c365e25b57038ee50231f669eaf1de4928cf3efcfc3eca5111761c24681920b624914431c4026589c01627fd592547dec57a9f53a85b58fe4e67604e0daa9752e7d7a5f58419d6256032d01827fed42a395a4edb8302688c0370a9ed0e13d614356b356c9d5b92bc26b39c2d64c9891457cee954aa7ca4f76e6eb5c7ff8d39367523652803e431f1db619bcf64103f030abc1e1d7131c6b36ab3cc95afd1ce4ef25eb361aa5e911f589e4a17a796dd94916c76868645f9d2b91c9b53c3af822de3086a6da05b56649154865e0f3ab987f1fa48174a5b05dfda25108531be8fd4284b935f7e7eafd76f5964c3f986b82c42fd2dc602a20363f98f3574168727355e149f8f56ecf40707708ebbd6dbdbfdc51d08b36d41c930fc539cc3731302c961e994f190beaf17420e6997b486b3e19bc3d3d07855a9f6895a10e5e40aff3239c96a8c03576d3d42a1d0b80e5794501532e0e2d7c32cdee98a97d8e0b33d807cd14f3b04654e600c397f3dbc50e322b25a5db043fca13c3ebcdef6a7a883d9e04c24fc6c8e7033c60af69cd3ded54b830a62fc2475c098fb519efbd25ca0d1cebc9cc3ea0abfcdf4fbe469c7f0887dc4af89d83688e9d4d3cc6584bbb010d07a015dde944eec1796e6f1aae6be8a0b545c4624ad94c55f30faab8667904f5f92ee84d1807d5b16acbb058bc0ae79cbf98e0ddd907a855e2f5051a05bc01556a9a0d664a54c7e9a423cd87655882fe5459050bc923c655c8074e9ef3ff040d72b38631cb5ff14c9a0aec8738ec769afda3b4f415a85d6ff02a883e5e2e3527f694dfda87026267473825d1d0e23cbadbfe18045f9e3c5cc3593722b1eb4dc0c370d94cceb798ecc01280c91b3281fe7c560dc3d6c0d0cd1bcf5e8c8d2076653f655372f70b0c65d605ca09866cce9200dda884773245f5ed8d3bbb0e81f7c67f94346ac8ac72b63c7c61bc9b23d66cfc9d56489c97af560956c01e75949559f3ae010353bb71e78a1fae6f6cf761892af97fc39326e3b730ca59f4ed90d481ef9958b04f8f38a61e4eb33bbb534074e9432604f11c9ed1c188271089cc73d1a244d72b75a8ff4d76d607ac5c50dc73ac47b9e065a161187260b3e6d3b8a1752b66caeaf04532f5dd3e9c4ec0fc8234f453f99e984962ac56de3531e4c00fd371f42bd5034eee7771e1dd2f5c4e8b20c10a4fa32ce93b5e9ab64f9174c3b39e0d98368ba49dd86ca56c1e6f52e9efb788100ae4291d64aaf7483378931bc030f7ab685bd16d798c579ad256dcef959b82f83c6b65a9b855274bda8ca9c839713c2c0eb3ec8bef678fa9b0db</script>
-  <div class="hbe hbe-content">
-    <div class="hbe hbe-input hbe-input-xray">
-      <input class="hbe hbe-input-field hbe-input-field-xray" type="password" id="hbePass">
-      <label class="hbe hbe-input-label hbe-input-label-xray" for="hbePass">
-        <span class="hbe hbe-input-label-content hbe-input-label-content-xray">Hey, password is required here.</span>
-      </label>
-      <svg class="hbe hbe-graphic hbe-graphic-xray" width="300%" height="100%" viewBox="0 0 1200 60" preserveAspectRatio="none">
-        <path d="M0,56.5c0,0,298.666,0,399.333,0C448.336,56.5,513.994,46,597,46c77.327,0,135,10.5,200.999,10.5c95.996,0,402.001,0,402.001,0"></path>
-        <path d="M0,2.5c0,0,298.666,0,399.333,0C448.336,2.5,513.994,13,597,13c77.327,0,135-10.5,200.999-10.5c95.996,0,402.001,0,402.001,0"></path>
-      </svg>
-    </div>
-  </div>
-</div>
-<script data-pjax src="/lib/hbe.js"></script><link href="/css/hbe.style.css" rel="stylesheet" type="text/css">
+        <h1 id="内容简介"><a href="#内容简介" class="headerlink" title="内容简介"></a>内容简介</h1><p>链接<code>(linking)</code>是将各种代码和数据片段收集并组合成为一个单一文件的过程，这个文件可被加载<code>(复制)</code>到内存并执行。链接可以执行于编译时<code>(compile time)</code>，也就是在源代码被翻译成机器代码时；也可以执行于加载时<code>(load time)</code>，也就是在程序被加载器<code>(loader)</code>加载到内存并执行时；甚至执行于运行时<code>(run time)</code>，也就是由应用程序来执行。</p>
+<span id="more"></span>
+
+<p>链接器在软件开发中扮演着一个关键的角色，因为它们使得分离编译<code>(separate compilation)</code>成为可能。我们不用将一个大型的应用程序组织为一个巨大的源文件，而是可以把它分解为更小、更好管理的模块，可以独立地修改和编译这些模块。当我们改变这些模块中的一个时，只需简单地重新编译它，并重新链接应用，而不必重新编译其他文件。</p>
+<p>链接通常是由链接器来默默地处理的，对于那些在编程入门课堂上构造小程序的学生而言，链接不是一个重要的议题。那为什么还要这么麻烦地学习关于链接的知识呢？</p>
+<ul>
+<li><p>理解链接器将帮助你构造大型程序。构造大型程序的程序员经常会遇到由于缺少模块、缺少库或者不兼容的库版本引起的链接器错误。除非你理解链接器是如何解析引用、什么是库以及链接器是如何使用库来解析引用的，否则这类错误将令你感到迷惑和挫败</p>
+</li>
+<li><p>理解链接器将帮助你避免一些危险的编程错误。<code>Linux</code>链接器解析符号引用时所做的决定可以不动声色地影响你程序的正确性。在默认情况下，错误地定义多个全局变量的程序将通过链接器，而不产生任何警告信息。由此得到的程序会产生令人迷惑的运行时行为，而且非常难以调试。我们将向你展示这是如何发生的，以及该如何避免它</p>
+</li>
+<li><p>理解链接将帮助你理解语言的作用域规则是如何实现的。例如，全局和局部变量之间的区别是什么？当你定义一个具有<code>static</code>属性的变量或者函数时，实际到底意味着什么</p>
+</li>
+<li><p>理解链接将帮助你理解其他重要的系统概念。链接器产生的可执行目标文件在重要的系统功能中扮演着关键角色，比如加载和运行程序、虚拟内存、分页、内存映射</p>
+</li>
+<li><p>理解链接将使你能够利用共享库。多年以来，链接都被认为是相当简单和无趣的。然而，随着共享库和动态链接在现代操作系统中重要性的日益加强，链接成为一个复杂的过程，为掌握它的程序员提供了强大的能力。比如，许多软件产品在运行时使用共享库来升级压缩包装的<code>(shrink-wrapped)</code>二进制程序。还有，大多数<code>Web</code>服务器都依赖于共享库的动态链接来提供动态内容</p>
+</li>
+</ul>
+<p>这一章提供了关于链接各方面的全面讨论，从传统静态链接到加载时的共享库的动态链接，以及到运行时的共享库的动态链接。我们将使用实际示例来描述基本的机制，而且指出链接问题在哪些情况中会影响程序的性能和正确性。为了使描述具体和便于理解，我们的讨论是基于这样的环境：一个运行<code>Linux</code>的<code>x86-64</code>系统，使用标准的<code>ELF-64(此后称为ELF)</code>目标文件格式。不过，无论是怎样的操作系统、<code>ISA</code>或者目标文件格式，基本的链接概念是通用的，认识到这一点是很重要的。细节可能不尽相同，但是概念是相同的。</p>
+<h1 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h1><ul>
+<li><a target="_blank" rel="noopener" href="https://csapp.cs.cmu.edu/"><code>Computer Systems: A Programmer&#39;s Perspective, 3/E</code></a></li>
+</ul>
+
     </div>
 
     
@@ -292,21 +299,18 @@
 
     <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/Crypto/" rel="tag"><i class="fa fa-tag"></i> Crypto</a>
+              <a href="/tags/CSAPP/" rel="tag"><i class="fa fa-tag"></i> CSAPP</a>
           </div>
 
         
 
           <div class="post-nav">
             <div class="post-nav-item">
-                <a href="/posts/htb-epsilon/" rel="prev" title="HTB Epsilon">
-                  <i class="fa fa-chevron-left"></i> HTB Epsilon
+                <a href="/posts/mem-hier3/" rel="prev" title="存储器层次结构(三)">
+                  <i class="fa fa-chevron-left"></i> 存储器层次结构(三)
                 </a>
             </div>
             <div class="post-nav-item">
-                <a href="/posts/htb-lostkey/" rel="next" title="HTB LostKey">
-                  HTB LostKey <i class="fa fa-chevron-right"></i>
-                </a>
             </div>
           </div>
     </footer>
