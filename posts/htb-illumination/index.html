@@ -20,25 +20,28 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"lu0k.github.io","root":"/","images":"/images","scheme":"Gemini","version":"8.7.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
-<meta name="description" content="谦虚学习!">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Lu0k">
-<meta property="og:url" content="https://lu0k.github.io/categories/Read-Notes/page/5/index.html">
+<meta name="description" content="Here&#39;s something encrypted, password is required to continue reading.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HTB Illumination">
+<meta property="og:url" content="https://lu0k.github.io/posts/htb-illumination/index.html">
 <meta property="og:site_name" content="Lu0k">
-<meta property="og:description" content="谦虚学习!">
+<meta property="og:description" content="Here&#39;s something encrypted, password is required to continue reading.">
 <meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-02-14T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-02-15T08:32:09.093Z">
 <meta property="article:author" content="Lu0k">
+<meta property="article:tag" content="Forensics">
 <meta name="twitter:card" content="summary">
 
 
-<link rel="canonical" href="https://lu0k.github.io/categories/Read-Notes/page/5/">
+<link rel="canonical" href="https://lu0k.github.io/posts/htb-illumination/">
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":false,"lang":"zh-CN","comments":"","permalink":"","path":"categories/Read-Notes/page/5/index.html","title":""}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://lu0k.github.io/posts/htb-illumination/","path":"posts/htb-illumination/","title":"HTB Illumination"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>分类: Read Notes | Lu0k</title>
+<title>HTB Illumination | Lu0k</title>
   
 
 
@@ -208,93 +211,109 @@
 </noscript>
 
 
-    <div class="main-inner category posts-collapse">
+    <div class="main-inner post posts-expand">
 
 
   
+
+
+<div class="post-block">
   
   
-  <div class="post-block">
-    <div class="post-content">
-      <div class="collection-title">
-        <h2 class="collection-header">Read Notes
-          <small>分类</small>
-        </h2>
-      </div>
 
-      
-    <div class="collection-year">
-      <span class="collection-header">2021</span>
-    </div>
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://lu0k.github.io/posts/htb-illumination/">
 
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-      <div class="post-meta-container">
-        <time itemprop="dateCreated"
-              datetime="2021-10-10T00:00:00+08:00"
-              content="2021-10-10">
-          10-10
-        </time>
-      </div>
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Lu0k">
+      <meta itemprop="description" content="谦虚学习!">
+    </span>
 
-      <div class="post-title">
-          <a class="post-title-link" href="/posts/compile-proc/" itemprop="url">
-            <span itemprop="name">编译流程</span>
-          </a>
-      </div>
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Lu0k">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          HTB Illumination
+        </h1>
 
-      
-    </header>
-  </article>
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
 
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-      <div class="post-meta-container">
-        <time itemprop="dateCreated"
-              datetime="2021-10-04T00:00:00+08:00"
-              content="2021-10-04">
-          10-04
-        </time>
-      </div>
+      <time title="创建时间：2022-02-15 00:00:00" itemprop="dateCreated datePublished" datetime="2022-02-15T00:00:00+08:00">2022-02-15</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/HTB-Challenges/" itemprop="url" rel="index"><span itemprop="name">HTB Challenges</span></a>
+        </span>
+    </span>
 
-      <div class="post-title">
-          <a class="post-title-link" href="/posts/linux-secintro/" itemprop="url">
-            <span itemprop="name">Linux安全机制简介</span>
-          </a>
-      </div>
+  
+</div>
 
-      
-    </header>
-  </article>
+        </div>
+      </header>
 
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-      <div class="post-meta-container">
-        <time itemprop="dateCreated"
-              datetime="2021-10-03T00:00:00+08:00"
-              content="2021-10-03">
-          10-03
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/posts/linux-basic/" itemprop="url">
-            <span itemprop="name">Linux基础</span>
-          </a>
-      </div>
-
-      
-    </header>
-  </article>
-
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <div class="hbe hbe-container" id="hexo-blog-encrypt" data-wpm="Oh, this is an invalid password. Check and try again, please." data-whm="OOPS, these decrypted content may changed, but you can still have a look.">
+  <script id="hbeData" type="hbeData" data-hmacdigest="7e76d0a85b1c829cba5be407d505a4297a0c90672824881f4484d3037cee99f5">21169b23c44daadbea349553dde7ccc4aa1c3124b1e78f3e8fc812d799affb9ddeea7c6603306e820b4441086bc078c7b04874185fcce28026ea889aa547723433fcfbcc97c2ab9e6b626b8c5aef1680c5bbb5180d52793da9961f78d3f3e4ca5d66c2101fd5156fd867e48082ba5c4dfbd13e8c404ff0d0f4e062e9d8c37eab6b3bb1e0c13d62b9cb6ab91d23c43625db12c1cd4aa372cb91f95f420e0d234ead35b822d735c6e5e7f89bd095f19e73dcaac6fce1cc8ff263df8d53548d017842957167746314e63f9d954353be035e1be7629765150fc8fa4e831c30264b57f3be99005749129358ad65814268dfcc5b661885b65dd4767a33ec90c876037f5a3004108805f16f2f936a5368042551dc3fd8676d2cea8952bae4fc3c4fd76a1e0eddeea2a1a6a14014b39f5b60c2a8e5fc1986c09bf0c050e353d44c6bb4fbaefcf5329f6aee0230183e4ec5b5f45300a124e6ec27eeba833386ec4bfc20c6df6ae10737ab77d13fcd1eecabed4f3e34fe193073b57251971f5f2d59f70f8e58b5378c4254c53c3670a7f8c4ebbee1aa86956542939d7931e4787d8ebfefe604bc11d67fd1a7296e174a85aa11d82e4c2b621602db3e48b201e127c45f2a0b6e0a569811af75d1ce18588cb02a6228075b87fe92ee9aa454c845be41bf79bac1c1893a186706869c10e742214f5ede7cb1e166713307cea907aa467b90f4785a99350695fe3a1fb7678ecaffc00f2f83ec9f31855cdbbdad442b9124cfa4c171c0ff498ffa6d98ffe9b41d9220b50e4e21f51bc06bf5f45572e15b2c2d2da4a488515a4072119af3d9440cf30d0b50aa7b7d5db18da251f28e3daf7545bed955ee2a5c2531b249e1b8feb63e997028578512978bb71407eb8e6b32dce4a3f975e2d54aaba76b018c18ef9defb46c181590caf43175566431e98fcd85299c6efde2f7b506067e5f18274599e7f62fa52929d0f4842fc16f34428eeb3f8d0341add92946b8de53ad187f07465e2e353a48b90982ffd37c897decd62cadd332f3</script>
+  <div class="hbe hbe-content">
+    <div class="hbe hbe-input hbe-input-xray">
+      <input class="hbe hbe-input-field hbe-input-field-xray" type="password" id="hbePass">
+      <label class="hbe hbe-input-label hbe-input-label-xray" for="hbePass">
+        <span class="hbe hbe-input-label-content hbe-input-label-content-xray">Hey, password is required here.</span>
+      </label>
+      <svg class="hbe hbe-graphic hbe-graphic-xray" width="300%" height="100%" viewBox="0 0 1200 60" preserveAspectRatio="none">
+        <path d="M0,56.5c0,0,298.666,0,399.333,0C448.336,56.5,513.994,46,597,46c77.327,0,135,10.5,200.999,10.5c95.996,0,402.001,0,402.001,0"></path>
+        <path d="M0,2.5c0,0,298.666,0,399.333,0C448.336,2.5,513.994,13,597,13c77.327,0,135-10.5,200.999-10.5c95.996,0,402.001,0,402.001,0"></path>
+      </svg>
     </div>
   </div>
-  
-  
-  
-  <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/categories/Read-Notes/page/4/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/categories/Read-Notes/">1</a><span class="space">&hellip;</span><a class="page-number" href="/categories/Read-Notes/page/4/">4</a><span class="page-number current">5</span>
-  </nav>
+</div>
+<script data-pjax src="/lib/hbe.js"></script><link href="/css/hbe.style.css" rel="stylesheet" type="text/css">
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Forensics/" rel="tag"><i class="fa fa-tag"></i> Forensics</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/htb-usbripper/" rel="prev" title="HTB USB Ripper">
+                  <i class="fa fa-chevron-left"></i> HTB USB Ripper
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
 
 </div>
   </main>
