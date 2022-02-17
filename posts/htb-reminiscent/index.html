@@ -22,26 +22,26 @@
 <script class="next-config" data-name="main" type="application/json">{"hostname":"lu0k.github.io","root":"/","images":"/images","scheme":"Gemini","version":"8.7.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
 <meta name="description" content="Here&#39;s something encrypted, password is required to continue reading.">
 <meta property="og:type" content="article">
-<meta property="og:title" content="HTB USB Ripper">
-<meta property="og:url" content="https://lu0k.github.io/posts/htb-usbripper/index.html">
+<meta property="og:title" content="HTB Reminiscent">
+<meta property="og:url" content="https://lu0k.github.io/posts/htb-reminiscent/index.html">
 <meta property="og:site_name" content="Lu0k">
 <meta property="og:description" content="Here&#39;s something encrypted, password is required to continue reading.">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2022-02-13T16:00:00.000Z">
-<meta property="article:modified_time" content="2022-02-14T09:14:06.121Z">
+<meta property="article:published_time" content="2022-02-16T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-02-17T06:52:52.077Z">
 <meta property="article:author" content="Lu0k">
 <meta property="article:tag" content="Forensics">
 <meta name="twitter:card" content="summary">
 
 
-<link rel="canonical" href="https://lu0k.github.io/posts/htb-usbripper/">
+<link rel="canonical" href="https://lu0k.github.io/posts/htb-reminiscent/">
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://lu0k.github.io/posts/htb-usbripper/","path":"posts/htb-usbripper/","title":"HTB USB Ripper"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://lu0k.github.io/posts/htb-reminiscent/","path":"posts/htb-reminiscent/","title":"HTB Reminiscent"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>HTB USB Ripper | Lu0k</title>
+<title>HTB Reminiscent | Lu0k</title>
   
 
 
@@ -222,7 +222,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://lu0k.github.io/posts/htb-usbripper/">
+    <link itemprop="mainEntityOfPage" href="https://lu0k.github.io/posts/htb-reminiscent/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">
@@ -235,7 +235,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          HTB USB Ripper
+          HTB Reminiscent
         </h1>
 
         <div class="post-meta-container">
@@ -246,7 +246,7 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2022-02-14 00:00:00" itemprop="dateCreated datePublished" datetime="2022-02-14T00:00:00+08:00">2022-02-14</time>
+      <time title="创建时间：2022-02-17 00:00:00" itemprop="dateCreated datePublished" datetime="2022-02-17T00:00:00+08:00">2022-02-17</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -269,7 +269,7 @@
     
     <div class="post-body" itemprop="articleBody">
         <div class="hbe hbe-container" id="hexo-blog-encrypt" data-wpm="Oh, this is an invalid password. Check and try again, please." data-whm="OOPS, these decrypted content may changed, but you can still have a look.">
-  <script id="hbeData" type="hbeData" data-hmacdigest="577e8319822ca924e6c455ab1123329ad1ebbaeeab2e974f9f87d8e2d5c1bea9">e79db2a7167d5ab33c81f66582ee7dc3946ad71f911b84d8ab009ff1fdd388033f74f14508f233ab337ff56c3d5fd33c00b0801b3fbe4b0e1cdcb52d5c8d67d4f2d663fc5883c668eb7554e7dab581b9498a7464050d418cc1f9270f4bc1a106467aeeaf1c3f8c6fd0d42d2647f91abf029f019b3756eb59c69ab3b58313b90075e791446dd527f01534352f87fdbec17901e5259fce2f0ea48a7f67906bc1a6cf729a97b19ef6060a7986efaf03daa54559d6726506cc31c2f3b34a044acc05d52bec8adfb7c68f494120846d66af6a0a9103f0ab783c1665b413dc6965d14c770bb153548f225e4cd21f98dc1b302d0244ff966e4f54dbc872868d14c0df62ff4e8f92ff869d47583c79333ecedc4db86243549d5418aa2c2b505b40ea62fc63c0ddf14fce318e35cb9a0f9b823999a53f4be47850173425945af8cc154e37c018f29450db4a292f40e8d293ef32d65bc14489065a9cff0795526938e47bb93ec0fa5f771bf3403a999aeb861b09fe655c49bb505a489a76c34f50da36f24aeb9e87764af838892f07b344937e03a554c9502ab2c73cff2d3d4252be92206ea5be7f9ed42af066cc66d2d2aebc0b3ec7b01a7c6831fb1703e04615694b95d31a8bb95ec6ed94aa6eb4e3c37971b32f5fabe777f6f1ceca062f58c06322a14584a24134190b9842af5ae7542fa002f7828da65546fc4b89f9064599bca5befa15634b8896b0c72640e846d4b53c142770106e5cfcd7d3a7f72f2843e172546ca3d9e213a0c7843df2e165b4265996740e5ff1dd39ea68a89d0b100af70e934fa68bb97303ef6429f84ca7c25c8a7b0b168ec72ac8f950cff52cf5ef463318fbeccfa0ada71ef422a6e511785d62e7ab5745130d1e2c70495bcf6b4dc3d61346b1f92e13f4d9795a6ed63b0ec643992403297ae3fb5f06d630666855eb07cffe85633c5ee10a3e99e122147170a9003bb389d3490b12d5d67e7d5045dbdd554ad77a3c4b9d0f36daf8339be226b5fd4492d4c38a0e9ab5b68891c2e5bdbaf43b</script>
+  <script id="hbeData" type="hbeData" data-hmacdigest="aac3e5f91cd50e3916172de5f08e633c239d5955e4cdf110128d453a34bb4885">a665b2236b45ca8281037bb277adb2c24e7e7321034791f5979b727c24219326ff5bed7080f40303909baf590bbf98e232f0c56b185f991cdbebbaaad575ead3065ffa50bdff3105305b6b5f772f54020c4eac6547f4d5bc0cce885961017619c5387346a7ff423bc86df8ee31c16ea86dc6b66963d5bed33e6d1aadf659782126f2ed5318e0887075a1d7bd01eea127edbbbcede84a5ece48ea932174ea0ac82b6f5a7a101c412e6c930a7b1bc1e2a3bf91c7b9ea4081203a28ecea752e85f8770e7ab77f17d1d3900b82086771daf6a19dfa28c9deff5f35ce58ec384268ed023989034a81ef7d253c2a50c7c1d96ec7035b92372b0835e3483262590b8129bdce9f888d1c97d4b400a9491c9e95a9e569fa4646dd5740eaabeda4483659903deda9c2f9acb6daa4dc302dd9cb76fd42581fe2db1c68637105850577d31f17bf9048b2140e91d9a4a9c90660fad849985f4b0942b11ca6a27041a3c63b4268d50d6c42094a6b343b8c952357953e8c1b083c2e49744f57092fc861e71072a7ef8a31e2c01d62d1b188accfb5f5d6f237beccc0e0938d3f1ef891db1e54feb72605f428d9ea127f7c8c80e13c291b6d6f8d1440ddec783b6c48cc3591a41f85272f559627f39387d460736eb7c5690cb2b5ca5d3c749fa93538b868dfadbca49ebcf1991f4eda9603de37fdbc7d60d2cf21d9aa64527ed90c3d4617afecdcae9c7427d87a24e0c3c8f73e1588fbe980e4f27fe1a8acb268e51806d4c5e8c05c2318ffe4ae5ff234210d21091fa3a8e9a8cdd0668f2680f03dc24b6553c7c8ebc5f48861e4905b9bb23373f06c70d326a21f8f760d64ec0ddff1fba1bd69f6f6ad4159bd6443ed0509aa8be3a1347ad150284a5511b56dfe984e75a145aedf9990be6d6aad6d1bbf9e7eff380389368d7e03f23fff95e12b2f648d3e579990878abe8e3c45b79190e951c8e1b6f797353235374176a798c3a209d895749aeeb2c80d41462eef61b6272a9440ee3ab9a086417dfec913f82b3003dcccecd7e9fd</script>
   <div class="hbe hbe-content">
     <div class="hbe hbe-input hbe-input-xray">
       <input class="hbe hbe-input-field hbe-input-field-xray" type="password" id="hbePass">
@@ -299,14 +299,11 @@
 
           <div class="post-nav">
             <div class="post-nav-item">
-                <a href="/posts/linking1/" rel="prev" title="链接(一)">
-                  <i class="fa fa-chevron-left"></i> 链接(一)
+                <a href="/posts/htb-emo/" rel="prev" title="HTB emo">
+                  <i class="fa fa-chevron-left"></i> HTB emo
                 </a>
             </div>
             <div class="post-nav-item">
-                <a href="/posts/htb-illumination/" rel="next" title="HTB Illumination">
-                  HTB Illumination <i class="fa fa-chevron-right"></i>
-                </a>
             </div>
           </div>
     </footer>
