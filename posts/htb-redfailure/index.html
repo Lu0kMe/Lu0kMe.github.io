@@ -20,25 +20,28 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"lu0k.github.io","root":"/","images":"/images","scheme":"Gemini","version":"8.7.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
-<meta name="description" content="谦虚学习!">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Lu0k">
-<meta property="og:url" content="https://lu0k.github.io/archives/2021/12/index.html">
+<meta name="description" content="Here&#39;s something encrypted, password is required to continue reading.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HTB Red Failure">
+<meta property="og:url" content="https://lu0k.github.io/posts/htb-redfailure/index.html">
 <meta property="og:site_name" content="Lu0k">
-<meta property="og:description" content="谦虚学习!">
+<meta property="og:description" content="Here&#39;s something encrypted, password is required to continue reading.">
 <meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-02-21T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-02-22T13:27:10.127Z">
 <meta property="article:author" content="Lu0k">
+<meta property="article:tag" content="Forensics">
 <meta name="twitter:card" content="summary">
 
 
-<link rel="canonical" href="https://lu0k.github.io/archives/2021/12/">
+<link rel="canonical" href="https://lu0k.github.io/posts/htb-redfailure/">
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":false,"lang":"zh-CN","comments":"","permalink":"","path":"archives/2021/12/index.html","title":""}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://lu0k.github.io/posts/htb-redfailure/","path":"posts/htb-redfailure/","title":"HTB Red Failure"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>归档 | Lu0k</title>
+<title>HTB Red Failure | Lu0k</title>
   
 
 
@@ -208,233 +211,109 @@
 </noscript>
 
 
-    <div class="main-inner archive posts-collapse">
+    <div class="main-inner post posts-expand">
 
 
   
+
+
+<div class="post-block">
   
   
-  <div class="post-block">
-    <div class="post-content">
-      <div class="collection-title">
-        
-        <span class="collection-header">非常好! 目前共计 145 篇日志。 继续努力。</span>
-      </div>
 
-      
-    <div class="collection-year">
-      <span class="collection-header">2021</span>
-    </div>
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://lu0k.github.io/posts/htb-redfailure/">
 
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-      <div class="post-meta-container">
-        <time itemprop="dateCreated"
-              datetime="2021-12-31T00:00:00+08:00"
-              content="2021-12-31">
-          12-31
-        </time>
-      </div>
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Lu0k">
+      <meta itemprop="description" content="谦虚学习!">
+    </span>
 
-      <div class="post-title">
-          <a class="post-title-link" href="/posts/htb-vipere/" itemprop="url">
-            <span itemprop="name">HTB Vipere</span>
-          </a>
-      </div>
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Lu0k">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          HTB Red Failure
+        </h1>
 
-      
-    </header>
-  </article>
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
 
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-      <div class="post-meta-container">
-        <time itemprop="dateCreated"
-              datetime="2021-12-30T00:00:00+08:00"
-              content="2021-12-30">
-          12-30
-        </time>
-      </div>
+      <time title="创建时间：2022-02-22 00:00:00" itemprop="dateCreated datePublished" datetime="2022-02-22T00:00:00+08:00">2022-02-22</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/HTB-Challenges/" itemprop="url" rel="index"><span itemprop="name">HTB Challenges</span></a>
+        </span>
+    </span>
 
-      <div class="post-title">
-          <a class="post-title-link" href="/posts/htb-query/" itemprop="url">
-            <span itemprop="name">HTB Query</span>
-          </a>
-      </div>
+  
+</div>
 
-      
-    </header>
-  </article>
+        </div>
+      </header>
 
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-      <div class="post-meta-container">
-        <time itemprop="dateCreated"
-              datetime="2021-12-29T00:00:00+08:00"
-              content="2021-12-29">
-          12-29
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/posts/htb-deterministic/" itemprop="url">
-            <span itemprop="name">HTB Deterministic</span>
-          </a>
-      </div>
-
-      
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-      <div class="post-meta-container">
-        <time itemprop="dateCreated"
-              datetime="2021-12-28T00:00:00+08:00"
-              content="2021-12-28">
-          12-28
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/posts/htb-quickr/" itemprop="url">
-            <span itemprop="name">HTB QuickR</span>
-          </a>
-      </div>
-
-      
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-      <div class="post-meta-container">
-        <time itemprop="dateCreated"
-              datetime="2021-12-27T00:00:00+08:00"
-              content="2021-12-27">
-          12-27
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/posts/htb-m0rsarchive/" itemprop="url">
-            <span itemprop="name">HTB M0rsarchive</span>
-          </a>
-      </div>
-
-      
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-      <div class="post-meta-container">
-        <time itemprop="dateCreated"
-              datetime="2021-12-26T00:00:00+08:00"
-              content="2021-12-26">
-          12-26
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/posts/mlr-program3/" itemprop="url">
-            <span itemprop="name">程序的机器级表示(三)</span>
-          </a>
-      </div>
-
-      
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-      <div class="post-meta-container">
-        <time itemprop="dateCreated"
-              datetime="2021-12-25T00:00:00+08:00"
-              content="2021-12-25">
-          12-25
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/posts/mlr-program2/" itemprop="url">
-            <span itemprop="name">程序的机器级表示(二)</span>
-          </a>
-      </div>
-
-      
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-      <div class="post-meta-container">
-        <time itemprop="dateCreated"
-              datetime="2021-12-24T00:00:00+08:00"
-              content="2021-12-24">
-          12-24
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/posts/htb-exploitedstream/" itemprop="url">
-            <span itemprop="name">HTB ExploitedStream</span>
-          </a>
-      </div>
-
-      
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-      <div class="post-meta-container">
-        <time itemprop="dateCreated"
-              datetime="2021-12-23T00:00:00+08:00"
-              content="2021-12-23">
-          12-23
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/posts/htb-microstorage/" itemprop="url">
-            <span itemprop="name">HTB Micro Storage</span>
-          </a>
-      </div>
-
-      
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-      <div class="post-meta-container">
-        <time itemprop="dateCreated"
-              datetime="2021-12-22T00:00:00+08:00"
-              content="2021-12-22">
-          12-22
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/posts/htb-canvas/" itemprop="url">
-            <span itemprop="name">HTB Canvas</span>
-          </a>
-      </div>
-
-      
-    </header>
-  </article>
-
-
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <div class="hbe hbe-container" id="hexo-blog-encrypt" data-wpm="Oh, this is an invalid password. Check and try again, please." data-whm="OOPS, these decrypted content may changed, but you can still have a look.">
+  <script id="hbeData" type="hbeData" data-hmacdigest="467c0e4f125c01308a1181b56f7c9c35c1824b42d72f6402a12c0f4d65e106b6">fc94c36015914c97cbf7e9293c39840fa40a1f5bd8f24ebb45fa19a6267fa4842a0f978fa00eb6e8f100c023db79b1036412ae02b0c49b43dd3ec4c672148c9110fc7d72692deb8d0e0397d944390509a7288dee73cbe92fd0b3c27a90b431765ca72ae48dd01a9fb17411ecb8e1a4499f4907191c4e83d595feaa9c48bdec56ac1dce87322be66580c92510ab008c4d29e2448c9b0819691f6b05ff68d5dd91e2ad17431257590cac83abbd082e8d32f94e77f60a367536261f1714344283cc0fc46a149887b5a73ad3901c3f40e0da97692fe2c715c37b40af32d3323f224253fd65bc8a5c19f42030190d03ebaecf426b50309b8472d3c0350fabd3cb4a3e94f79681e206613439d7a2cc7fa1551189ad5ff8fae09022600bcaffe17edc1598ac15444162078806607f287deb115467053ee9dea17d955065f273dbfd7e3265f111d96998485359bf2c690e0d87eb6c8a942f695d9af85c42d24388a7af69769b71a592b9e9bf85d0d20d14d0bd689f63e18146a239ac828441374f2cb95ae5f91d28f48220ed31b59f0b79f3feaa7c82eb40ee3b07699367596d88f19745998521b2de1095b490ff633a9e1cf0673493bccb028f809eabe9283f0f05cc4f57a9d177c46c2b9d484d0146d138b87f182bd0bb9493ef26f5ad2c5f216414daa8d13b13ee2eea43cb41117a92faea58962317ec5097b207b7370baa99559242a23c41e243286c8a6616557a07fc998dc2db4fd4517fcc4a053e33bb6ca91cf1f1af907aba9d1052fa084ceeb4ce349911374c95b089908a9260821a9e5772893681b1715243d4e0da0d8ebb14cefa6a50d9841ddcd83c547e14585977a2c1997d60c9c69934bca43896e3cd029136f78f8034c8de863c684160f1343599c231ea88a41728d6a080b1e9dc67e7685b597d9e840358b4100efce9fad63eccd17ba3302fc93967e65962d7e9016df0bba7abde787375a0689091ffc1c0d691a34cfa5c79da633b6c19383f3f236fb3266162c9642d8bc10fd2724039162d01db7d</script>
+  <div class="hbe hbe-content">
+    <div class="hbe hbe-input hbe-input-xray">
+      <input class="hbe hbe-input-field hbe-input-field-xray" type="password" id="hbePass">
+      <label class="hbe hbe-input-label hbe-input-label-xray" for="hbePass">
+        <span class="hbe hbe-input-label-content hbe-input-label-content-xray">Hey, password is required here.</span>
+      </label>
+      <svg class="hbe hbe-graphic hbe-graphic-xray" width="300%" height="100%" viewBox="0 0 1200 60" preserveAspectRatio="none">
+        <path d="M0,56.5c0,0,298.666,0,399.333,0C448.336,56.5,513.994,46,597,46c77.327,0,135,10.5,200.999,10.5c95.996,0,402.001,0,402.001,0"></path>
+        <path d="M0,2.5c0,0,298.666,0,399.333,0C448.336,2.5,513.994,13,597,13c77.327,0,135-10.5,200.999-10.5c95.996,0,402.001,0,402.001,0"></path>
+      </svg>
     </div>
   </div>
-  
-  
-  
-  <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/archives/2021/12/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/archives/2021/12/page/4/">4</a><a class="extend next" rel="next" href="/archives/2021/12/page/2/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
-  </nav>
+</div>
+<script data-pjax src="/lib/hbe.js"></script><link href="/css/hbe.style.css" rel="stylesheet" type="text/css">
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Forensics/" rel="tag"><i class="fa fa-tag"></i> Forensics</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/htb-persistenceisfutile/" rel="prev" title="HTB PersistenceIsFutile">
+                  <i class="fa fa-chevron-left"></i> HTB PersistenceIsFutile
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
 
 </div>
   </main>
