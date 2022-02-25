@@ -20,28 +20,28 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"lu0k.github.io","root":"/","images":"/images","scheme":"Gemini","version":"8.7.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
-<meta name="description" content="内容简介存储器系统(memory system)是一个具有不同容量、成本和访问时间的存储设备的层次结构。CPU寄存器保存着最常用的数据。靠近CPU的小的、快速的高速缓存存储器(cache memory)作为一部分存储在相对慢速的主存储器(main memory)中数据和指令的缓冲区域。主存缓存存储在容量较大的、慢速磁盘上的数据，而这些磁盘常常又作为存储在通过网络连接的其他机器的磁盘或磁带上的数据的">
+<meta name="description" content="Here&#39;s something encrypted, password is required to continue reading.">
 <meta property="og:type" content="article">
-<meta property="og:title" content="存储器层次结构(一)">
-<meta property="og:url" content="https://lu0k.github.io/posts/mem-hier1/index.html">
+<meta property="og:title" content="HTB oBfsC4t10n2">
+<meta property="og:url" content="https://lu0k.github.io/posts/htb-obfsc4t10n2/index.html">
 <meta property="og:site_name" content="Lu0k">
-<meta property="og:description" content="内容简介存储器系统(memory system)是一个具有不同容量、成本和访问时间的存储设备的层次结构。CPU寄存器保存着最常用的数据。靠近CPU的小的、快速的高速缓存存储器(cache memory)作为一部分存储在相对慢速的主存储器(main memory)中数据和指令的缓冲区域。主存缓存存储在容量较大的、慢速磁盘上的数据，而这些磁盘常常又作为存储在通过网络连接的其他机器的磁盘或磁带上的数据的">
+<meta property="og:description" content="Here&#39;s something encrypted, password is required to continue reading.">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2022-02-04T16:00:00.000Z">
-<meta property="article:modified_time" content="2022-02-05T14:37:24.111Z">
+<meta property="article:published_time" content="2022-02-24T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-02-25T07:31:55.077Z">
 <meta property="article:author" content="Lu0k">
-<meta property="article:tag" content="CSAPP">
+<meta property="article:tag" content="Forensics">
 <meta name="twitter:card" content="summary">
 
 
-<link rel="canonical" href="https://lu0k.github.io/posts/mem-hier1/">
+<link rel="canonical" href="https://lu0k.github.io/posts/htb-obfsc4t10n2/">
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://lu0k.github.io/posts/mem-hier1/","path":"posts/mem-hier1/","title":"存储器层次结构(一)"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://lu0k.github.io/posts/htb-obfsc4t10n2/","path":"posts/htb-obfsc4t10n2/","title":"HTB oBfsC4t10n2"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>存储器层次结构(一) | Lu0k</title>
+<title>HTB oBfsC4t10n2 | Lu0k</title>
   
 
 
@@ -135,7 +135,7 @@
 
   <aside class="sidebar">
 
-    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+    <div class="sidebar-inner sidebar-overview-active">
       <ul class="sidebar-nav">
         <li class="sidebar-nav-toc">
           文章目录
@@ -148,7 +148,6 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%86%85%E5%AE%B9%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">内容简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Reference"><span class="nav-number">2.</span> <span class="nav-text">Reference</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -223,7 +222,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://lu0k.github.io/posts/mem-hier1/">
+    <link itemprop="mainEntityOfPage" href="https://lu0k.github.io/posts/htb-obfsc4t10n2/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">
@@ -236,7 +235,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          存储器层次结构(一)
+          HTB oBfsC4t10n2
         </h1>
 
         <div class="post-meta-container">
@@ -247,7 +246,7 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2022-02-05 00:00:00" itemprop="dateCreated datePublished" datetime="2022-02-05T00:00:00+08:00">2022-02-05</time>
+      <time title="创建时间：2022-02-25 00:00:00" itemprop="dateCreated datePublished" datetime="2022-02-25T00:00:00+08:00">2022-02-25</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -255,7 +254,7 @@
       </span>
       <span class="post-meta-item-text">分类于</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/Read-Notes/" itemprop="url" rel="index"><span itemprop="name">Read Notes</span></a>
+          <a href="/categories/HTB-Challenges/" itemprop="url" rel="index"><span itemprop="name">HTB Challenges</span></a>
         </span>
     </span>
 
@@ -269,18 +268,22 @@
     
     
     <div class="post-body" itemprop="articleBody">
-        <h1 id="内容简介"><a href="#内容简介" class="headerlink" title="内容简介"></a>内容简介</h1><p>存储器系统<code>(memory system)</code>是一个具有不同容量、成本和访问时间的存储设备的层次结构。CPU寄存器保存着最常用的数据。靠近CPU的小的、快速的高速缓存存储器<code>(cache memory)</code>作为一部分存储在相对慢速的主存储器<code>(main memory)</code>中数据和指令的缓冲区域。主存缓存存储在容量较大的、慢速磁盘上的数据，而这些磁盘常常又作为存储在通过网络连接的其他机器的磁盘或磁带上的数据的缓冲区域。</p>
-<span id="more"></span>
-
-<p>存储器层次结构是可行的，这是因为与下一个更低层次的存储设备相比来说，一个编写良好的程序倾向于更频繁地访问某一个层次上的存储设备。所以，下一层的存储设备可以更慢速一点，也因此可以更大，每个比特位更便宜。整体效果是一个大的存储器池，其成本与层次结构底层最便宜的存储设备相当，但是却以接近于层次结构顶部存储设备的高速率向程序提供数据。</p>
-<p>作为一个程序员，你需要理解存储器层次结构，因为它对应用程序的性能有着巨大的影响。如果你的程序需要的数据是存储在CPU寄存器中的，那么在指令的执行期间，在0个周期内就能访问到它们。如果存储在高速缓存中，需要<code>4~75</code>个周期。如果存储在主存中，需要上百个周期。而如果存储在磁盘上，需要大约几千万个周期！</p>
-<p>这里就是计算机系统中一个基本而持久的思想：如果你理解了系统是如何将数据在存储器层次结构中上上下下移动的，那么你就可以编写自己的应用程序，使得它们的数据项存储在层次结构中较高的地方，在那里CPU能更快地访问到它们。</p>
-<p>这个思想围绕着计算机程序的一个称为局部性<code>(locality)</code>的基本属性。具有良好局部性的程序倾向于一次又一次地访问相同的数据项集合，或是倾向于访问邻近的数据项集合。具有良好局部性的程序比局部性差的程序更多地倾向于从存储器层次结构中较高层次处访问数据项，因此运行得更快。例如，在<code>Core i7</code>系统，不同的矩阵乘法核心程序执行相同数量的算术操作，但是有不同程度的局部性，它们的运行时间可以相差40倍！</p>
-<p>在本章中，我们会看看基本的存储技术——<code>SRAM</code>存储器、<code>DRAM</code>存储器、<code>ROM</code>存储器以及旋转的和固态的硬盘——并描述它们是如何被组织成层次结构的。特别地，我们将注意力集中在高速缓存存储器上，它是作为CPU和主存之间的缓存区域，因为它们对应用程序性能的影响最大。我们向你展示如何分析C程序的局部性，并且介绍改进你的程序中局部性的技术。</p>
-<h1 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h1><ul>
-<li><a target="_blank" rel="noopener" href="https://csapp.cs.cmu.edu/"><code>Computer Systems: A Programmer&#39;s Perspective, 3/E</code></a></li>
-</ul>
-
+        <div class="hbe hbe-container" id="hexo-blog-encrypt" data-wpm="Oh, this is an invalid password. Check and try again, please." data-whm="OOPS, these decrypted content may changed, but you can still have a look.">
+  <script id="hbeData" type="hbeData" data-hmacdigest="2547e96b451ec3ce351e720a8244bf0bb8244fa444f4bbae1644134102a25709">11176acece5e4448b30e3720997dc154fd0f44bae9610cf45b7049ff7e6c8861bb37f294cf425853ec203ade5b7562eecb3d9aa3d54f3dc7f8d5fea5b4a70e21a78602a8da9c87cc50fdf946bf1b254a1629034f7c6720e665dc0c126c013f0a069730b7b7c438155180fb37972572be6d16f58abad07215d94e8794b7755b03e23f2707b6b7c89ce2549e855b963366aad71b7ac7cdb1053c0e06fa5b2fbfc9628044d9fd564bff3f0d28b43895af71f5263c2165126de769946fb464f6287b5f2a7b3c9d291e0e2fc3353197d5b83b0c1f648f817f31c1b92f0752a3107d142afc905e94f909c34f04d0639841ff17c8eb2a52c7b637fa2196ced88d944ba01faa2d4d4ae7706b7fc9748546efca360870e15f74bb9670ad08a7a0f9bf2eaedde23220efaec85b08a5d3747042c54c2f0d119d70d65fe57bd79b99650306958d99b897d2b295286d02ca8099e58ad45092275770509604e492ecf9b9c217cf3daa6db6f4c2e4e0166d6296136b934aa0ed4f1efdb2708c927dbdca2ad9cb6d13e969e460b69d510b05d612598abeffae40b8a19e46021bc28367d45a19a22d55f3fc94b491f1732e523b457c3aa15ddb2233933d3d266b85046d1db055696b815b984706848cb36ead00b2127f72e320d68805073fedd3236a22ef2bf4f4fbd3ee095c5e227cbb44b0efb43287700a496e6c2867e5e0e1144ac953181031e0da30182a5330adbf81f974c2566cf1fca2153657c1aee5e07edb95c2e17326248c6a2a3d34187e5a58abe303dffcb4305d56a30d7416ba86b5941f75a0cb5cd3fe5613323ea3c04eb2faf3ce4d01c8a1427ba076f58ffd4313ec043fd5f7a43e9648d61a17983e275aefcf0b6e0345734a570cdc342b4e02f10bcdf032b78537b0b31e4d9c7ab78dd9bb8091de94382bc8cf3be4531beb5d0a892d5dbe4ab9b40f2693f91698a21e02baa58eeb6a6f6fc297a011dd0c3f9d9d743d986ab9b58f22b1b084e0f86b968ddcf0364e38c4e18150cec9b0e513fbdd989258a2f025cd</script>
+  <div class="hbe hbe-content">
+    <div class="hbe hbe-input hbe-input-xray">
+      <input class="hbe hbe-input-field hbe-input-field-xray" type="password" id="hbePass">
+      <label class="hbe hbe-input-label hbe-input-label-xray" for="hbePass">
+        <span class="hbe hbe-input-label-content hbe-input-label-content-xray">Hey, password is required here.</span>
+      </label>
+      <svg class="hbe hbe-graphic hbe-graphic-xray" width="300%" height="100%" viewBox="0 0 1200 60" preserveAspectRatio="none">
+        <path d="M0,56.5c0,0,298.666,0,399.333,0C448.336,56.5,513.994,46,597,46c77.327,0,135,10.5,200.999,10.5c95.996,0,402.001,0,402.001,0"></path>
+        <path d="M0,2.5c0,0,298.666,0,399.333,0C448.336,2.5,513.994,13,597,13c77.327,0,135-10.5,200.999-10.5c95.996,0,402.001,0,402.001,0"></path>
+      </svg>
+    </div>
+  </div>
+</div>
+<script data-pjax src="/lib/hbe.js"></script><link href="/css/hbe.style.css" rel="stylesheet" type="text/css">
     </div>
 
     
@@ -289,21 +292,18 @@
 
     <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/CSAPP/" rel="tag"><i class="fa fa-tag"></i> CSAPP</a>
+              <a href="/tags/Forensics/" rel="tag"><i class="fa fa-tag"></i> Forensics</a>
           </div>
 
         
 
           <div class="post-nav">
             <div class="post-nav-item">
-                <a href="/posts/htb-pressed/" rel="prev" title="HTB Pressed">
-                  <i class="fa fa-chevron-left"></i> HTB Pressed
+                <a href="/posts/htb-obfsc4t10n/" rel="prev" title="HTB oBfsC4t10n">
+                  <i class="fa fa-chevron-left"></i> HTB oBfsC4t10n
                 </a>
             </div>
             <div class="post-nav-item">
-                <a href="/posts/mem-hier2/" rel="next" title="存储器层次结构(二)">
-                  存储器层次结构(二) <i class="fa fa-chevron-right"></i>
-                </a>
             </div>
           </div>
     </footer>
