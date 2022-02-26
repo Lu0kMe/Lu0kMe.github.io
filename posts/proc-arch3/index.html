@@ -27,11 +27,42 @@
 <meta property="og:site_name" content="Lu0k">
 <meta property="og:description" content="内容简介处理器必须执行一系列指令，每条指令执行某个简单操作，例如两个数相加。指令被编码为由一个或多个字节序列组成的二进制格式。一个处理器支持的指令和指令的字节级编码称为它的指令集体系结构(ISA, Instruction-Set Architecture)。ISA在编译器编写者和处理器设计人员之间提供了一个概念抽象层，编译器编写者只需要知道允许哪些指令，以及它们是如何编码的；而处理器设计者必须建造">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://lu0k.github.io/4-39.png">
+<meta property="og:image" content="https://lu0k.github.io/4-40.png">
+<meta property="og:image" content="https://lu0k.github.io/4-41.png">
+<meta property="og:image" content="https://lu0k.github.io/4-42.png">
+<meta property="og:image" content="https://lu0k.github.io/4-43.png">
+<meta property="og:image" content="https://lu0k.github.io/4-44.png">
+<meta property="og:image" content="https://lu0k.github.io/4-45.png">
+<meta property="og:image" content="https://lu0k.github.io/4-46.png">
+<meta property="og:image" content="https://lu0k.github.io/4-47.png">
+<meta property="og:image" content="https://lu0k.github.io/4-48.png">
+<meta property="og:image" content="https://lu0k.github.io/4-49.png">
+<meta property="og:image" content="https://lu0k.github.io/4-50.png">
+<meta property="og:image" content="https://lu0k.github.io/4-51.png">
+<meta property="og:image" content="https://lu0k.github.io/4-52.png">
+<meta property="og:image" content="https://lu0k.github.io/4-53.png">
+<meta property="og:image" content="https://lu0k.github.io/4-54.png">
+<meta property="og:image" content="https://lu0k.github.io/4-55.png">
+<meta property="og:image" content="https://lu0k.github.io/4-56.png">
+<meta property="og:image" content="https://lu0k.github.io/4-57.png">
+<meta property="og:image" content="https://lu0k.github.io/4-58.png">
+<meta property="og:image" content="https://lu0k.github.io/4-59.png">
+<meta property="og:image" content="https://lu0k.github.io/4-60.png">
+<meta property="og:image" content="https://lu0k.github.io/4-61.png">
+<meta property="og:image" content="https://lu0k.github.io/4-62.png">
+<meta property="og:image" content="https://lu0k.github.io/4-63.png">
+<meta property="og:image" content="https://lu0k.github.io/4-64.png">
+<meta property="og:image" content="https://lu0k.github.io/4-65.png">
+<meta property="og:image" content="https://lu0k.github.io/4-66.png">
+<meta property="og:image" content="https://lu0k.github.io/4-67.png">
+<meta property="og:image" content="https://lu0k.github.io/4-68.png">
 <meta property="article:published_time" content="2022-01-14T16:00:00.000Z">
-<meta property="article:modified_time" content="2022-01-15T12:49:05.103Z">
+<meta property="article:modified_time" content="2022-02-26T14:05:58.056Z">
 <meta property="article:author" content="Lu0k">
 <meta property="article:tag" content="CSAPP">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://lu0k.github.io/4-39.png">
 
 
 <link rel="canonical" href="https://lu0k.github.io/posts/proc-arch3/">
@@ -148,7 +179,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%86%85%E5%AE%B9%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">内容简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Reference"><span class="nav-number">2.</span> <span class="nav-text">Reference</span></a></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%86%85%E5%AE%B9%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">内容简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Y86-64%E7%9A%84%E6%B5%81%E6%B0%B4%E7%BA%BF%E5%AE%9E%E7%8E%B0"><span class="nav-number">2.</span> <span class="nav-text">Y86-64的流水线实现</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#SEQ-%EF%BC%9A%E9%87%8D%E6%96%B0%E5%AE%89%E6%8E%92%E8%AE%A1%E7%AE%97%E9%98%B6%E6%AE%B5"><span class="nav-number">2.1.</span> <span class="nav-text">SEQ+：重新安排计算阶段</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8F%92%E5%85%A5%E6%B5%81%E6%B0%B4%E7%BA%BF%E5%AF%84%E5%AD%98%E5%99%A8"><span class="nav-number">2.2.</span> <span class="nav-text">插入流水线寄存器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AF%B9%E4%BF%A1%E5%8F%B7%E8%BF%9B%E8%A1%8C%E9%87%8D%E6%96%B0%E6%8E%92%E5%88%97%E5%92%8C%E6%A0%87%E5%8F%B7"><span class="nav-number">2.3.</span> <span class="nav-text">对信号进行重新排列和标号</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%A2%84%E6%B5%8B%E4%B8%8B%E4%B8%80%E4%B8%AAPC"><span class="nav-number">2.4.</span> <span class="nav-text">预测下一个PC</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B5%81%E6%B0%B4%E7%BA%BF%E5%86%92%E9%99%A9"><span class="nav-number">2.5.</span> <span class="nav-text">流水线冒险</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%A8%E6%9A%82%E5%81%9C%E6%9D%A5%E9%81%BF%E5%85%8D%E6%95%B0%E6%8D%AE%E5%86%92%E9%99%A9"><span class="nav-number">2.5.1.</span> <span class="nav-text">用暂停来避免数据冒险</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%A8%E8%BD%AC%E5%8F%91%E6%9D%A5%E9%81%BF%E5%85%8D%E6%95%B0%E6%8D%AE%E5%86%92%E9%99%A9"><span class="nav-number">2.5.2.</span> <span class="nav-text">用转发来避免数据冒险</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8A%A0%E8%BD%BD-x2F-%E4%BD%BF%E7%94%A8%E6%95%B0%E6%8D%AE%E5%86%92%E9%99%A9"><span class="nav-number">2.5.3.</span> <span class="nav-text">加载&#x2F;使用数据冒险</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%81%BF%E5%85%8D%E6%8E%A7%E5%88%B6%E5%86%92%E9%99%A9"><span class="nav-number">2.5.4.</span> <span class="nav-text">避免控制冒险</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86"><span class="nav-number">2.6.</span> <span class="nav-text">异常处理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PIPE%E5%90%84%E9%98%B6%E6%AE%B5%E7%9A%84%E5%AE%9E%E7%8E%B0"><span class="nav-number">2.7.</span> <span class="nav-text">PIPE各阶段的实现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#PC%E9%80%89%E6%8B%A9%E5%92%8C%E5%8F%96%E6%8C%87%E9%98%B6%E6%AE%B5"><span class="nav-number">2.7.1.</span> <span class="nav-text">PC选择和取指阶段</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%91%E7%A0%81%E5%92%8C%E5%86%99%E5%9B%9E%E9%98%B6%E6%AE%B5"><span class="nav-number">2.7.2.</span> <span class="nav-text">译码和写回阶段</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%89%A7%E8%A1%8C%E9%98%B6%E6%AE%B5"><span class="nav-number">2.7.3.</span> <span class="nav-text">执行阶段</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%BF%E5%AD%98%E9%98%B6%E6%AE%B5"><span class="nav-number">2.7.4.</span> <span class="nav-text">访存阶段</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B5%81%E6%B0%B4%E7%BA%BF%E6%8E%A7%E5%88%B6%E9%80%BB%E8%BE%91"><span class="nav-number">2.8.</span> <span class="nav-text">流水线控制逻辑</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%89%B9%E6%AE%8A%E6%8E%A7%E5%88%B6%E6%83%85%E5%86%B5%E6%89%80%E6%9C%9F%E6%9C%9B%E7%9A%84%E5%A4%84%E7%90%86"><span class="nav-number">2.8.1.</span> <span class="nav-text">特殊控制情况所期望的处理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%91%E7%8E%B0%E7%89%B9%E6%AE%8A%E6%8E%A7%E5%88%B6%E6%9D%A1%E4%BB%B6"><span class="nav-number">2.8.2.</span> <span class="nav-text">发现特殊控制条件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B5%81%E6%B0%B4%E7%BA%BF%E6%8E%A7%E5%88%B6%E6%9C%BA%E5%88%B6"><span class="nav-number">2.8.3.</span> <span class="nav-text">流水线控制机制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8E%A7%E5%88%B6%E6%9D%A1%E4%BB%B6%E7%9A%84%E7%BB%84%E5%90%88"><span class="nav-number">2.8.4.</span> <span class="nav-text">控制条件的组合</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8E%A7%E5%88%B6%E9%80%BB%E8%BE%91%E5%AE%9E%E7%8E%B0"><span class="nav-number">2.8.5.</span> <span class="nav-text">控制逻辑实现</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%A7%E8%83%BD%E5%88%86%E6%9E%90"><span class="nav-number">2.9.</span> <span class="nav-text">性能分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%AA%E5%AE%8C%E6%88%90%E7%9A%84%E5%B7%A5%E4%BD%9C"><span class="nav-number">2.10.</span> <span class="nav-text">未完成的工作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A4%9A%E5%91%A8%E6%9C%9F%E6%8C%87%E4%BB%A4"><span class="nav-number">2.10.1.</span> <span class="nav-text">多周期指令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8E%E5%AD%98%E5%82%A8%E7%B3%BB%E7%BB%9F%E7%9A%84%E6%8E%A5%E5%8F%A3"><span class="nav-number">2.10.2.</span> <span class="nav-text">与存储系统的接口</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B0%8F%E7%BB%93"><span class="nav-number">2.11.</span> <span class="nav-text">小结</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Reference"><span class="nav-number">3.</span> <span class="nav-text">Reference</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -272,6 +303,400 @@
         <h1 id="内容简介"><a href="#内容简介" class="headerlink" title="内容简介"></a>内容简介</h1><p>处理器必须执行一系列指令，每条指令执行某个简单操作，例如两个数相加。指令被编码为由一个或多个字节序列组成的二进制格式。一个处理器支持的指令和指令的字节级编码称为它的指令集体系结构<code>(ISA, Instruction-Set Architecture)</code>。<code>ISA</code>在编译器编写者和处理器设计人员之间提供了一个概念抽象层，编译器编写者只需要知道允许哪些指令，以及它们是如何编码的；而处理器设计者必须建造出执行这些指令的处理器。</p>
 <span id="more"></span>
 
+<h1 id="Y86-64的流水线实现"><a href="#Y86-64的流水线实现" class="headerlink" title="Y86-64的流水线实现"></a>Y86-64的流水线实现</h1><p>我们终于准备好要开始本章的主要任务——设计一个流水线化的<code>Y86-64</code>处理器。首先，对顺序的<code>SEQ</code>处理器做一点小的改动，将<code>PC</code>的计算挪到取指阶段。然后，在各个阶段之间加上流水线寄存器。到这个时候，我们的尝试还不能正确处理各种数据和控制相关。不过，做一些修改，就能实现我们的目标——一个高效的、流水线化的实现<code>Y86-64 ISA</code>的处理器。</p>
+<h2 id="SEQ-：重新安排计算阶段"><a href="#SEQ-：重新安排计算阶段" class="headerlink" title="SEQ+：重新安排计算阶段"></a>SEQ+：重新安排计算阶段</h2><p>作为实现流水线化设计的一个过渡步骤，我们必须稍微调整一下<code>SEQ</code>中五个阶段的顺序，使得更新<code>PC</code>阶段在一个时钟周期开始时执行，而不是结束时才执行。只需要对整体硬件结构做最小的改动，对于流水线阶段中的活动的时序，它能工作得更好。我们称这种修改过的设计为<code>SEQ+</code>。</p>
+<p>我们移动<code>PC</code>阶段，使得它的逻辑在时钟周期开始时活动，使它计算当前指令的<code>PC</code>值。图<code>4-39</code>给出了<code>SEQ</code>和<code>SEQ+</code>在<code>PC</code>计算上的不同之处。在<code>SEQ</code>中<code>(图4-39a)</code>，<code>PC</code>计算发生在时钟周期结束的时候，根据当前时钟周期内计算出的信号值来计算<code>PC</code>寄存器的新值。在<code>SEQ+</code>中<code>(图4-39b)</code>，我们创建状态寄存器来保存在一条指令执行过程中计算出来的信号。然后，当一个新的时钟周期开始时，这些信号值通过同样的逻辑来计算当前指令的<code>PC</code>。我们将这些寄存器标号为<code>pIcode</code>、<code>pCnd</code>等等，来指明在任一给定的周期，它们保存的是前一个周期中产生的控制信号。</p>
+<p><img src="/4-39.png"></p>
+<p>图<code>4-40</code>给出了<code>SEQ+</code>硬件的一个更为详细的说明。可以看到，其中的硬件单元和控制块与我们在<code>SEQ</code>中用到的<code>(图4-23)</code>一样，只不过<code>PC</code>逻辑从上面<code>(在时钟周期结束时活动)</code>移到了下面<code>(在时钟周期开始时活动)</code>。</p>
+<p><img src="/4-40.png"></p>
+<p><code>SEQ</code>到<code>SEQ+</code>中对状态单元的改变是一种很通用的改进的例子，这种改进称为电路重定时<code>(circuit retiming)</code>。重定时改变了一个系统的状态表示，但是并不改变它的逻辑行为。通常用它来平衡一个流水线系统中各个阶段之间的延迟。</p>
+<h2 id="插入流水线寄存器"><a href="#插入流水线寄存器" class="headerlink" title="插入流水线寄存器"></a>插入流水线寄存器</h2><p>在创建一个流水线化的<code>Y86-64</code>处理器的最初尝试中，我们要在<code>SEQ+</code>的各个阶段之间插入流水线寄存器，并对信号重新排列，得到<code>PIPE-</code>处理器，这里的<code>-</code>代表这个处理器和最终的处理器设计相比，性能要差一点。<code>PIPE-</code>的抽象结构如图<code>4-41</code>所示。流水线寄存器在该图中用黑色方框表示，每个寄存器包括不同的字段，用白色方框表示。正如多个字段表明的那样，每个流水线寄存器可以存放多个字节和字。同两个顺序处理器的硬件结构<code>(图4-23和图4-40)</code>中的圆角方框不同，这些白色的方框表示实际的硬件组成。</p>
+<p><img src="/4-41.png"></p>
+<p>可以看到，<code>PIPE-</code>使用了与顺序设计<code>SEQ(图4-40)</code>几乎一样的硬件单元，但是有流水线寄存器分隔开这些阶段。两个系统中信号的不同之处在<code>4.5.3</code>节中讨论。流水线寄存器按如下方式标号：</p>
+<ul>
+<li><code>F</code>：保存程序计数器的预测值，稍后讨论</li>
+<li><code>D</code>：位于取指和译码阶段之间。它保存关于最新取出的指令的信息，即将由译码阶段进行处理</li>
+<li><code>E</code>：位于译码和执行阶段之间。它保存关于最新译码的指令和从寄存器文件读出的值的信息，即将由执行阶段进行处理</li>
+<li><code>M</code>：位于执行和访存阶段之间。它保存最新执行的指令的结果，即将由访存阶段进行处理。它还保存关于用于处理条件转移的分支条件和分支目标的信息</li>
+<li><code>W</code>：位于访存阶段和反馈路径之间，反馈路径将计算出来的值提供给寄存器文件写，而当完成<code>ret</code>指令时，它还要向<code>PC</code>选择逻辑提供返回地址</li>
+</ul>
+<p>图<code>4-42</code>表明以下代码序列如何通过我们的五阶段流水线，其中注释将各条指令标识为<code>I1~I5</code>以便引用：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">irmovq $1,%rax # I1</span><br><span class="line">irmovq $2,%rbx # I2</span><br><span class="line">irmovq $3,%rcx # I3</span><br><span class="line">irmovq $4,%rdx # I4</span><br><span class="line">halt           # I5</span><br></pre></td></tr></table></figure>
+
+<p><img src="/4-42.png"></p>
+<p>图中右边给出了这个指令序列的流水线图。同<code>4.4</code>节中简单流水线化的计算单元的流水线图一样，这个图描述了每条指令通过流水线各个阶段的行进过程，时间从左往右增大。上面一条数字表明各个阶段发生的时钟周期。例如，在周期1取出指令<code>I1</code>，然后它开始通过流水线各个阶段，到周期5结束后，其结果写入寄存器文件。在周期2取出指令<code>I2</code>，到周期6结束后，其结果写回，以此类推。在最下面，我们给出了当周期为5时的流水线的扩展图。此时，每个流水线阶段中各有一条指令。</p>
+<p>从图<code>4-42</code>中还可以判断我们画处理器的习惯是合理的，这样，指令是自底向上的流动的。周期5时的扩展图表明的流水线阶段，取指阶段在底部，写回阶段在最上面，同流水线硬件图<code>(图4-41)</code>表明的一样。如果看看流水线各个阶段中指令的顺序，就会发现它们出现的顺序与在程序中列出的顺序一样。因为正常的程序是从上到下列出的，我们保留这种顺序，让流水线从下到上进行。在使用本书附带的模拟器时，这个习惯会特别有用。</p>
+<h2 id="对信号进行重新排列和标号"><a href="#对信号进行重新排列和标号" class="headerlink" title="对信号进行重新排列和标号"></a>对信号进行重新排列和标号</h2><p>顺序实现<code>SEQ</code>和<code>SEQ+</code>在一个时刻只处理一条指令，因此诸如<code>valC</code>、<code>srcA</code>和<code>valE</code>这样的信号值有唯一的值。在流水线化的设计中，与各个指令相关联的这些值有多个版本，会随着指令一起流过系统。例如，在<code>PIPE-</code>的详细结构中，有4个标号为<code>Stat</code>的白色方框，保存着4条不同指令的状态码<code>(参见图4-41)</code>。我们需要很小心以确保使用的是正确版本的信号，否则会有很严重的错误，例如将一条指令计算出的结果存放到了另一条指令指定的目的寄存器。我们采用的命名机制，通过在信号名前面加上大写的流水线寄存器名字作为前缀，存储在流水线寄存器中的信号可以唯一地被标识。例如，4个状态码可以被命名为<code>D_stat</code>、<code>E_stat</code>、<code>M_stat</code>和<code>W_stat</code>。我们还需要引用某些在一个阶段内刚刚计算出来的信号。它们的命名是在信号名前面加上小写的阶段名的第一个字母作为前<br>缀。以状态码为例，可以看到在取指和访存阶段中标号为<code>Stat</code>的控制逻辑块。因而，这些块的输出被命名为<code>f_stat</code>和<code>m_stat</code>。我们还可以看到整个处理器的实际状态<code>Stat</code>是根据流水线寄存器<code>W</code>中的状态值，由写回阶段中的块计算出来的。</p>
+<p><code>SEQ+</code>和<code>PIPE-</code>的译码阶段都产生信号<code>dstE</code>和<code>dstM</code>，它们指明值<code>valE</code>和<code>valM</code>的目的寄存器。在<code>SEQ+</code>中，我们可以将这些信号直接连到寄存器文件写端口的地址输入。在<code>PIPE-</code>中，会在流水线中一直携带这些信号穿过执行和访存阶段，直到写回阶段才送到寄存器文件<code>(如各个阶段的详细描述所示)</code>。我们这样做是为了确保写端口的地址和数据输入是来自同一条指令。否则，会将处于写回阶段的指令的值写入，而寄存器<code>ID</code>却来自于处于译码阶段的指令。作为一条通用原则，我们要保存处于一个流水线阶段中的指令的所有信息。</p>
+<p><code>PIPE-</code>中有一个块在相同表示形式的<code>SEQ+</code>中是没有的，那就是译码阶段中标号为<code>Select A</code>的块。我们可以看出，这个块会从来自流水线寄存器<code>D</code>的<code>valP</code>或从寄存器文件<code>A</code>端口中读出的值中选择一个，作为流水线寄存器<code>E</code>的值<code>valA</code>。包括这个块是为了减少要携带给流水线寄存器<code>E</code>和<code>M</code>的状态数量。在所有的指令中，只有<code>call</code>在访存阶段需要<code>valP</code>的值。只有跳转指令在执行阶段<code>(当不需要进行跳转时)</code>需要<code>valP</code>的值。而这些指令又都不需要从寄存器文件中读出的值。因此我们合并这两个信号，将它们作为信号<code>valA</code>携带穿过流水线，从而可以减少流水线寄存器的状态数量。这样做就消除了<code>SEQ(图4-23)</code>和<code>SEQ+(图4-40)</code>中标号为数据的块，这个块完成的是类似的功能。在硬件设计中，像这样仔细确认信号是如何使用的，然后通过合并信号来减少寄存器状态和线路的数量，是很常见的。</p>
+<p>如图<code>4-41</code>所示，我们的流水线寄存器包括一个状态码<code>stat</code>字段，开始时是在取指阶段计算出来的，在访存阶段有可能会被修改。在讲完正常指令执行的实现之后，我们会在<code>4.5.6</code>节中讨论如何实现异常事件的处理。到目前为止我们可以说，最系统的方法就是让与每条指令关联的状态码与指令一起通过流水线，就像图中表明的那样。</p>
+<h2 id="预测下一个PC"><a href="#预测下一个PC" class="headerlink" title="预测下一个PC"></a>预测下一个PC</h2><p>在<code>PIPE-</code>设计中，我们采取了一些措施来正确处理控制相关。流水线化设计的目的就是每个时钟周期都发射一条新指令，也就是说每个时钟周期都有一条新指令进入执行阶段并最终完成。要是达到这个目的也就意味着吞吐量是每个时钟周期一条指令。要做到这一点，我们必须在取出当前指令之后，马上确定下一条指令的位置。不幸的是，如果取出的指令是条件分支指令，要到几个周期后，也就是指令通过执行阶段之后，我们才能知道是否要选择分支。类似地，如果取出的指令是<code>ret</code>，要到指令通过访存阶段，才能确定返回地址。</p>
+<p>除了条件转移指令和<code>ret</code>以外，根据取指阶段中计算出的信息，我们能够确定下一条指令的地址。对于<code>call</code>和<code>jmp(无条件转移)</code>来说，下一条指令的地址是指令中的常数字<code>valC</code>，而对于其他指令来就是<code>valP</code>。因此，通过预测<code>PC</code>的下一个值，在大多数情况下，我们能达到每个时钟周期发射一条新指令的目的。对大多数指令类型来说，我们的预测是完全可靠的。对条件转移来说，我们既可以预测选择了分支，那么新<code>PC</code>值应为<code>valC</code>，也可以预测没有选择分支，那么新<code>PC</code>值应为<code>valP</code>。无论哪种情况，我们都必须以某种方式来处理预测错误的情况，因为此时已经取出并部分执行了错误的指令。我们会在<code>4.5.8</code>节中再讨论这个问题。</p>
+<p>猜测分支方向并根据猜测开始取指的技术称为分支预测。实际上所有的处理器都采用了某种形式的此类技术。对于预测是否选择分支的有效策略已经进行了广泛的研究。有的系统花费了大量硬件来解决这个任务。我们的设计只使用了简单的策略，即总是预测选择了条件分支，因而预测<code>PC</code>的新值为<code>valC</code>。</p>
+<p>我们还没有讨论预测<code>ret</code>指令的新<code>PC</code>值。同条件转移不同，此时可能的返回值几乎是无限的，因为返回地址是位于栈顶的字，其内容可以是任意的。在设计中，我们不会试图对返回地址做任何预测。只是简单地暂停处理新指令，直到<code>ret</code>指令通过写回阶段。在<code>4.5.8</code>节中，我们将回过来讨论这部分的实现。</p>
+<p><code>PIPE-</code>的取指阶段，如图<code>4-41</code>底部所示，负责预测<code>PC</code>的下一个值，以及为取指选择实际的<code>PC</code>。我们可以看到，标号为<code>Predict PC</code>的块会从<code>PC</code>增加器计算出的<code>valP</code>和取出的指令中得到的<code>valC</code>中进行选择。这个值存放在流水线寄存器<code>F</code>中，作为程序计数器的预测值。标号为<code>Select PC</code>的块类似于<code>SEQ+</code>的<code>PC</code>选择阶段中标号为<code>PC</code>的块<code>(图4-40)</code>。它从三个值中选择一个作为指令内存的地址：预测的<code>PC</code>，对于到达流水线寄存器<code>M</code>的不选择分支的指令来说是<code>valP</code>的值<code>(存储在寄存器M_valA中)</code>，或是当<code>ret</code>指令到达流水线寄存器<code>W(存储在W_valM)</code>时的返回地址的值。</p>
+<h2 id="流水线冒险"><a href="#流水线冒险" class="headerlink" title="流水线冒险"></a>流水线冒险</h2><p><code>PIPE-</code>结构是创建一个流水线化的<code>Y86-64</code>处理器的好开端。不过，回忆<code>4.4.4</code>节中的讨论，将流水线技术引入一个带反馈的系统，当相邻指令间存在相关时会导致出现问题。在完成我们的设计之前，必须解决这个问题。这些相关有两种形式：</p>
+<ul>
+<li><p>数据相关，下一条指令会用到这一条指令计算出的结果</p>
+</li>
+<li><p>控制相关，一条指令要确定下一条指令的位置，例如在执行跳转、调用或返回指令时</p>
+</li>
+</ul>
+<p>这些相关可能会导致流水线产生计算错误，称为冒险<code>(hazard)</code>。同相关一样，冒险也可以分为两类：数据冒险<code>(data hazard)</code>和控制冒险<code>(control hazard)</code>。我们首先关心的是数据冒险，然后再考虑控制冒险。</p>
+<p>图<code>4-43</code>描述的是<code>PIPE-</code>处理器处理<code>prog1</code>指令序列的情况。假设在这个例子以及后面的例子中，程序寄存器初始时值都为0。这段代码将值10和3放入程序寄存器<code>%rdx</code>和<code>%rax</code>，执行三条<code>nop</code>指令，然后将寄存器<code>%rdx</code>加到<code>%rax</code>。我们重点关注两条<code>irmovq</code>指令和<code>addq</code>指令之间的数据相关造成的可能的数据冒险。图的右边是这个指令序列的流水线图。图中突出显示了周期6和7的流水线阶段。流水线图的下面是周期6中写回活动和周期7中译码活动的扩展说明。在周期7开始以后，两条<code>irmovq</code>都已经通过写回阶段，所以寄存器文件保存着更新过的<code>%rdx</code>和<code>%rax</code>的值。因此，当<code>addq</code>指令在周期7经过译码阶段时，它可以读到源操作数的正确值。在此示例中，两条<code>irmovq</code>指令和<code>addq</code>指令之间的数据相关没有造成数据冒险。</p>
+<p><img src="/4-43.png"></p>
+<p>我们看到<code>prog1</code>通过流水线并得到正输的结果，因为3条<code>nop</code>指令在有数据相关的指令之间创造了一些延迟。让我们来看看如果去掉这些<code>nop</code>指令会发生些什么。图<code>4-44</code>描述的是<code>prog2</code>程序的流水线流程，在两条产生寄存器<code>%rdx</code>和<code>%rax</code>值的<code>irmovq</code>指令和以这两个寄存器作为操作数的<code>addq</code>指令之间有两条<code>nop</code>指令。在这种情况下，关键步骤发生在周期6，此时<code>addq</code>指令从寄存器文件中读取它的操作数。该图底部是这个同期内流水线活动的扩展描述。第一个<code>irmovq</code>指令已经通过了写回阶段，因此程序寄存器<code>%rdx</code>已经在寄存器文件中更新过了。在该周期内，第二个<code>irmovq</code>指令处于写回阶段，因此对程序寄存器<code>%rax</code>的写要到周期7开始，时钟上升时，才会发生。结果，会读出<code>%rax</code>的错误值<code>(回想一下，我们假设所有的寄存器的初始值为0)</code>，因为对该寄存器的写还未发生。很明显，我们必须改进流水线让它能够正确处理这样的冒险。</p>
+<p><img src="/4-44.png"></p>
+<p>图<code>4-45</code>是当<code>irmovq</code>指令和<code>addq</code>指令之间只有一条<code>nop</code>指令，即为程序<code>prog3</code>时发生的情况。现在我们必须检查周期5内流水线的行为，此时<code>addq</code>指令通过译码阶段。不幸的是，对寄存器<code>%rdx</code>的写仍处在写回阶段，而对寄存器<code>%rax</code>的写还处在访存阶段。因此，<code>addq</code>指令会得到两个错误的操作数。</p>
+<p><img src="/4-45.png"></p>
+<p>图<code>4-46</code>是当去掉<code>irmovq</code>指令和<code>addq</code>指令间的所有<code>nop</code>指令，即为程序<code>prog4</code>时发生的情况。现在我们必须检查周期4内流水线的行为，此时<code>addq</code>指令通过译码阶段。不幸的是，对寄存器<code>%rdx</code>的写仍处在访存阶段，而执行阶段正在计算寄存器<code>%rax</code>的新值。因此，<code>addq</code>指令的两个操作数都是不正确的。</p>
+<p><img src="/4-46.png"></p>
+<p>这些例子说明，如果一条指令的操作数被它前面三条指令中的任意一条改变的话，都会出现数据冒险。之所以会出现这些冒险，是因为我们的流水线化的处理器是在译码阶段从寄存器文件中读取指令的操作数，而要到三个周期以后，指令经过写回阶段时，才会将指令的结果写到寄存器文件。</p>
+<h3 id="用暂停来避免数据冒险"><a href="#用暂停来避免数据冒险" class="headerlink" title="用暂停来避免数据冒险"></a>用暂停来避免数据冒险</h3><p>暂停<code>(stalling)</code>是避免冒险的一种常用技术，暂停时，处理器会停止流水线中一条或多条指令，直到冒险条件不再满足。让一条指令停顿在译码阶段，直到产生它的源操作数的指令通过了写回阶段，这样我们的处理器就能避免数据冒险。这种机制的细节会在<code>4.5.8</code>节中讨论。它对流水线控制逻辑做了一些简单的加强。图<code>4-47(prog2)</code>和图<code>4-48(prog4)</code>中画出了暂停的效果。<code>(在这里的讨论中我们省略了prog3，因为它的运行类似于其他两个例子。)</code>当指令<code>addq</code>处于译码阶段时，流水线控制逻辑发现执行、访存或写回阶段中至少有一条指令会更新寄存器<code>%rdx</code>或<code>%rax</code>。处理器不会让<code>addq</code>指令带着不正确的结果通过这个阶段，而是会暂停指令，将它阻塞在译码阶段，时间为一个周期<code>(对prog2来说)</code>或者三个周期<code>(对prog4来说)</code>。对所有这三个程序来说，<code>addq</code>指令最终都会在周期7中得到两个源操作数的正确值，然后继续沿着流水线进行下去。</p>
+<p><img src="/4-47.png"></p>
+<p>将<code>addq</code>指令阻塞在译码阶段时，我们还必须将紧跟其后的<code>halt</code>指令阻塞在取指阶段。通过将程序计数器保持不变就能做到这一点，这样一来，会不断地对<code>halt</code>指令进行取指，直到暂停结束。</p>
+<p><img src="/4-48.png"></p>
+<p>暂停技术就是让一组指令阻塞在它们所处的阶段，而允许其他指令继续通过流水线。那么在本该正常处理<code>addq</code>指令的阶段中，我们该做些什么呢？我们使用的处理方法是：每次要把一条指令阻塞在译码阶段，就在执行阶段插入一个气泡。气泡就像一个自动产生的<code>nop</code>指令——它不会改变寄存器、内存、条件码或程序状态。在图<code>4-47</code>和图<code>4-48</code>的流水线图中，白色方框表示的就是气泡。在这些图中，我们用一个<code>addq</code>指令的标号为<code>D</code>的方框到标号为<code>E</code>的方框之间的箭头来表示一个流水线气泡，这些箭头表明，在执行阶段中插入气泡是为了替代<code>addq</code>指令，它本来应该经过译码阶段进入执行阶段。在<code>4.5.8</code>节中，我们将看到使流水线暂停以及插入气泡的详细机制。</p>
+<p>在使用暂停技术来解决数据冒险的过程中，我们通过动态地产生和<code>prog1</code>流<code>(图4-43)</code>一样的流水线流，有效地执行了程序<code>prog2</code>和<code>prog4</code>。为<code>prog2</code>插入1个气泡，为<code>prog4</code>插入3个气泡，与在第2条<code>irmovq</code>指令和<code>addq</code>指令之间有3条<code>nop</code>指令，有相同的效果。虽然实现这一机制相当容易<code>(参考家庭作业4.53)</code>，但是得到的性能并不很好。一条指令更新一个寄存器，紧跟其后的指令就使用被更新的寄存器，像这样的情况不胜枚举。这会导致流水线暂停长达三个周期，严重降低了整体的吞吐量。</p>
+<h3 id="用转发来避免数据冒险"><a href="#用转发来避免数据冒险" class="headerlink" title="用转发来避免数据冒险"></a>用转发来避免数据冒险</h3><p><code>PIPE-</code>的设计是在译码阶段从寄存器文件中读入源操作数，但是对这些源寄存器的写有可能要在写回阶段才能进行。与其暂停直到写完成，不如简单地将要写的值传到流水线寄存器<code>E</code>作为源操作数。图<code>4-49</code>用<code>prog2</code>周期6的流水线图的扩展描述来说明了这一策略。译码阶段逻辑发现，寄存器<code>%rax</code>是操作数<code>valB</code>的源寄存器，而在写端口<code>E</code>上还有一个对<code>%rax</code>的未进行的写。它只要简单地将提供到端口<code>E</code>的数据字<code>(信号W_valE)</code>作为操作数<code>valB</code>的值，就能避免暂停。这种将结果值直接从一个流水线阶段传到较早阶段的技术称为数据转发<code>(data forwarding, 或简称转发，有时称为旁路(bypassing))</code>。它使得<code>prog2</code>的指令能通过流水线而不需要任何暂停。数据转发需要在基本的硬件结构中增加一些额外的数据连接和控制逻辑。</p>
+<p><img src="/4-49.png"></p>
+<p>如图<code>4-50</code>所示，当访存阶段中有对寄存器未进行的写时，也可以使用数据转发，以避免程序<code>prog3</code>中的暂停。在周期5中，译码阶段逻辑发现，在写回阶段中端口<code>E</code>上有对寄存器<code>%rdx</code>未进行的写，以及在访存阶段中有会在端口<code>E</code>上对寄存器<code>%rax</code>未进行的写。它不会暂停直到这些写真正发生，而是用写回阶段中的值<code>(信号W_valE)</code>作为操作数<code>valA</code>，用访存阶段中的值<code>(信号M_valE)</code>作为操作数<code>valB</code>。</p>
+<p><img src="/4-50.png"></p>
+<p>为了充分利用数据转发技术，我们还可以将新计算出来的值从执行阶段传到译码阶段，以避免程序<code>prog4</code>所需要的暂停，如图<code>4-51</code>所示。在周期4中，译码阶段逻辑发现在访存阶段中有对寄存器<code>%rdx</code>未进行的写，而且执行阶段中<code>ALU</code>正在计算的值稍后也会写入寄存器<code>%rax</code>。它可以将访存阶段中的值<code>(信号M_valE)</code>作为操作数<code>valA</code>，也可以将<code>ALU</code>的输出<code>(信号e_valE)</code>作为操作数<code>valB</code>。注意，使用<code>ALU</code>的输出不会造成任何时序问题。译码阶段只要在时钟周期结束之前产生一个信号<code>valA</code>和<code>valB</code>，这样在时钟上升开始下一个周期时，流水线寄存器<code>E</code>就能装载来自译码阶段的值了。而在此之前<code>ALU</code>的输出已经是合法的了。</p>
+<p><img src="/4-51.png"></p>
+<p>程序<code>prog2~prog4</code>中描述的转发技术的使用都是将<code>ALU</code>产生的以及其目标为写端口<code>E</code>的值进行转发，其实也可以转发从内存中读出的以及其目标为写端口<code>M</code>的值。从访存阶段，我们可以转发刚刚从数据内存中读出的值<code>(信号m_valM)</code>。从写回阶段，我们可以转发对端口<code>M</code>未进行的写<code>(信号W_valM)</code>。这样一共有五个不同的转发源<code>(e_valE、m_valM、M_valE、W_valM和w_valE)</code>，以及两个不同的转发目的<code>(valA和valB)</code>。</p>
+<p>图<code>4-49~</code>图<code>4-51</code>的扩展图还表明译码阶段逻辑能够确定是使用来自寄存器文件的值，还是要用转发过来的值。与每个要写回寄存器文件的值相关的是目的寄存器<code>ID</code>。逻辑会将这些<code>ID</code>与源寄存器<code>ID srcA</code>和<code>srcB</code>相比较，以此来检测是否需要转发。可能有多个目的寄存器<code>ID</code>与一个源<code>ID</code>相等。要解决这样的情况，我们必须在各个转发源中建立起优先级关系。在学习转发逻辑的详细设计时，我们会讨论这个内容。</p>
+<p>图<code>4-52</code>给出的是<code>PIPE</code>的结构，它是<code>PIPE-</code>的扩展，能通过转发处理数据冒险。将这幅图与<code>PIPE-</code>的结构<code>(图4-41)</code>相比，我们可以看到来自五个转发源的值反馈到译码阶段中两个标号为<code>Sel+Fwd A</code>和<code>Fwd B</code>的块。标号为<code>Sel+Fwd A</code>的块是<code>PIPE-</code>中标号为<code>Select A</code>的块的功能与转发逻辑的结合。它允许流水线寄存器<code>E</code>的<code>valA</code>为已增加的程序计数器值<code>valP</code>，从寄存器文件<code>A</code>端口读出的值，或者某个转发过来的值。标号为<code>Fwd B</code>的块实现的是源操作数<code>valB</code>的转发逻辑。</p>
+<p><img src="/4-52.png"></p>
+<h3 id="加载-x2F-使用数据冒险"><a href="#加载-x2F-使用数据冒险" class="headerlink" title="加载&#x2F;使用数据冒险"></a>加载&#x2F;使用数据冒险</h3><p>有一类数据冒险不能单纯用转发来解决，因为内存读在流水线发生的比较晚。图<code>4-53</code>举例说明了加载<code>/</code>使用冒险<code>(load/use hazard)</code>，其中一条指令<code>(位于地址0x028的mrmovq)</code>从内存中读出寄存器<code>%rax</code>的值，而下一条指令<code>(位于地址0x032的addq)</code>需要该值作为源操作数。图的下部是周期7和8的扩展说明，在此假设所有的程序寄存器都初始化为0。<code>addq</code>指令在周期7中需要该寄存器的值，但是<code>mrmovq</code>指令直到周期8才产生出这个值。为了从<code>mrmovq</code>转发到<code>addq</code>，转发逻辑不得不将值送回到过去的时间。这显然是不可能的，我们必须找到其他机制来解决这种形式的数据冒险。<code>(位于地址0x01e的irmovq指令产生的寄存器%rbx的值，会被位于地址0x032的addq指令使用，转发能够处理这种数据冒险。)</code></p>
+<p><img src="/4-53.png"></p>
+<p>如图<code>4-54</code>所示，我们可以将暂停和转发结合起来，避免加载<code>/</code>使用数据冒险，这个需要修改控制逻辑，但是可以使用现有的旁路路径。当<code>mrmovq</code>指令通过执行阶段时，流水线控制逻发现译码阶段中的指令<code>(addq)</code>需要从内存中读出的结果。它会将译码阶段中指令暂停一个周期，导致执行阶段中插入一个气泡。如周期8的扩展说明所示，从内存中读出的值可以从访存阶段转发到译码阶段中的<code>addq</code>指令。寄存器<code>%rbx</code>的值也可以从访存阶段转发到译码阶段。就像流水线图，从周期7中标号为<code>D</code>的方框到周期8中标号为<code>E</code>的方框的箭头表明的那样，插入的气泡代替了正常情况下本来应该继续通过流水线的<code>addq</code>指令。</p>
+<p><img src="/4-54.png"></p>
+<p>这种用暂停来处理加载<code>/</code>使用冒险的方法称为加载互锁<code>(load interlock)</code>。加载互锁和转发技术结合起来足以处理所有可能类型的数据冒险。因为只有加载互锁会降低流水线的吞吐量，我们几乎可以实现每个时钟周期发射一条新指令的吞吐量目标。</p>
+<h3 id="避免控制冒险"><a href="#避免控制冒险" class="headerlink" title="避免控制冒险"></a>避免控制冒险</h3><p>当处理器无法根据处于取指阶段的当前指令来确定下一条指令的地址时，就会出现控制冒险。如同在<code>4.5.4</code>节讨论过的，在我们的流水线化处理器中，控制冒险只会发生在<code>ret</code>指令和跳转指令。而且，后一种情况只有在条件跳转方向预测错误时才会造成麻烦。在本小节中，我们概括介绍如何来处理这些冒险。作为对流水线控制更一般性讨论的一部分，其详细实现将在<code>4.5.8</code>节给出。</p>
+<p>对于<code>ret</code>指令，考虑下面的示例程序。这个程序是用汇编代码表示的，左边是各个指令的地址，以供参考：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">0x000:     irmovq stack,%rsp  #     Initialize stack pointer</span><br><span class="line">0x00a:     call proc          #     Procedure call</span><br><span class="line">0x013:     irmovq $10,%rdx    #     Return point</span><br><span class="line">0x01d:     halt</span><br><span class="line">0x020: .pos 0x20</span><br><span class="line">0x020: proc:                  # proc:</span><br><span class="line">0x020:     ret                #     Return immediately</span><br><span class="line">0x021:     rrmovq %rdx,%rbx   #     Not executed</span><br><span class="line">0x030: .pos 0x30</span><br><span class="line">0x030: stack:                 # stack: Stack pointer</span><br></pre></td></tr></table></figure>
+
+<p>图<code>4-55</code>给出了我们希望流水线如何来处理<code>ret</code>指令。同前面的流水线图一样，这幅图展示了流水线的活动，时间从左向右增加。与前面不同的是，指令列出的顺序与它们在程序中出现的顺序并不相同，这是因为这个程序的控制流中指令并不是按线性顺序执行的。看看指令的地址就能看出它们在程序中的位置。</p>
+<p><img src="/4-55.png"></p>
+<p>如这张图所示，在周期3中取出<code>ret</code>指令，并沿着流水线前进，在周期7进入写回阶段。在它经过译码、执行和访存阶段时，流水线不能做任何有用的活动。我们只能在流水线中插入三个气泡。一旦<code>ret</code>指令到达写回阶段，<code>PC</code>选择逻辑就会将程序计数器设为返回地址，然后取指阶段就会取出位于返回点<code>(地址0x013)</code>处的<code>irmovq</code>指令。</p>
+<p>要处理预测错误的分支，考虑下面这个用汇编代码表示的程序，左边是各个指令的地址，以供参考：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">0x000:     xorq %rax,%rax</span><br><span class="line">0x002:     jne target        # Not taken</span><br><span class="line">0x00b:     irmovq $1, %rax   # Fall through</span><br><span class="line">0x015:     halt</span><br><span class="line">0x016: target:</span><br><span class="line">0x016:     irmovq $2, %rdx   # Target</span><br><span class="line">0x020:     irmovq $3, %rbx   # Target+1</span><br><span class="line">0x02a:     halt</span><br></pre></td></tr></table></figure>
+
+<p>图<code>4-56</code>表明是如何处理这些指令的。同前面一样，指令是按照它们进入流水线的顺序列出的，而不是按照它们出现在程序中的顺序。因为预测跳转指令会选择分支，所以周期3中会取出位于跳转目标出的指令，而同期4中会取出该指令后的那条情令，在周期4，分支逻辑发现不应该选择分支之前，已经取出了两条指令，它们不应该继续执行下去了。幸运的是，这两条指令都没有导致程序员可见的状态发生改变。只有到指令到达执行阶段时才会发生那种情况，在执行阶段中，指令会改变条件码。我们只要在下一个周期往译码和执行阶段中插入气泡，并同时取出跳转指令后面的指令，这样就能取消<code>(有时也称为指令排除(instruction squashing))</code>那两条预测错误的指令。这样一来，两条预测错误的指令就会简单地从流水线中消失，因此不会对程序员可见的状态产生影响。唯一的缺点是两个时钟周期的指令处理能力被浪费了。</p>
+<p><img src="/4-56.png"></p>
+<p>对控制冒险的讨论表明，通过慎重考虑流水线的控制逻辑，控制冒险是可以被处理的。在出现特殊情况时，暂停和往流水线中插入气泡的技术可以动态调整流水线的流程。如同我们将在<code>4.5.8</code>节中讨论的一样，对基本时钟寄存器设计的简单扩展就可以让我们暂停流水段，并向作为流水线控制逻辑一部分的流水线寄存器中插入气泡。</p>
+<h2 id="异常处理"><a href="#异常处理" class="headerlink" title="异常处理"></a>异常处理</h2><p>正如第8章中将讨论的，处理器中很多事情都会导致异常控制流，此时，程序执行的正常流程被破坏掉。异常可以由程序执行从内部产生，也可以由某个外部信号从外部产生。我们的指令集体系结构包括三种不同的内部产生的异常：</p>
+<ul>
+<li><p><code>halt</code>指令</p>
+</li>
+<li><p>有非法指令和功能码组合的指令</p>
+</li>
+<li><p>取指或数据读写试图访问一个非法地址。</p>
+</li>
+</ul>
+<p>一个更完整的处理器设计应该也能处理外部异常，例如当处理器收到一个网络接口收到新包的信号，或是一个用户点击鼠标按钮的信号。正确处理异常是任何微处理器设计中很有挑战性的一方面。异常可能出现在不可预测的时间，需要明确地中断通过处理器流水线的指令流。我们对这三<br>种内部异常的处理只是让你对正确发现和处理异常的真实复杂性略有了解。</p>
+<p>我们把导致异常的指令称为异常指令<code>(excepting instruction)</code>。在使用非法指令地址的情况中，没有实际的异常指令，但是想象在非法地址处有一种<code>虚拟指令</code>会有所帮助。在简化的<code>ISA</code>模型中，我们希望当处理器遇到异常时，会停止，设置适合的状态码，如图<code>4-5</code>所示。看上去应该是到异常指令之前的所有指令都已经完成，而其后的指令都不应该对程序员可见的状态产生任何影响。在一个更完整的设计中，处理器会继续调用异常处理程序<code>(exception handler)</code>，这是操作系统的一部分，但是实现异常处理的这部分超出了本书讲述的范围<code>(参见中文版勘误网站第12页的说明)</code>。</p>
+<p>在一个流水线化的系统中，异常处理包括一些细节问题。首先，可能同时有多条指令会引起异常。例如，在一个流水线操作的周期内，取指阶段中有<code>halt</code>指令，而数据内存会报告访存阶段中的指令数据地址越界。我们必须确定处理器应该向操作系统报告哪个异常。基本原则是：由流水线中最深的指令引起的异常，优先级最高。在上面那个例子中，应该报告访存阶段中指令的地址越界。就机器语言程序来说，访存阶段中的指令本来应该在取指阶段中的指令开始之前就结束的，所以，只应该向操作系统报告这个异常。</p>
+<p>第二个细节问题是，当首先取出一条指令，开始执行时，导致了一个异常，而后来由于分支预测错误，取消了该指令。下面就是一个程序示例的目标代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">0x000: 6300                 |     xorq %rax,%rax</span><br><span class="line">0x002: 741600000000000000   |     jne target        # Not taken</span><br><span class="line">0x00b: 30f00100000000000000 |     irmovq $1, %rax   # Fall through</span><br><span class="line">0x015: 00                   |     halt</span><br><span class="line">0x016:                      | target:</span><br><span class="line">0x016: ff                   |     .byte 0xFF        # Invalid instruction code</span><br></pre></td></tr></table></figure>
+
+<p>在这个程序中，流水线会预测选择分支，因此它会取出并以一个值为<code>0xFF</code>的字节作为指令<code>(由汇编代码中.byte伪指令产生的)</code>。译码阶段会因此发现一个非法指令异常。稍后，流水线会发现不应该选择分支，因此根本就不应该取出位于地址<code>0x016</code>的指令。流水线控制逻辑会取消该指令，但是我们想要避免出现异常。</p>
+<p>第三个细节问题的产生是因为流水线化的处理器会在不同的阶段更新系统状态的不同部分。有可能会出现这样的情况，一条指令导致了一个异常，它后面的指令在异常指令完成之前改变了部分状态。比如说，考虑下面的代码序列，其中假设不允许用户程序访问64位范围的高端地址：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">irmovq $1,%rax</span><br><span class="line">xorq %rsp,%rsp  # Set stack pointer to 0 and CC to 100</span><br><span class="line">pushq %rax      # Attempt to write to 0xfffffffffffffff8</span><br><span class="line">addq %rax,%rax  # (Should not be executed) Would set CC to 000</span><br></pre></td></tr></table></figure>
+
+<p><code>pushq</code>指令导致一个地址异常，因为减小栈指针会导致它绕回到<code>0xfffffffffffffff8</code>。访存阶段中会发现这个异常。在同一周期中，<code>addq</code>指令处于执行阶段，而它会将条件码设置成新的值。这就会违反异常指令之后的所有指令都不能影响系统状态的要求。</p>
+<p>一般地，通过在流水线结构中加入异常处理逻辑，我们既能够从各个异常中做出正确的选择，也能够避免出现由于分支预测错误取出的指令造成的异常。这就是为什么我们会在每个流水线寄存器中包括一个状态码<code>stat(图4-41和图4-52)</code>。如果一条指令在其处理中于某个阶段产生了一个异常，这个状态字段就被设置成指示异常的种类。异常状态和该指令的其他信息一起沿着流水线传播，直到它到达写回阶段。在此，流水线控制逻辑发现出现了异常，并停止执行。</p>
+<p>为了避免异常指令之后的指令更新任何程序员可见的状态，当处于访存或写回阶段中的指令导致异常时，流水线控制逻辑必须禁止更新条件码寄存器或是数据内存。在上面的示例程序中，控制逻辑会发现访存阶段中的<code>pushq</code>导致了异常，因此应该禁止<code>addq</code>指令更新条件码寄存器。</p>
+<p>让我们来看看这种处理异常的方法是怎样解决刚才提到的那些细节问题的。当流水线中有一个或多个阶段出现异常时，信息只是简单地存放在流水线寄存器的状态字段中。异常事件不会对流水线中的指令流有任何影响，除了会禁止流水线中后面的指令更新程序员可见的状态<code>(条件码寄存器和内存)</code>，直到异常指令到达最后的流水线阶段。因为指令到达写回阶段的顺序与它们在非流水线化的处理器中执行的顺序相同，所以我们可以保证第一条遇到异常的指令会第一个到达写回阶段，此时程序执行会停止，流水线寄存器<code>W</code>中的状态码会被记录为程序状态。如果取出了某条指令，过后又取消了，那么所有关于这条指令的异常状态信息也都会被取消。所有导致异常的指令后面的指令都不能改变程序员可见的状态。携带指令的异常状态以及所有其他信息通过流水线的简单原则是处理异常的简单而可靠的机制。</p>
+<h2 id="PIPE各阶段的实现"><a href="#PIPE各阶段的实现" class="headerlink" title="PIPE各阶段的实现"></a>PIPE各阶段的实现</h2><p>现在我们已经创建了<code>PIPE</code>的整体结构，<code>PIPE</code>是我们使用了转发技术的流水线化的<code>Y86-64</code>处理器。它使用了一组与前面顺序设计相同的硬件单元，另外增加了一些流水线寄存器、一些重新配置了的逻辑块，以及增加的流水线控制逻辑。在本节中，我们将浏览各个逻辑块的设计，而将流水线控制逻辑的设计放到下一节中介绍。许多逻辑块与<code>SEQ</code>和<code>SEQ+</code>中相应部件完全相同，除了我们必须从来自不同流水线寄存器<code>(用大写的流水线寄存器的名字作为前缀)</code>或来自各个阶段计算<code>(用小写的阶段名字的第一个字母作为前缀)</code>的信号中选择适当的值。</p>
+<p>作为一个示例，比较一下<code>SEQ</code>中产生<code>srcA</code>信号的逻辑的<code>HCL</code>代码与<code>PIPE</code>中相应的代码：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">    # Code from SEQ</span><br><span class="line">word srcA = [</span><br><span class="line">    icode in &#123; IRRMOVQ, IRMMOVQ, IOPQ, IPUSHQ &#125; : rA;</span><br><span class="line">    icode in &#123; IPOPQ, IRET &#125; : RRSP;</span><br><span class="line">    <span class="number">1</span> : RNONE; # Don’t need <span class="keyword">register</span></span><br><span class="line">];</span><br><span class="line">    # Code from PIPE</span><br><span class="line">word d_srcA = [</span><br><span class="line">    D_icode in &#123; IRRMOVQ, IRMMOVQ, IOPQ, IPUSHQ &#125; : D_rA;</span><br><span class="line">    D_icode in &#123; IPOPQ, IRET &#125; : RRSP;</span><br><span class="line">    <span class="number">1</span> : RNONE; # Don’t need <span class="keyword">register</span></span><br><span class="line">];</span><br></pre></td></tr></table></figure>
+
+<p>它们的不同之处只在于<code>PIPE</code>信号都加上了前缀：<code>D_</code>表示源值，以表明信号是来自流水线寄存器<code>D</code>，而<code>d_</code>表示结果值，以表明它是在译码阶段中产生的。为了避免重复，我们在此就不列出那些与<code>SEQ</code>中代码只有名字前缀不同的块的<code>HCL</code>代码。</p>
+<h3 id="PC选择和取指阶段"><a href="#PC选择和取指阶段" class="headerlink" title="PC选择和取指阶段"></a>PC选择和取指阶段</h3><p>图<code>4-57</code>提供了<code>PIPE</code>取指阶段逻辑的一个详细描述。像前面讨论过的那样，这个阶段必须选择程序计数器的当前值，并且预测下一个<code>PC</code>值。用于从内存中读取指令和抽取不同指令字段的硬件单元与<code>SEQ</code>中考虑的那些一样<code>(参见4.3.4节中的取指阶段)</code>。</p>
+<p><img src="/4-57.png"></p>
+<p><code>PC</code>选择逻辑从三个程序计数器源中进行选择。当一条预测错误的分支进入访存阶段时，会从流水线寄存器<code>M(信号M_valA)</code>中读出该指令<code>valP</code>的值<code>(指明下一条指令的地址)</code>。当<code>ret</code>指令进入写回阶段时，会从流水线寄存器<code>W(信号w_valM)</code>中读出返回地址。其他情况会使用存放在流水线寄存器<code>F(信号F_predPC)</code>中的<code>PC</code>的预测值：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">word f_pc = [</span><br><span class="line">    # Mispredicted branch. Fetch at incremented PC</span><br><span class="line">    M_icode == IJXX &amp;&amp; !M_Cnd : M_valA;</span><br><span class="line">    # Completion of RET instruction</span><br><span class="line">    W_icode == IRET : W_valM;</span><br><span class="line">    # Default: Use predicted value of PC</span><br><span class="line">    <span class="number">1</span> : F_predPC;</span><br><span class="line">];</span><br></pre></td></tr></table></figure>
+
+<p>当取出的指令为函数调用或跳转时，<code>PC</code>预测逻辑会选择<code>valC</code>，否则就会选择<code>valP</code>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">word f_predPC = [</span><br><span class="line">    f_icode in &#123; IJXX, ICALL &#125; : f_valC;</span><br><span class="line">    1 : f_valP;</span><br><span class="line">];</span><br></pre></td></tr></table></figure>
+
+<p>标号为<code>Instr valid</code>、<code>Need regids</code>和<code>Need valC</code>的逻辑块和<code>SEQ</code>中的一样，使用了适当命名的源信号。同<code>SEQ</code>中不一样，我们必须将指令状态的计算分成两个部分。在取指阶段，可以测试由于指令地址越界引起的内存错误，还可以发现非法指令或<code>halt</code>指令。必须推迟到访存阶段才能发现非法数据地址。</p>
+<h3 id="译码和写回阶段"><a href="#译码和写回阶段" class="headerlink" title="译码和写回阶段"></a>译码和写回阶段</h3><p>图<code>4-58</code>是<code>PIPE</code>的译码和写回逻辑的详细说明。标号为<code>dstE</code>、<code>dstM</code>、<code>srcA</code>和<code>srcB</code>的块非常类似于它们在<code>SEQ</code>的实现中的相应部件。我们观察到，提供给写端口的寄存器<code>ID</code>来自于写回阶段<code>(信号W_dstE和W_dstM)</code>，而不是来自于译码阶段。这是因为我们希望进行写的目的寄存器是由写回阶段中的指令指定的。</p>
+<p><img src="/4-58.png"></p>
+<p>这个阶段的复杂性主要是跟转发逻辑相关。就像前面提到的那样，标号为<code>Sel+Fwd A</code>的块扮演两个角色。它为后面的阶段将<code>valP</code>信号合并到<code>valA</code>信号，这样可以减少流水线寄存器中状态的数量。它还实现了源操作数<code>valA</code>的转发逻辑。</p>
+<p>合并信号<code>valA</code>和<code>valP</code>的依据是，只有<code>call</code>和跳转指令在后面的阶段中需要<code>valP</code>的值，而这些指令并不需要从寄存器文件<code>A</code>端口中读出的值。这个选择是由该阶段的<code>icode</code>信号来控制的。当信号<code>D_icode</code>与<code>call</code>或<code>jXX</code>的指令代码相匹配时，这个块就会选择<code>D_valP</code>作为它的输出。</p>
+<p><code>4.5.5</code>节中提到有5个不同的转发源，每个都有一个数据字和一个目的寄存器<code>ID</code>：</p>
+<table>
+<thead>
+<tr>
+<th align="center">数据字</th>
+<th align="center">寄存器ID</th>
+<th align="center">源描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><code>e_valE</code></td>
+<td align="center"><code>e_dstE</code></td>
+<td align="center"><code>ALU</code>输出</td>
+</tr>
+<tr>
+<td align="center"><code>m_valM</code></td>
+<td align="center"><code>M_dstM</code></td>
+<td align="center">内存输出</td>
+</tr>
+<tr>
+<td align="center"><code>M_valE</code></td>
+<td align="center"><code>M_dstE</code></td>
+<td align="center">访存阶段中对端口<code>E</code>未进行的写</td>
+</tr>
+<tr>
+<td align="center"><code>W_valM</code></td>
+<td align="center"><code>W_dstM</code></td>
+<td align="center">写回阶段中对端口<code>M</code>未进行的写</td>
+</tr>
+<tr>
+<td align="center"><code>W_valE</code></td>
+<td align="center"><code>W_dstE</code></td>
+<td align="center">写回阶段中对端口<code>E</code>未进行的写</td>
+</tr>
+</tbody></table>
+<p>如果不满足任何转发条件，这个块就应该选择<code>d_rvalA</code>作为它的输出，也就是从寄存器端口<code>A</code>中读出的值。综上所述，我们得到以下流水线寄存器<code>E</code>的<code>valA</code>新值的<code>HCL</code>描述：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">word d_valA = [</span><br><span class="line">    D_icode in &#123; ICALL, IJXX &#125; : D_valP; # Use incremented PC</span><br><span class="line">    d_srcA == e_dstE : e_valE; # Forward valE from execute</span><br><span class="line">    d_srcA == M_dstM : m_valM; # Forward valM from memory</span><br><span class="line">    d_srcA == M_dstE : M_valE; # Forward valE from memory</span><br><span class="line">    d_srcA == W_dstM : W_valM; # Forward valM from write back</span><br><span class="line">    d_srcA == W_dstE : W_valE; # Forward valE from write back</span><br><span class="line">    <span class="number">1</span> : d_rvalA; # Use value read from <span class="keyword">register</span> file</span><br><span class="line">];</span><br></pre></td></tr></table></figure>
+
+<p>上述<code>HCL</code>代码中赋予这5个转发源的优先级是非常重要的。这种优先级是由<code>HCL</code>代码中检测5个目的寄存器<code>ID</code>的顺序来确定的。如果选择了其他任何顺序，对某些程序来说，流水线就会出错。图<code>4-59</code>给出了一个程序示例，要求对执行和访存阶段中的转发源设置正确的优先级。在这个程序中，前两条指令写寄存器<code>%rdx</code>，而第三条指令用这个寄存器作为它的源操作数。当指令<code>rrmovq</code>在周期4到达译码阶段时，转发逻辑必须在两个都以该源寄存器为目的的值中选择一个。它应该选择哪一个呢？为了设定优先级，我们必须考虑当一次执行一条指令时，机器语言程序的行为。第一条<code>irmovq</code>指令会将寄存器<code>%rdx</code>设为10，第二条<code>irmovq</code>指令会将之设为3，然后<code>rrmovq</code>指令会从<code>%rdx</code>中读出3。为了模拟这种行为，流水线化的实现应该总是给处于最早流水线阶段中的转发源以较高的优先级，因为它保持着程序序列中设置该寄存器的最近的指令。因此，上述<code>HCL</code>代码中的逻辑首先会检测执行阶段中的转发源，然后是访存阶段，最后才是写回阶段。只有指令<code>popq %rsp</code>会关心在访存或写回阶段中的两个源之间的转发优先级，因为只有这一条指令会试图两次写同一个寄存器。</p>
+<p><img src="/4-59.png"></p>
+<p>写回阶段的一小部分是保持不变的。如图<code>4-52</code>所示，整个处理器的状态<code>Stat</code>是一个块根据流水线寄存器<code>W</code>中的状态值计算出来的。回想一下<code>4.1.1</code>节，状态码应该指明是正常操作<code>(AOK)</code>，还是三种异常条件中的一种。由于流水线寄存器<code>W</code>保存着最近完成的指令的状态，很自然地要用这个值来表示整个处理器状态。唯一要考虑的特殊情况是当写回阶段有气泡时。这是正常操作的一部分，因此对于这种情况，我们也希望状态码是<code>AOK</code>：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">word Stat = [</span><br><span class="line">    W_stat == SBUB : SAOK;</span><br><span class="line">    <span class="number">1</span> : W_stat;</span><br><span class="line">];</span><br></pre></td></tr></table></figure>
+
+<h3 id="执行阶段"><a href="#执行阶段" class="headerlink" title="执行阶段"></a>执行阶段</h3><p>图<code>4-60</code>展现的是<code>PIPE</code>执行阶段的逻辑。这些硬件单元和逻辑块同<code>SEQ</code>中的相同，使用的信号做适当的重命名。我们可以看到信号<code>e_valE</code>和<code>e_dstE</code>作为转发源，指向译码阶段。一个区别是标号为<code>Set CC</code>的逻辑以信号<code>m_stat</code>和<code>W_stat</code>作为输入，这个逻辑决定了是否要更新条件码。这些信号被用来检查一条导致异常的指令正在通过后面的流水线阶段的情况，因此，任何对条件码的更新都会被禁止。这部分设计在<code>4.5.8</code>节中讨论。</p>
+<p><img src="/4-60.png"></p>
+<h3 id="访存阶段"><a href="#访存阶段" class="headerlink" title="访存阶段"></a>访存阶段</h3><p>图<code>4-61</code>是<code>PIPE</code>的访存阶段逻辑。将这个逻辑与<code>SEQ</code>的访存阶段<code>(图4-30)</code>相比较，我们看到，正如前面提到的那样，<code>PIPE</code>中没有<code>SEQ</code>中标号为<code>Data</code>的块。这个块是用来在数据源<code>valP(对call指令来说)</code>和<code>valA</code>中进行选择的，但是这个选择现在由译码阶段中标号为<code>Sel+Fwd A</code>的块来执行。这个阶段中的其他块都和<code>SEQ</code>中相应的部件相同，采用的信号做适当的重命名。在图中，你还可以看到许多流水线寄存器<code>M</code>和<code>W</code>中的值作为转发和流水线控制逻辑的一部分，提供给电路中其他部分。</p>
+<p><img src="/4-61.png"></p>
+<h2 id="流水线控制逻辑"><a href="#流水线控制逻辑" class="headerlink" title="流水线控制逻辑"></a>流水线控制逻辑</h2><p>现在准备创建流水线控制逻辑，完成我们的<code>PIPE</code>设计。这个逻辑必须处理下面4种控制情况，这些情况是其他机制<code>(例如数据转发和分支预测)</code>不能处理的：</p>
+<ul>
+<li><p>加载<code>/</code>使用冒险：在一条从内存中读出一个值的指令和一条使用该值的指令之间，流水线必须暂停一个周期</p>
+</li>
+<li><p>处理<code>ret</code>：流水线必须暂停直到<code>ret</code>指令到达写回阶段</p>
+</li>
+<li><p>预测错误的分支：在分支逻辑发现不应该选择分支之前，分支目标处的几条指令已经进入流水线了。必须取消这些指令，并从跳转指令后面的那条指令开始取指</p>
+</li>
+<li><p>异常：当一条指令导致异常，我们想要禁止后面的指令更新程序员可见的状态，并且在异常指令到达写回阶段时，停止执行</p>
+</li>
+</ul>
+<p>我们先浏览每种情况所期望的行为，然后再设计处理这些情况的控制逻辑。</p>
+<h3 id="特殊控制情况所期望的处理"><a href="#特殊控制情况所期望的处理" class="headerlink" title="特殊控制情况所期望的处理"></a>特殊控制情况所期望的处理</h3><p>在<code>4.5.5</code>节中，我们已经描述了对加载<code>/</code>使用冒险所期望的流水线操作，如图<code>4-54</code>所示。只有<code>mrmovq</code>和<code>popq</code>指令会从内存中读数据。当这两条指令中的任一条处于执行阶段，并且需要该目的寄存器的指令正处在译码阶段时，我们要将第二条指令阻塞在译码阶段，并在下一个周期往执行阶段中插入一个气泡。此后，转发逻辑会解决这个数据冒险。可以将流水线寄存器<code>D</code>保持为固定状态，从而将一个指令阻塞在译码阶段。这样做还可以保证流水线寄存器<code>F</code>保持为固定状态，由此下一条指令会被再取一次。总之，实现这个流水线流需要发现冒险的情况，保持流水线寄存器<code>F</code>和<code>D</code>固定不变，并且在执行阶段中插入气泡。</p>
+<p>对<code>ret</code>指令的处理，我们已经在<code>4.5.5</code>节中描述了所需的流水线操作。流水线要停顿3个时钟周期，直到<code>ret</code>指令经过访存阶段，读出返回地址。通过图<code>4-55</code>中下面程序的处理的简化流水线图，说明了这种情况：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">0x000:     irmovq stack,%rsp   #     Initialize stack pointer</span><br><span class="line">0x00a:     call proc           #     Procedure call</span><br><span class="line">0x013:     irmovq $10,%rdx     #     Return point</span><br><span class="line">0x01d:     halt</span><br><span class="line">0x020: .pos 0x20</span><br><span class="line">0x020: proc:                   # proc:</span><br><span class="line">0x020:     ret                 #     Return immediately</span><br><span class="line">0x021:     rrmovq %rdx,%rbx    #     Not executed</span><br><span class="line">0x030: .pos 0x30</span><br><span class="line">0x030: stack:                  # stack: Stack pointer</span><br></pre></td></tr></table></figure>
+
+<p>图<code>4-62</code>是示例程序中<code>ret</code>指令的实际处理过程。在此可以看到，没有办法在流水线的取指阶段中插入气泡。每个周期，取指阶段从指令内存中读出一条指令。看看<code>4.5.7</code>节实现<code>PC</code>预测逻辑的<code>HCL</code>代码，我们可以看到，对<code>ret</code>指令来说，<code>PC</code>的新值被预测成<code>valP</code>，也就是下一条指令的地址。在我们的示例程序中，这个地址会是<code>0x021</code>，即<code>ret</code>后面<code>rrmovq</code>指令的地址。对这个例子来说，这种预测是不对的，即使对大部分情况来说，也是不对的，但是在设计中，我们并不试图正确预测返回地址。取指阶段会暂停3个时钟周期，导致取出<code>rrmovq</code>指令，但是在译码阶段就被替换成了气泡。这个过程在图<code>4-62</code>中的表示为，3个取指用箭头指向下面的气泡，气泡会经过剩下的流水线阶段。最后，在周期7取出<code>irmovq</code>指令。比较图<code>4-62</code>和图<code>4-55</code>，可以看到，我们的实现达到了期望的效果，只不过连续3个周期取出了不正确的指令。</p>
+<p><img src="/4-62.png"></p>
+<p>当分支预测错误发生时，我们已经在<code>4.5.5</code>节中描述了所需的流水线操作，并用图<code>4-56</code>进行了说明。当跳转指令到达执行阶段时就可以检测到预测错误。然后在下一个时钟周期，控制逻辑就会在译码和执行段插入气泡，取消两条不正确的已取指令。在同一个时钟周期，流水线将正确的指令读取到取指阶段。</p>
+<p>对于导致异常的指令，我们必须使流水线化的实现符合期望的<code>ISA</code>行为，也就是在前面所有的指令结束前，后面的指令不能影响程序的状态。一些因素会使得想达到这些效果比较麻烦：</p>
+<ul>
+<li>异常在程序执行的两个不同阶段<code>(取指和访存)</code>被发现的</li>
+<li>程序状态在三个不同阶段<code>(执行、访存和写回)</code>被更新</li>
+</ul>
+<p>在我们的阶段设计中，每个流水线寄存器中会包含一个状态码<code>stat</code>，随着每条指令经过流水线阶段，它会记录指令的状态。当异常发生时，我们将这个信息作为指令状态的一部分记录下来，并且继续取指、译码和执行指令，就好像什么都没有出错似的。当异常指令到达访存阶段时，我们会采取措施防止后面的指令修改程序员可见的状态：</p>
+<ul>
+<li><p>禁止执行阶段中的指令设置条件码</p>
+</li>
+<li><p>向内存阶段中插入气泡，以禁止向数据内存中写入</p>
+</li>
+<li><p>当写回阶段中有异常指令时，暂停写回阶段，因而暂停了流水线</p>
+</li>
+</ul>
+<p>图<code>4-63</code>中的流水线图说明了我们的流水线控制如何处理导致异常的指令后面跟着一条会改变条件码的指令的情况。在周期6，<code>pushq</code>指令到达访存阶段，产生一个内存错误。在同一个周期，执行阶段中的<code>addq</code>指令产生新的条件码的值。当访存或者写回阶段中有异常指令时<code>(通过检查信号m_stat和W_stat，然后将信号set_cc设置为0)</code>，禁止设置条件码。在图<code>4-63</code>的例子中，我们还可以看到既向访存阶段插入了气泡，也在写回阶段暂停了异常指令——<code>pushq</code>指令在写回阶段保持暂停，后面的指令都没有通过执行阶段。</p>
+<p>对状态信号流水线化，控制条件码的设置，以及控制流水线阶段——将这些结合起来，我们实现了对异常的期望的行为：异常指令之前的指令都完成了，而后面的指令对程序员可见的状态都没有影响。</p>
+<p><img src="/4-63.png"></p>
+<h3 id="发现特殊控制条件"><a href="#发现特殊控制条件" class="headerlink" title="发现特殊控制条件"></a>发现特殊控制条件</h3><p>图<code>4-64</code>总结了需要特殊流水线控制的条件。它给出的表达式描述了在哪些条件下会出现这三种特殊情况。一些简单的组合逻辑块实现了这些表达式，为了在时钟上升开始下一个周期时控制流水线寄存器的活动，这些块必须在时钟周期结束之前产生出结果。在一个时钟周期内，流水线寄存器<code>D</code>、<code>E</code>和<code>M</code>分别保持着处于译码、执行和访存阶段中的指令的状态。在到达时钟周期末尾时，信号<code>d_srcA</code>和<code>d_srcB</code>会被设置为译码阶段中指令的源操作数的寄存器<code>ID</code>。当<code>ret</code>指令通过流水线时，要想发现它，只要检查译码、执行和访存阶段中指令的指令码。发现加载<code>/</code>使用冒险要检查执行阶段中的指令类型<code>(mrmovq或popq)</code>，并把它的目的寄存器与译码阶段中指令的源寄存器相比较。当跳转指令在执行阶段时，流水线控制逻辑应该能发现预测错误的分支，这样当指令进入访存阶段时，它就能设置从错误预测中恢复所需要的条件。当跳转指令处于执行阶段时，信号<code>e_Cnd</code>指明是否要选择分支。通过检查访存和写回阶段中的指令状态值，就能发现异常指令。对于访存阶段，我们使用在这个阶段中计算出来的信号<code>m_stat</code>，而不是使用流水线寄存器的<code>M_stat</code>。这个内部信号包含着可能的数据内存地址错误。</p>
+<p><img src="/4-64.png"></p>
+<h3 id="流水线控制机制"><a href="#流水线控制机制" class="headerlink" title="流水线控制机制"></a>流水线控制机制</h3><p>图<code>4-65</code>是一些低级机制，它们使得流水线控制逻辑能将指令阻塞在流水线寄存器中，或是往流水线中插入一个气泡。这些机制包括对<code>4.2.5</code>节中描述的基本时钟寄存器的小扩展。假设每个流水线寄存器有两个控制输入：暂停<code>(stall)</code>和气泡<code>(bubble)</code>。这些信号的设置决定了当时钟上升时该如何更新流水线寄存器。在正常操作下<code>(图4-65a)</code>，这两个输入都设为0，使得寄存器加载它的输入作为新的状态。当暂停信号设为1时<code>(图4-65b)</code>，禁止更新状态。相反，寄存器会保持它以前的状态。这使得它可以将指令阻塞在某个流水线阶段中。当气泡信号设置为1时<code>(图4-65c)</code>，寄存器状态会设置成某个固定的复位配置<code>(reset configuration)</code>，得到一个等效于<code>nop</code>指令的状态。一个流水线寄存器的复位配置的0、1模式是由流水线寄存器中字段的集合决定的。例如，要往流水线寄存器<code>D</code>中插入一个气泡，我们要将<code>icode</code>字段设置为常数值<code>INOP(图4-26)</code>。要往流水线寄存器<code>E</code>中插入一个气泡，我们要将<code>icode</code>字段设为<code>INOP</code>，并将<code>dstE</code>、<code>dstM</code>、<code>srcA</code>和<code>srcB</code>字段设为常数<code>RNONE</code>。确定复位配置是硬件设计师在设计流水线寄存器时的任务之一。在此我们不讨论细节。我们会将气泡和暂停信号都设为1看成是出错。</p>
+<p><img src="/4-65.png"></p>
+<p>图<code>4-66</code>中的表给出了各个流水线寄存器在三种特殊情况下应该采取的行动。对每种情况的处理都是对流水线寄存器正常、暂停和气泡操作的某个组合。在时序方面，流水线寄存器的暂停和气泡控制信号是由组合逻辑块产生的。当时钟上升时，这些值必须是合法的，使得当下一个时钟周期开始时，每个流水线寄存器要么加载，要么暂停，要么产生气泡。有了这个对流水线寄存器设计的小扩展，我们就能用组合逻辑、时钟寄存器和随机访问存储器这样的基本构建块，来实现一个完整的、包括所有控制的流水线。</p>
+<p><img src="/4-66.png"></p>
+<h3 id="控制条件的组合"><a href="#控制条件的组合" class="headerlink" title="控制条件的组合"></a>控制条件的组合</h3><p>到目前为止，在我们对特殊流水线控制条件的讨论中，假设在任意一个时钟周期内，最多只能出现一个特殊情况。在设计系统时，一个常见的缺陷是不能处理同时出现多个特殊情况的情形。现在来分析这些可能性。我们不需要担心多个程序异常的组合情况，因为已经很小心地设计了异常处理机制，它能够考虑流水线中其他指令的情况。图<code>4-67</code>画出了导致其他三种特殊控制条件的流水线状态。图中所示的是译码、执行和访存阶段的块。暗色的方框代表要出现这种条件必须要满足的特别限制。加载<code>/</code>使用冒险要求执行阶段中的指令将一个值从内存读到寄存器中，同时译码阶段中的指令要以该寄存器作为源操作数。预测错误的分支要求执行阶段中的指令是一个跳转指令。对<code>ret</code>来说有三种可能的情况一一指令可以处在译码、执行或访存阶段。当<code>ret</code>指令通过流水线时，前面的流水线阶段都是气泡。</p>
+<p><img src="/4-67.png"></p>
+<p>从这些图中我们可以看出，大多数控制条件是互斥的。例如，不可能同时既有加载<code>/</code>使用冒险又有预测错误的分支，因为加载<code>/</code>使用冒险要求执行阶段中是加载指令<code>(mrmovq或popq)</code>，而预测错误的分支要求执行阶段中是一条跳转指令。类似地，第二个和第三个<code>ret</code>组合也不可能与加载<code>/</code>使用冒险或预测错误的分支同时出现。只有用箭头标明的两种组合可能同时出现。</p>
+<p>组合<code>A</code>中执行阶段中有一条不选择分支的跳转指令，而译码阶段中有一条<code>ret</code>指令。出现这种组合要求<code>ret</code>位于不选择分支的目标处。流水线控制逻辑应该发现分支预测错误，因此要取消<code>ret</code>指令。</p>
+<p>合并组合<code>A</code>条件的控制动作<code>(图4-66)</code>，我们得到以下流水线控制动作<code>(假设气泡或暂停会覆盖正常的情况)</code>：</p>
+<table>
+<thead>
+<tr>
+<th align="center">条件</th>
+<th align="center">F</th>
+<th align="center">D</th>
+<th align="center">E</th>
+<th align="center">M</th>
+<th align="center">W</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">处理<code>ret</code></td>
+<td align="center">暂停</td>
+<td align="center">气泡</td>
+<td align="center">正常</td>
+<td align="center">正常</td>
+<td align="center">正常</td>
+</tr>
+<tr>
+<td align="center">预测错误的分支</td>
+<td align="center">正常</td>
+<td align="center">气泡</td>
+<td align="center">气泡</td>
+<td align="center">正常</td>
+<td align="center">正常</td>
+</tr>
+<tr>
+<td align="center">组合</td>
+<td align="center">暂停</td>
+<td align="center">气泡</td>
+<td align="center">气泡</td>
+<td align="center">正常</td>
+<td align="center">正常</td>
+</tr>
+</tbody></table>
+<p>也就是说，组合情况<code>A</code>的处理与预测错误的分支相似，只不过在取指阶段是暂停。幸运的是，在下一个周期，<code>PC</code>选择逻辑会选择跳转后面那条指令的地址，而不是预测的程序计数器值，所以流水线寄存器<code>F</code>发生了什么是没有关系的。因此我们得出结论，流水线能正确处理这种组合情况。</p>
+<p>组合<code>B</code>包括一个加载<code>/</code>使用冒险，其中加载指令设置寄存器<code>%rsp</code>，然后<code>ret</code>指令用这个寄存器作为源操作数，因为它必须从栈中弹出返回地址。流水线控制逻辑应该将<code>ret</code>指令阻塞在译码阶段。</p>
+<p>合并组合<code>B</code>条件的控制动作<code>(图4-66)</code>，我们得到以下流水线控制动作：</p>
+<table>
+<thead>
+<tr>
+<th align="center">条件</th>
+<th align="center">F</th>
+<th align="center">D</th>
+<th align="center">E</th>
+<th align="center">M</th>
+<th align="center">W</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">处理<code>ret</code></td>
+<td align="center">暂停</td>
+<td align="center">气泡</td>
+<td align="center">正常</td>
+<td align="center">正常</td>
+<td align="center">正常</td>
+</tr>
+<tr>
+<td align="center">加载<code>/</code>使用</td>
+<td align="center">暂停</td>
+<td align="center">暂停</td>
+<td align="center">气泡</td>
+<td align="center">正常</td>
+<td align="center">正常</td>
+</tr>
+<tr>
+<td align="center">组合</td>
+<td align="center">暂停</td>
+<td align="center">气泡<code>+</code>暂停</td>
+<td align="center">气泡</td>
+<td align="center">正常</td>
+<td align="center">正常</td>
+</tr>
+<tr>
+<td align="center">期望的情况</td>
+<td align="center">暂停</td>
+<td align="center">暂停</td>
+<td align="center">气泡</td>
+<td align="center">正常</td>
+<td align="center">正常</td>
+</tr>
+</tbody></table>
+<p>如果同时触发两组动作，控制逻辑会试图暂停<code>ret</code>指令来避免加载<code>/</code>使用冒险，同时又会因为<code>ret</code>指令而往译码阶段中插入一个气泡。显然，我们不希望流水线同时执行这两组动作。相反，我们希望它只采取针对加载<code>/</code>使用冒险的动作。处理<code>ret</code>指令的动作应该推迟一个周期。</p>
+<p>这些分析表明组合<code>B</code>需要特殊处理。实际上，<code>PIPE</code>控制逻辑原来的实现并没有正确处理这种组合情况。即使设计已经通过了许多模拟测试，它还是有细节问题，只有通过刚才那样的分析才能发现。当执行一个含有组合<code>B</code>的程序时，控制逻辑会将流水线寄存器<code>D</code>的气泡和暂停信号都置为1。这个例子表明了系统分析的重要性。只运行正常的程序是很难发现这个问题的。如果没有发现这个问题，流水线就不能忠实地实现<code>ISA</code>的行为。</p>
+<h3 id="控制逻辑实现"><a href="#控制逻辑实现" class="headerlink" title="控制逻辑实现"></a>控制逻辑实现</h3><p>图<code>4-68</code>是流水线控制逻辑的整体结构。根据来自流水线寄存器和流水线阶段的信号，控制逻辑产生流水线寄存器的暂停和气泡控制信号，同时也决定是否要更新条件码寄存器。我们可以将图<code>4-64</code>的发现条件和图<code>4-66</code>的动作结合起来，产生各个流水线控制信号的<code>HCL</code>描述。</p>
+<p>遇到加载<code>/</code>使用冒险或<code>ret</code>指令，流水线寄存器<code>F</code>必须暂停：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">bool</span> F_stall =</span><br><span class="line">    # Conditions <span class="keyword">for</span> a load/use hazard</span><br><span class="line">    E_icode in &#123; IMRMOVQ, IPOPQ &#125; &amp;&amp;</span><br><span class="line">    E_dstM in &#123; d_srcA, d_srcB &#125; ||</span><br><span class="line">    # Stalling at fetch <span class="keyword">while</span> ret passes through pipeline</span><br><span class="line">    IRET in &#123; D_icode, E_icode, M_icode &#125;;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/4-68.png"></p>
+<p>遇到预测错误的分支或<code>ret</code>指令，流水线寄存器<code>D</code>必须设置为气泡。不过，正如前面一节中的分析所示，当遇到加载<code>/</code>使用冒险和<code>ret</code>指令组合时，不应该插入气泡：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">bool</span> D_bubble =</span><br><span class="line">    # Mispredicted branch</span><br><span class="line">    (E_icode == IJXX &amp;&amp; !e_Cnd) ||</span><br><span class="line">    # Stalling at fetch <span class="keyword">while</span> ret passes through pipeline</span><br><span class="line">    <span class="meta"># but not condition for a load/use hazard</span></span><br><span class="line">    !(E_icode in &#123; IMRMOVQ, IPOPQ &#125; &amp;&amp; E_dstM in &#123; d_srcA, d_srcB &#125;) &amp;&amp;</span><br><span class="line">    IRET in &#123; D_icode, E_icode, M_icode &#125;;</span><br></pre></td></tr></table></figure>
+
+<p>现在我们讲完了所有的特殊流水线控制信号的值。在<code>PIPE</code>的完整<code>HCL</code>代码中，所有其他的流水线控制信号都设为0。</p>
+<h2 id="性能分析"><a href="#性能分析" class="headerlink" title="性能分析"></a>性能分析</h2><p>我们可以看到，所有需要流水线控制逻辑进行特殊处理的条件，都会导致流水线不能够实现每个时钟周期发射一条新指令的目标。我们可以通过确定往流水线中插入气泡的频率，来衡量这种效率的损失，因为插入气泡会导致未使用的流水线周期。一条返回指令会产生三个气泡，一个加载<code>/</code>使用冒险会产生一个，而一个预测错误的分支会产生两个。我们可以通过计算<code>PIPE</code>执行一条指令所需要的平均时钟周期数的估计值，来量化这些处罚对整体性能的影响，这种衡量方法称为<code>CPI(Cycles Per Instruction，每指令周期数)</code>。这种衡量值是流水线平均吞吐量的倒数，不过时间单位是时钟周期，而不是微微秒。这是一个设计体系结构效率的很有用的衡量标准。</p>
+<p>如果我们忽略异常带来的性能损失<code>(异常的定义表明它是很少出现的)</code>，另一种思考<code>CPI</code>的方法是，假设我们在处理器上运行某个基准程序，并观察执行阶段的运行。每个周期，执行阶段要么会处理一条指令，然后这条指令继续通过剩下的阶段，直到完成；要么会处理一个由于三种特殊情况之一而插入的气泡。如果这个阶段一共处理了C<sub>i</sub>条指令和C<sub>b</sub>个气泡，那么处理器总共需要大约C<sub>i</sub>+C<sub>b</sub>个时钟周期来执行C<sub>i</sub>条指令。我们说大约是因为忽略了启动指令通过流水线的周期。于是，可以用如下方法来计算这个基准程序的<code>CPI</code>：CPI&#x3D;(C<sub>i</sub>+C<sub>b</sub>)&#x2F;C<sub>i</sub>&#x3D;1.0+C<sub>b</sub>&#x2F;C<sub>i</sub></p>
+<p>也就是说，<code>CPI</code>等于1.0加上一个处罚项C<sub>b</sub>&#x2F;C<sub>i</sub>，这个项表明执行一条指令平均要插入多少个气泡。因为只有三种指令类型会导致插入气泡，我们可以将这个处罚项分解成三个部分：CPI&#x3D;1.0+lp+mp+rp</p>
+<p>这里，<code>lp(load penalty，加载处罚)</code>是当由于加载<code>/</code>使用冒险造成暂停时插入气泡的平均数，<code>mp(mispredicted branch penalty，预测错误分支处罚)</code>是当由于预测错误取消指令时插入气泡的平均数，而<code>rp(retun penalty，返回处罚)</code>是当由于<code>ret</code>指令造成暂停时插入气泡的平均数。每种处罚都是由该种原因引起的插入气泡的总数<code>(Cb的一部分)</code>除以执行指令的总数<code>(Ci)</code>。</p>
+<p>为了估计每种处罚，我们需要知道相关指令<code>(加载、条件转移和返回)</code>的出现频率，以及对每种指令特殊情况出现的频率。对<code>CPI</code>的计算，我们使用下面这组频率：</p>
+<ul>
+<li><p>加载指令<code>(mrmovq和popq)</code>占所有执行指令的25%。其中20%会导致加载<code>/</code>使用冒险</p>
+</li>
+<li><p>条件分支指令占所有执行指令的20%。其中60%会选择分支，而40%不选择分支</p>
+</li>
+<li><p>返回指令占所有执行指令的2%</p>
+</li>
+</ul>
+<p>因此，我们可以估计每种处罚，它是指令类型频率、条件出现频率和当条件出现时插入气泡数的乘积：</p>
+<table>
+<thead>
+<tr>
+<th align="center">原因</th>
+<th align="center">名称</th>
+<th align="center">指令频率</th>
+<th align="center">条件频率</th>
+<th align="center">气泡</th>
+<th align="center">乘积</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">加载<code>/</code>使用</td>
+<td align="center"><code>lp</code></td>
+<td align="center">0.25</td>
+<td align="center">0.20</td>
+<td align="center">1</td>
+<td align="center">0.05</td>
+</tr>
+<tr>
+<td align="center">预测错误</td>
+<td align="center"><code>mp</code></td>
+<td align="center">0.20</td>
+<td align="center">0.40</td>
+<td align="center">2</td>
+<td align="center">0.16</td>
+</tr>
+<tr>
+<td align="center">返回</td>
+<td align="center"><code>rp</code></td>
+<td align="center">0.02</td>
+<td align="center">1.00</td>
+<td align="center">3</td>
+<td align="center">0.06</td>
+</tr>
+<tr>
+<td align="center">总处罚</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">0.27</td>
+</tr>
+</tbody></table>
+<p>三种处罚的总和是0.27，所以得到CPI为1.27。我们的目标是设计一个每个周期发射一条指令的流水线，也就是CPI为1.0。虽然没有完全达到目标，但是整体性能已经很不错了。我们还能看到，要想进一步降低<code>CPI</code>，就应该集中注意力预测错误的分支。它们占到了整个处罚0.27中的0.16，因为条件转移非常常见，我们的预测策略又经常出错，而每次预测错误都要取消两条指令。</p>
+<h2 id="未完成的工作"><a href="#未完成的工作" class="headerlink" title="未完成的工作"></a>未完成的工作</h2><p>我们已经创建了<code>PIPE</code>流水线化的微处理器结构，设计了控制逻辑块，并实现了处理普通流水线流不足以处理的特殊情况的流水线控制逻辑。不过，<code>PIPE</code>还是缺乏一些实际微处理器设计中所必需的关键特性。我们会强调其中一些，并时论要增加这些特性需要些什么。</p>
+<h3 id="多周期指令"><a href="#多周期指令" class="headerlink" title="多周期指令"></a>多周期指令</h3><p><code>Y86-64</code>指令集中的所有指令都包括一些简单的操作，例如数字加法。这些操作可以在执行阶段中一个周期内处理完。在一个更完整的指令集中，我们还将实现一些需要更为复杂操作的指今，例如，整数乘法和除法，以及浮点运算。在一个像<code>PIPE</code>这样性能中等的处理器中，这些操作的典型执行时间从浮点加法的3成4个周期到整数除法的64个周期。为了实现这些指令，我们既需要额外的硬件来执行这些计算，还需要一种机制来协调这些指令的处理与流水线其他部分之间的关系。</p>
+<p>实现多周期指令的一种简单方法就是简单地扩展执行阶段逻辑的功能，添加一些整数和浮点数运算单元。一条指令在执行阶段中逗留它所需要的多个时钟周期，会导致取指和译码阶段暂停。这种方法实现起来很简单，但是得到的性能并不是太好。</p>
+<p>通过采用独立于主流水线的特殊硬件功能单元来处理较为复杂的操作，可以得到更好的性能。通常，有一个功能单元来执行整数乘法和除法，还有一个来执行浮点操作。当一条指令进入译码阶段时，它可以被发射到特殊单元。在这个特殊单元执行该操作时，流水线会继续处理其他指令。通常，浮点单元本身也是流水线化的，因此多条指令可以在主流水线和各个单元中并发执行。</p>
+<p>不同单元的操作必须同步，以避免出错。比如说，如果在不同单元执行的各个指令之间有数据相关，控制逻辑可能需要暂停系统的某个部分，直到由系统其他某个部分处理的操作的结果完成。经常使用各种形式的转发，将结果从系统的一个部分传递到其他部分，这和前面<code>PIPE</code>各个阶段之间的转发一样。虽然与<code>PIPE</code>相比，整个设计变得更为复杂，但还是可以使用暂停、转发以及流水线控制等同样的技术来使整体行为与顺序的<code>ISA</code>模型相匹配。</p>
+<h3 id="与存储系统的接口"><a href="#与存储系统的接口" class="headerlink" title="与存储系统的接口"></a>与存储系统的接口</h3><p>在对<code>PIPE</code>的描述中，我们假设取指单元和数据内存都可以在一个时钟周期内读或是写内存中任意的位置。我们还忽略了由自我修改代码造成的可能冒险，在自我修改代码中，一条指令对一个存储区域进行写，而后面又从这个区域中读取指令。进一步说，我们是以存储器位置的虚拟地址来引用它们的，这要求在执行实际的读或写操作之前，要将虚拟地址翻译成物理地址。显然，要在一个时钟周期内完成所有这些处理是不现实的。更糟糕的是，要访问的存储器的值可能位于磁盘上，这会需要上百万个时钟周期才能把数据读入到处理器内存中。</p>
+<p>正如将在第6章和第9章中讲述的那样，处理器的存储系统是由多种硬件存储器和管理虚拟内存的操作系统件共同组成的。存储系统被组织成一个层次结构，较快但是较小的存储器保持着存储器的一个子集，而较慢但是较大的存储器作为它的后备。最靠近处理器的一层是高速缓存<code>(cache)</code>存储器，它提供对最常使用的存储器位置的快速访问。一个典型的处理器有两个第一层高速缓存——一个用于读指令，一个用于读和写数据。另一种类型的高速缓存存储器，称为翻译后备缓冲器<code>(Translation Look-aside Buffer, TLB)</code>，它提供了从虚拟地址到物理地址的快速翻译。将<code>TLB</code>和高速缓存结合起来使用，在大多数时候，确实可能在一个时钟周期内读指令并读或是写数据。因此，我们的处理器对访问存储器的简化看法实际上是很合理的。</p>
+<p>虽然高速缓存中保存有最常引用的存储器位置，但是有时候还会出现高速缓存不命中<code>(miss)</code>，也就是有些引用的位置不在高速缓存中。在最好的情况中，可以从较高层的高速缓存或处理器的主存中找到不命中的数据，这需要<code>3~20</code>个时钟周期。同时，流水线会简单地暂停，将指令保持在取指或访存阶段，直到高速缓存能够执行读或写操作。至于流水线设计，通过添加更多的暂停条件到流水线控制逻辑，就能实现这个功能。高速缓存不命中以及随之而来的与流水线的同步都完全是由硬件来处理的，这样能使所需的时间尽可能地缩短到很少数量的时钟周期。</p>
+<p>在有些情况中，被引用的存储器位置实际上是存储在磁盘存储器上的。此时，硬件会产生一个缺页<code>(page fault)</code>异常信号。同其他异常一样，这个异常会导致处理器调用操作系统的异常处理程序代码。然后这段代码会发起一个从磁盘到主存的传送操作。一旦完成，操作系统会返回到原来的程序，而导致缺页的指令会被重新执行。这次，存储器引用将成功，虽然可能会导致高速缓存不命中。让硬件调用操作系统例程，然后操作系统例程又会将控制返回给硬件，这就使得硬件和系统软件在处理缺页时能协同工作。因为访问磁盘需要数百万个时钟周期，<code>OS</code>缺页中断处理程序执行的处理所需的几百个时钟周期对性能的影响可以忽略不计。</p>
+<p>从处理器的角度来看，将用暂停来处理短时间的高速缓存不命中和用异常处理来处理长时间的缺页结合起来，能够顾及到存储器访问时由于存储器层次结构引起的所有不可预测性。</p>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>我们已经看到，指令集体系结构，即<code>ISA</code>，在处理器行为<code>(就指令集合及其编码而言)</code>和如何实现处理器之间提供了一层抽象。<code>ISA</code>提供了程序执行的一种顺序说明，也就是一条指令执行完了，下一条指令才会开始。</p>
+<p>从<code>IA32</code>指令开始，大大简化数据类型、地址模式和指令编码，我们定义了<code>Y86-64</code>指令集。得到的<code>ISA</code>既有<code>RISC</code>指令集的属性，也有<code>CISC</code>指令集的属性。然后，将不同指令组织放到五个阶段中处理，在此，根据被执行的指令的不同，每个阶段中的操作也不相同。据此，我们构造了<code>SEQ</code>处理器，其中每个时钟周期执行一条指令，它会通过所有五个阶段。</p>
+<p>流水线化通过让不同的阶段并行操作，改进了系统的吞吐量性能，在任意一个给定的时刻，多条指令被不同的阶段处理。在引入这种并行性的过程中，我们必须非常小心，以提供与程序的顺序执行相同的程序级行为。通过调整<code>SEQ</code>各个部分的顺序，引入流水线，我们得到<code>SEQ+</code>，接着添加流水线寄存器，创建出<code>PIPE</code>流水线。然后，添加了转发逻辑，加速了将结果从一条指令发送到另一条指令，从而提高了流水线的性能。有几种特殊情况需要额外的流水线控制逻辑来暂停或取消一些流水线阶段。</p>
+<p>我们的设计中包括了一些基本的异常处理机制，在此，保证只有到异常指令之前的指令会影响程序员可见的状态。实现完整的异常处理远比此更具挑战性。在采用了更深流水线和更多并行性的系统中，要想正确处理异常就更加复杂了。</p>
+<p>在本章中，我们学习了有关处理器设计的几个重要经验：</p>
+<ul>
+<li><p>管理复杂性是首要问题。想要优化使用硬件资源，在最小的成本下获得最大的性能。为了实现这个目的，我们创建了一个非常简单而一致的框架，来处理所有不同的指令类型。有了这个框架，就能够在处理不同指令类型的逻辑中共享硬件单元</p>
+</li>
+<li><p>我们不需要直接实现<code>ISA</code>。<code>ISA</code>的直接实现意味着一个顺序的设计。为了获得更高的性能，我们想运用硬件能力以同时执行许多操作，这就导致要使用流水线化的设计。通过仔细的设计和分析，我们能够处理各种流水线冒险，因此运行一个程序的整体效果，同用<code>ISA</code>模型获得的效果完全一致</p>
+</li>
+<li><p>硬件设计人员必须非常谨慎小心。一旦芯片被制造出来，就几乎不可能改正任何错误了。一开始就使设计正确是非常重要的。这就意味着要仔细地分析各种指令类型和组合，甚至于那些看上去没有意义的情况，例如弹出值到栈指针。必须用系统的模拟测试程序彻底地测试设计。在开发<code>PIPE</code>的控制逻辑中，我们的设计有个细微的错误，只有通过对控制组合的仔细而系统的分析才能发现</p>
+</li>
+</ul>
 <h1 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h1><ul>
 <li><a target="_blank" rel="noopener" href="https://csapp.cs.cmu.edu/"><code>Computer Systems: A Programmer&#39;s Perspective, 3/E</code></a></li>
 </ul>
