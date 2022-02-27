@@ -27,11 +27,19 @@
 <meta property="og:site_name" content="Lu0k">
 <meta property="og:description" content="内容简介写程序最主要的目标就是使它在所有可能的情况下都正确工作。一个运行得很快但是给出错误结果的程序没有任何用处。另一方面，在很多情况下，让程序运行得快也是一个重要的考虑因素。如果一个程序要实时地处理视频帧或者网络包，一个运行得很慢的程序就不能提供所需的功能。本章会探讨如何使用几种不同类型的程序优化技术，使程序运行得更快。">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://lu0k.github.io/5.1.png">
+<meta property="og:image" content="https://lu0k.github.io/5-1.png">
+<meta property="og:image" content="https://lu0k.github.io/5-2.png">
+<meta property="og:image" content="https://lu0k.github.io/5-3.png">
+<meta property="og:image" content="https://lu0k.github.io/5-4.png">
+<meta property="og:image" content="https://lu0k.github.io/5-5.png">
+<meta property="og:image" content="https://lu0k.github.io/table.png">
 <meta property="article:published_time" content="2022-01-15T16:00:00.000Z">
-<meta property="article:modified_time" content="2022-01-22T06:37:53.107Z">
+<meta property="article:modified_time" content="2022-02-27T11:57:47.089Z">
 <meta property="article:author" content="Lu0k">
 <meta property="article:tag" content="CSAPP">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://lu0k.github.io/5.1.png">
 
 
 <link rel="canonical" href="https://lu0k.github.io/posts/opp-perf1/">
@@ -148,7 +156,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%86%85%E5%AE%B9%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">内容简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Reference"><span class="nav-number">2.</span> <span class="nav-text">Reference</span></a></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%86%85%E5%AE%B9%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">内容简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BC%98%E5%8C%96%E7%BC%96%E8%AF%91%E5%99%A8%E7%9A%84%E8%83%BD%E5%8A%9B%E5%92%8C%E5%B1%80%E9%99%90%E6%80%A7"><span class="nav-number">2.</span> <span class="nav-text">优化编译器的能力和局限性</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%A1%A8%E7%A4%BA%E7%A8%8B%E5%BA%8F%E6%80%A7%E8%83%BD"><span class="nav-number">3.</span> <span class="nav-text">表示程序性能</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%A8%8B%E5%BA%8F%E7%A4%BA%E4%BE%8B"><span class="nav-number">4.</span> <span class="nav-text">程序示例</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Reference"><span class="nav-number">5.</span> <span class="nav-text">Reference</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -283,6 +291,63 @@
 <p>研究程序的汇编代码表示是理解编译器以及产生的代码会如何运行的最有效手段之一。仔细研究内循环的代码是一个很好的开端，识别出降低性能的属性，例如过多的内存引用和对寄存器使用不当。从汇编代码开始，我们还可以预测什么操作会并行执行，以及它们会如何使用处理器资源。正如我们会看到的，常常通过确认关键路径<code>(critical path)</code>来决定执行一个循环所需要的时间<code>(或者说，至少是一个时间下界)</code>。所谓关键路径是在循环的反复执行过程中形成的数据相关链。然后，我们会回过头来修改源代码，试着控制编译器使之产生更有效率的实现。</p>
 <p>大多数编译器，包括<code>GCC</code>，一直都在更新和改进，特别是在优化能力方面。一个很有用的策略是只重写程序到编译器由此就能产生有效代码所需要的程度就好了。这样，能尽量避免损害代码的可读性、模块性和可移植性，就好像我们使用的是具有最低能力的编译器。同样，通过测量值和检查生成的汇编代码，反复修改源代码和分析它的性能是很有帮助的。</p>
 <p>对于新手程序员来说，不断修改源代码，试图欺骗编译器产生有效的代码，看起来很奇怪，但这确实是编写很多高性能程序的方式。比较于另一种方法——用汇编语言写代码，这种间接的方法具有的优点是：虽然性能不一定是最好的，但得到的代码仍然能够在其他机器上运行。</p>
+<h1 id="优化编译器的能力和局限性"><a href="#优化编译器的能力和局限性" class="headerlink" title="优化编译器的能力和局限性"></a>优化编译器的能力和局限性</h1><p>现代编译器运用复杂精细的算法来确定一个程序中计算的是什么值，以及它们是被如何使用的。然后会利用一些机会来简化表达式，在几个不同的地方使用同一个计算，以及降低一个给定的计算必须被执行的次数。大多数编译器，包括<code>GCC</code>，向用户提供了一些对它们所使用的优化的控制。就像在第3章中讨论过的，最简单的控制就是指定优化级别。例如，以命令行选项<code>-Og</code>调用<code>GCC</code>是让<code>GCC</code>使用一组基本的优化。以选项<code>-O1</code>或更高<code>(如-O2或-O3)</code>调用<code>GCC</code>会让它使用更大量的优化。这样做可以进一步提高程序的性能，但是也可能增加程序的规模，也可能使标准的调试工具更难对程序进行调试。我们的表述，虽然对于大多数使用<code>GCC</code>的软件项目来说，优化级别<code>-O2</code>已经成为了被接受的标准，但是还是主要考虑以优化级别<code>-O1</code>编译出的代码。我们特意限制了优化级别，以展示写C语言函数的不同方法如何影响编译器产生代码的效率。我们会发现可以写出的C代码，即使用<code>-O1</code>选项编译得到的性能，也比用可能的最高的优化等级编译一个更原始的版本得到的性能好。</p>
+<p>编译器必须很小心地对程序只使用安全的优化，也就是说对于程序可能遇到的所有可能的情况，在C语言标准提供的保证之下，优化后得到的程序和未优化的版本有一样的行为。限制编译器只进行安全的优化，消除了造成不希望的运行时行为的一些可能的原因，但是这也意味着程序员必须花费更大的力气写出编译器能够将之转换成有效机器代码的程序。为了理解决定一种程序转换是否安全的难度，让我们来看看下面这两个过程：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">twiddle1</span><span class="params">(<span class="keyword">long</span> *xp, <span class="keyword">long</span> *yp)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    *xp += *yp;</span><br><span class="line">    *xp += *yp;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">twiddle2</span><span class="params">(<span class="keyword">long</span> *xp, <span class="keyword">long</span> *yp)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    *xp += <span class="number">2</span>* *yp;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>乍一看，这两个过程似乎有相同的行为。它们都是将存储在由指针<code>yp</code>指示的位置处的值两次加到指针<code>xp</code>指示的位置处的值。另一方面，函数<code>twiddle2</code>效率更高一些。它只要求3次内存引用<code>(读*xp，读*yp，写*xp)</code>，而<code>twiddle1</code>需要6次<code>(2次读*xp，2次读*yp，2次写*xp)</code>。因此，如果要编译器编译过程<code>twiddle1</code>，我们会认为基于<code>twiddle2</code>执行的计算能产生更有效的代码。</p>
+<p>不过，考虑<code>xp</code>等于<code>yp</code>的情况。此时，函数<code>twiddle1</code>会执行下面的计算：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">*xp += *xp; <span class="comment">/* Double value at xp */</span></span><br><span class="line">*xp += *xp; <span class="comment">/* Double value at xp */</span></span><br></pre></td></tr></table></figure>
+
+<p>结果是<code>xp</code>的值增加4倍。另一方面，函数<code>twiddle2</code>会执行下面的计算：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">*xp += <span class="number">2</span>* *xp; <span class="comment">/* Triple value at xp */</span></span><br></pre></td></tr></table></figure>
+
+<p>结果是<code>xp</code>的值增加3倍。编译器不知道<code>twiddle1</code>会如何被调用，因此它必须假设参数<code>xp</code>和<code>yp</code>可能会相等。因此，它不能产生<code>twiddle2</code>风格的代码作为<code>twiddle1</code>的优化版本。</p>
+<p>这种两个指针可能指向同一个内存位置的情况称为内存别名使用<code>(memory aliasing)</code>。在只执行安全的优化中，编译器必须假设不同的指针可能会指向内存中同一个位置。再看一个例子，对于一个使用指针变量<code>p</code>和<code>q</code>的程序，考虑下面的代码序列：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">x = <span class="number">1000</span>; y = <span class="number">3000</span>;</span><br><span class="line">*q = y; <span class="comment">/* 3000 */</span></span><br><span class="line">*p = x; <span class="comment">/* 1000 */</span></span><br><span class="line">t1 = *q; <span class="comment">/* 1000 or 3000 */</span></span><br></pre></td></tr></table></figure>
+
+<p><code>t1</code>的计算值依赖于指针<code>p</code>和<code>q</code>是否指向内存中同一个位置——如果不是，<code>t1</code>就等于3000，但如果是，就等于1000。这造成了一个主要的妨辱优化的因素，这也是可能严重限制编译器产生优化代码机会的程序的一个方面。如果编译器不能确定两个指针是否指向同一个位置，就必须假设什么情况都有可能，这就限制了可能的优化策略。</p>
+<p>第二个妨碍优化的因素是函数调用。作为一个示例，考虑下面这两个过程：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">long</span> <span class="title">f</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">long</span> <span class="title">func1</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> f() + f() + f() + f();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">long</span> <span class="title">func2</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">4</span>*f();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>最初看上去两个过程计算的都是相同的结果，但是<code>func2</code>只调用<code>f</code>一次，而<code>func1</code>调用<code>f</code>四次。以<code>func1</code>作为源代码时，会很想产生<code>func2</code>风格的代码。</p>
+<p>不过，考虑下面<code>f</code>的代码：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">long</span> counter = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">long</span> <span class="title">f</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> counter++;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个函数有个副作用——它修改了全局程序状态的一部分。改变调用它的次数会改变程序的行为。特别地，假设开始时全局变量<code>counter</code>都设置为0，对<code>func1</code>的调用会返回<code>0+1+2+3=6</code>，而对<code>func2</code>的调用会返回<code>4*0=0</code>。</p>
+<p>大多数编译器不会试图判断一个函数是否没有副作用，如果没有，就可能被优化成像<code>func2</code>中的样子。相反，编译器会假设最糟的情况，并保持所有的函数调用不变。</p>
+<p>在各种编译器中，就优化能力来说，<code>GCC</code>被认为是胜任的，但是并不是特别突出。它完成基本的优化，但是它不会对程序进行更加有进取心的编译器所做的那种激进变换。因此，使用<code>GCC</code>的程序员必须花费更多的精力，以一种简化编译器生成高效代码的任务的方式来编写程序。</p>
+<h1 id="表示程序性能"><a href="#表示程序性能" class="headerlink" title="表示程序性能"></a>表示程序性能</h1><p>我们引入度量标准每元素的周期数<code>(Cycles Per Element, CPE)</code>，作为一种表示程序性能并指导我们改进代码的方法。<code>CPE</code>这种度量标准帮助我们在更细节的级别上理解迭代程序的循环性能。这样的度量标准对执行重复计算的程序来说是很适当的，例如处理图像中的像素，或是计算矩阵乘积中的元素。</p>
+<p>处理器活动的顺序是由时钟控制的，时钟提供了某个频率的规律信号，通常用千兆赫兹<code>(GHz)</code>，即十亿周期每秒来表示。例如，当表明一个系统有<code>4GHz</code>处理器，这表示处理器时钟运行频率为每秒4x10<sup>9</sup>个周期。每个时钟周期的时间是时钟频率的倒数。通常是以纳秒<code>(nanosecond, 1纳秒等于10^-9秒)</code>或皮秒<code>(picosecond, 1皮秒等于10^-12秒)</code>为单位的。例如，一个<code>4GHz</code>的时钟其周期为0.25纳秒，或者250皮秒。从程序员的角度来看，用时钟周期来表示度量标准要比用纳秒或皮秒来表示有帮助得多。用时钟周期来表示，度量值表示的是执行了多少条指令，而不是时钟运行得有多快。</p>
+<p>许多过程含有在一组元素上迭代的循环。例如，图5-1中的函数<code>psum1</code>和<code>psum2</code>计算的都是一个长度为<code>n</code>的向量的前置和<code>(prefix sum)</code>。对于向量a&#x3D;&lt;a<sub>0</sub>, a<sub>1</sub>, ···, a<sub>n-1</sub>&gt;，前置和p&#x3D;&lt;p<sub>0</sub>, p<sub>1</sub>, ···, p<sub>n-1</sub>&gt;定义为</p>
+<p><img src="/5.1.png"></p>
+<p><img src="/5-1.png"></p>
+<p>函数<code>psum1</code>每次迭代计算结果向量的一个元素。第二个函数使用循环展开<code>(loop unrolling)</code>的技术，每次迭代计算两个元素。本章后面我们会探讨循环展开的好处。这样一个过程所需要的时间可以用一个常数加上一个与被处理元素个数成正比的因子来描述。例如，图<code>5-2</code>是这两个函数需要的周期数关于<code>n</code>的取值范围图。使用最小二乘拟合<code>(least squares fit)</code>，我们发现，<code>psum1</code>和<code>psum2</code>的运行时间<code>(用时钟周期为单位)</code>分别近似于等式<code>368+9.0n</code>和<code>368+6.0n</code>。这两个等式表明对代码计时和初始化过程、准备循环以及完成过程的开销为368个周期加上每个元素6.0或9.0周期的线性因子。对于较大的n的值<code>(比如说大于200)</code>，运行时间就会主要由线性因子来决定。这些项中的系数称为每元素的周期数<code>(简称CPE)</code>的有效值。注意，我们更愿意用每个元素的周期数而不是每次循环的周期数来度量，这是因为像循环展开这样的技术使得我们能够用较少的循环完成计算，而我们最终关心的是，对于给定的向量长度，程序运行的速度如何。我们将精力集中在减小计算的<code>CPE</code>上。根据这种度量标准，<code>psum2</code>的<code>CPE</code>为6.0，优于<code>CPE</code>为9.0的<code>psum1</code>。</p>
+<p><img src="/5-2.png"></p>
+<h1 id="程序示例"><a href="#程序示例" class="headerlink" title="程序示例"></a>程序示例</h1><p>为了说明一个抽象的程序是如何被系统地转换成更有效的代码的，我们将使用一个基于图<code>5-3</code>所示向量数据结构的运行示例。向量由两个内存块表示：头部和数据数组。头部是一个声明如下的结构：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* Create abstract data type for vector */</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">    <span class="keyword">long</span> len;</span><br><span class="line">    <span class="keyword">data_t</span> *data;</span><br><span class="line">&#125; vec_rec, *vec_ptr;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/5-3.png"></p>
+<p>这个声明用<code>data_t</code>来表示基本元素的数据类型。在测试中，我们度量代码对于整数<code>(C语言的int和long)</code>和浮点数<code>(C语言的float和double)</code>数据的性能。为此，我们会分别为不同的类型声明编译和运行程序，就像下面这个例子对数据类型<code>long</code>一样：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="keyword">long</span> <span class="keyword">data_t</span>;</span><br></pre></td></tr></table></figure>
+
+<p>我们还会分配一个<code>len</code>个<code>data_t</code>类型对象的数组，来存放实际的向量元素。</p>
+<p>图<code>5-4</code>给出的是一些生成向量、访问向量元素以及确定向量长度的基本过程。一个值得注意的重要特性是向量访问程序<code>get_vec_element</code>，它会对每个向量引用进行边界检查。这段代码类似于许多其他语言<code>(包括Java)</code>所使用的数组表示法。边界检查降低了程序出错的机会，但是它也会减缓程序的执行。</p>
+<p><img src="/5-4.png"></p>
+<p>作为一个优化示例，考虑图<code>5-5</code>中所示的代码，它使用某种运算，将一个向量中所有的元素合并成一个值。通过使用编译时常数<code>IDENT</code>和<code>OP</code>的不同定义，这段代码可以重编译成对数据执行不同的运算。特别地，使用声明：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> IDENT 0</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> OP +</span></span><br></pre></td></tr></table></figure>
+
+<p>它对向量的元素求和。使用声明：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> IDENT 1</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> OP *</span></span><br></pre></td></tr></table></figure>
+
+<p>它计算的是向量元素的乘积。</p>
+<p><img src="/5-5.png"></p>
+<p>在我们的讲述中，我们会对这段代码进行一系列的变化，写出这个合并函数的不同版本。为了评估性能变化，我们会在一个具有<code>Intel Core i7 Haswell</code>处理器的机器上测量这些函数的<code>CPE</code>性能，这个机器称为参考机。<code>3.1</code>节中给出了一些有关这个处理器的特性。这些测量值刻画的是程序在某个特定的机器上的性能，所以在其他机器和编译器组合中不保证有同等的性能。不过，我们把这些结果与许多不同编译器<code>/</code>处理器组合上的结果做了比较，发现也非常相似。</p>
+<p>我们会进行一组变换，发现有很多只能带来很小的性能提高，而其他的能带来更巨大的效果。确定该使用哪些变换组合确实是编写快速代码的魔术<code>(black art)</code>。有些不能提供可测量的好处的组合确实是无效的，然而有些组合是很重要的，它们使编译器能够进一步优化。根据我们的经验，最好的方法是实验加上分析：反复地尝试不同的方法，进行测量，并检查汇编代码表示以确定底层的性能瓶颈。</p>
+<p>作为一个起点，下表给出的是<code>combine1</code>的<code>CPE</code>度量值，它运行在我们的参考机上，尝试了操作<code>(加法或乘法)</code>和数据类型<code>(长整数和双精度浮点数)</code>的不同组合。使用多个不同的程序，我们的实验显示32位整数操作和64位整数操作有相同的性能，除了涉及除法操作的代码之外。同样，对于操作单精度和双精度浮点数据的程序，其性能也是相同的。因此在表中，我们将只给出整数数据和浮点数据各自的结果。</p>
+<p><img src="/table.png"></p>
+<p>可以看到测量值有些不太精确。对于整数求和的<code>CPE</code>数更像是23.00，而不是22.68；对于整数乘积的<code>CPE</code>数则是20.0而非20.02。我们不会捏造数据让它们看起来好看一点儿，只是给出了实际获得的测量值。有很多因素会使得可靠地测量某段代码序列需要的精确周期数这个任务变得复杂。检查这些数字时，在头脑里把结果向上或者向下取整几百分之一个时钟周期会很有帮助。</p>
+<p>未经优化的代码是从C语言代码到机器代码的直接翻译，通常效率明显较低。简单地使用命令行选项<code>-O1</code>，就会进行一些基本的优化。正如可以看到的，程序员不需要做什么，就会显著地提高程序性能——超过两倍。通常，养成至少使用这个级别优化的习惯是很好的。<code>(使用-Og优化级别能得到相似的性能结果。)</code>在剩下的测试中，我们使用<code>-O1</code>和<code>-O2</code>级别的优化来生成和测量程序。</p>
 <h1 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h1><ul>
 <li><a target="_blank" rel="noopener" href="https://csapp.cs.cmu.edu/"><code>Computer Systems: A Programmer&#39;s Perspective, 3/E</code></a></li>
 </ul>

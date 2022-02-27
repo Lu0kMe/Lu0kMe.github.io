@@ -27,11 +27,27 @@
 <meta property="og:site_name" content="Lu0k">
 <meta property="og:description" content="内容简介写程序最主要的目标就是使它在所有可能的情况下都正确工作。一个运行得很快但是给出错误结果的程序没有任何用处。另一方面，在很多情况下，让程序运行得快也是一个重要的考虑因素。如果一个程序要实时地处理视频帧或者网络包，一个运行得很慢的程序就不能提供所需的功能。本章会探讨如何使用几种不同类型的程序优化技术，使程序运行得更快。">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://lu0k.github.io/5-6.png">
+<meta property="og:image" content="https://lu0k.github.io/table1.png">
+<meta property="og:image" content="https://lu0k.github.io/5-7.png">
+<meta property="og:image" content="https://lu0k.github.io/5-8.png">
+<meta property="og:image" content="https://lu0k.github.io/5-9.png">
+<meta property="og:image" content="https://lu0k.github.io/table2.png">
+<meta property="og:image" content="https://lu0k.github.io/5-10.png">
+<meta property="og:image" content="https://lu0k.github.io/table3.png">
+<meta property="og:image" content="https://lu0k.github.io/table4.png">
+<meta property="og:image" content="https://lu0k.github.io/5-11.png">
+<meta property="og:image" content="https://lu0k.github.io/5-12.png">
+<meta property="og:image" content="https://lu0k.github.io/table5.png">
+<meta property="og:image" content="https://lu0k.github.io/table6.png">
+<meta property="og:image" content="https://lu0k.github.io/5-13.png">
+<meta property="og:image" content="https://lu0k.github.io/5-14.png">
 <meta property="article:published_time" content="2022-01-21T16:00:00.000Z">
-<meta property="article:modified_time" content="2022-01-22T06:38:14.075Z">
+<meta property="article:modified_time" content="2022-02-27T11:57:47.090Z">
 <meta property="article:author" content="Lu0k">
 <meta property="article:tag" content="CSAPP">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://lu0k.github.io/5-6.png">
 
 
 <link rel="canonical" href="https://lu0k.github.io/posts/opp-perf2/">
@@ -148,7 +164,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%86%85%E5%AE%B9%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">内容简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Reference"><span class="nav-number">2.</span> <span class="nav-text">Reference</span></a></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%86%85%E5%AE%B9%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">内容简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%B6%88%E9%99%A4%E5%BE%AA%E7%8E%AF%E7%9A%84%E4%BD%8E%E6%95%88%E7%8E%87"><span class="nav-number">2.</span> <span class="nav-text">消除循环的低效率</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%87%8F%E5%B0%91%E8%BF%87%E7%A8%8B%E8%B0%83%E7%94%A8"><span class="nav-number">3.</span> <span class="nav-text">减少过程调用</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%B6%88%E9%99%A4%E4%B8%8D%E5%BF%85%E8%A6%81%E7%9A%84%E5%86%85%E5%AD%98%E5%BC%95%E7%94%A8"><span class="nav-number">4.</span> <span class="nav-text">消除不必要的内存引用</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%90%86%E8%A7%A3%E7%8E%B0%E4%BB%A3%E5%A4%84%E7%90%86%E5%99%A8"><span class="nav-number">5.</span> <span class="nav-text">理解现代处理器</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B4%E4%BD%93%E6%93%8D%E4%BD%9C"><span class="nav-number">5.1.</span> <span class="nav-text">整体操作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8A%9F%E8%83%BD%E5%8D%95%E5%85%83%E7%9A%84%E6%80%A7%E8%83%BD"><span class="nav-number">5.2.</span> <span class="nav-text">功能单元的性能</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%84%E7%90%86%E5%99%A8%E6%93%8D%E4%BD%9C%E7%9A%84%E6%8A%BD%E8%B1%A1%E6%A8%A1%E5%9E%8B"><span class="nav-number">5.3.</span> <span class="nav-text">处理器操作的抽象模型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%8E%E6%9C%BA%E5%99%A8%E7%BA%A7%E4%BB%A3%E7%A0%81%E5%88%B0%E6%95%B0%E6%8D%AE%E6%B5%81%E5%9B%BE"><span class="nav-number">5.3.1.</span> <span class="nav-text">从机器级代码到数据流图</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B6%E4%BB%96%E6%80%A7%E8%83%BD%E5%9B%A0%E7%B4%A0"><span class="nav-number">5.3.2.</span> <span class="nav-text">其他性能因素</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Reference"><span class="nav-number">6.</span> <span class="nav-text">Reference</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -272,6 +288,118 @@
         <h1 id="内容简介"><a href="#内容简介" class="headerlink" title="内容简介"></a>内容简介</h1><p>写程序最主要的目标就是使它在所有可能的情况下都正确工作。一个运行得很快但是给出错误结果的程序没有任何用处。另一方面，在很多情况下，让程序运行得快也是一个重要的考虑因素。如果一个程序要实时地处理视频帧或者网络包，一个运行得很慢的程序就不能提供所需的功能。本章会探讨如何使用几种不同类型的程序优化技术，使程序运行得更快。</p>
 <span id="more"></span>
 
+<h1 id="消除循环的低效率"><a href="#消除循环的低效率" class="headerlink" title="消除循环的低效率"></a>消除循环的低效率</h1><p>可以观察到，过程<code>combine1</code>调用函数<code>vec_length</code>作为<code>for</code>循环的测试条件，如图<code>5-5</code>所示。回想关于如何将含有循环的代码翻译成机器级程序的讨论<code>(见3.6.7节)</code>，每次循环迭代时都必须对测试条件求值。另一方面，向量的长度并不会随着循环的进行而改变。因此，只需计算一次向量的长度，然后在我们的测试条件中都使用这个值。</p>
+<p>图<code>5-6</code>是一个修改了的版本，称为<code>combine2</code>，它在开始时调用<code>vec_length</code>，并将结果赋值给局部变量<code>length</code>。对于某些数据类型和操作，这个变换明显地影响了某些数据类型和操作的整体性能，对于其他的则只有很小甚至没有影响。无论是哪种情况，都需要这种变换来消除这个低效率，这有可能成为尝试进一步优化时的瓶颈。</p>
+<p><img src="/5-6.png"></p>
+<p>这个优化是一类常见的优化的一个例子，称为代码移动<code>(code motion)</code>。这类优化包括识别要执行多次<code>(例如在循环里)</code>但是计算结果不会改变的计算。因而可以将计算移动到代码前面不会被多次求值的部分。在本例中，我们将对<code>vec_length</code>的调用从循环内部移动到循环的前面。</p>
+<p><img src="/table1.png"></p>
+<p>优化编译器会试着进行代码移动。不幸的是，就像前面讨论过的那样，对于会改变在哪里调用函数或调用多少次的变换，编译器通常会非常小心。它们不能可靠地发现一个函数是否会有副作用，因而假设函数会有副作用。例如，如果<code>vec_length</code>有某种副作用，那么<code>combine1</code>和<code>combine2</code>可能就会有不同的行为。为了改进代码，程序员必须经常帮助编译器显式地完成代码的移动。</p>
+<p>举一个<code>combine1</code>中看到的循环低效率的极端例子，考虑图<code>5-7</code>中所示的过程<code>lower1</code>。这个过程模仿几个学生的函数设计，他们的函数是作为一个网络编程项目的一部分交上来的。这个过程的目的是将一个字符串中所有大写字母转换成小写字母。这个大小写转换涉及将<code>A</code>到<code>Z</code>范围内的字符转换成<code>a</code>到<code>z</code>范围内的字符。</p>
+<p><img src="/5-7.png"></p>
+<p>对库函数<code>strlen</code>的调用是<code>lower1</code>的循环测试的一部分。虽然<code>strlen</code>通常是用特殊的<code>x86</code>字符串处理指令来实现的，但是它的整体执行也类似于图<code>5-7</code>中给出的这个简单版本。因为C语言中的字符串是以<code>null</code>结尾的字符序列，<code>strlen</code>必须一步一步地检查这个序列，直到遇到<code>null</code>字符。对于一个长度为<code>n</code>的字符串，<code>strlen</code>所用的时间与<code>n</code>成正比。因为对<code>lower1</code>的<code>n</code>次迭代的每一次都会调用<code>strlen</code>，所以<code>lower1</code>的整体运行时间是字符串长度的二次项，正比于<code>n</code><sup>2</sup>。</p>
+<p>如图<code>5-8</code>所示<code>(使用strlen的库版本)</code>，这个函数对各种长度的字符串的实际测量值证实了上述分析。<code>lower1</code>的运行时间曲线图随着字符串长度的增加上升得很陡峭<code>(图5-8a)</code>。图<code>5-8b</code>展示了7个不同长度字符串的运行时间<code>(与曲线图中所示的有所不同)</code>，每个长度都是2的幂。可以观察到，对于<code>lower1</code>来说，字符串长度每增加一倍，运行时间都会变为原来的4倍。这很明显地表明运行时间是二次的。对于一个长度为<code>1048576</code>的字符串来说，<code>lower1</code>需要超过17分钟的<code>CPU</code>时间。</p>
+<p><img src="/5-8.png"></p>
+<p>除了把对<code>strlen</code>的调用移出了循环以外，图<code>5-7</code>中所示的<code>lower2</code>与<code>lower1</code>是一样的。做了这样的变化之后，性能有了显著改善。对于一个长度为<code>1048576</code>的字符串，这个函数只需要2.0毫秒——比<code>lower1</code>快了500000多倍。字符串长度每增加一倍，运行时间也会增加一倍——很显然运行时间是线性的。对于更长的字符串，运行时间的改进会更大。</p>
+<p>在理想的世界里，编译器会认出循环测试中对<code>strlen</code>的每次调用都会返回相同的结果，因此应该能够把这个调用移出循环。这需要非常成熟完善的分析，因为<code>strlen</code>会检查字符串的元素，而随着<code>lower1</code>的进行，这些值会改变。编译器需要探查，即使字符串中的字符发生了改变，但是没有字符会从非零变为零，或是反过来，从零变为非零。即使是使用内联函数，这样的分析也远远超出了最成熟完善的编译器的能力，所以程序员必须自己进行这样的变换。</p>
+<p>这个示例说明了编程时一个常见的问题，一个看上去无足轻重的代码片断有隐藏的渐近低效率<code>(asymptotic inefficiency)</code>。人们可不希望一个小写字母转换函数成为程序性能的限制因素。通常，会在小数据集上测试和分析程序，对此，<code>lower1</code>的性能是足够的。不过，当程序最终部署好以后，过程完全可能被应用到一个有100万个字符的串上。突然这段无危险的代码变成了一个主要的性能瓶颈。相比较而言，<code>lower2</code>的性能对于任意长度的字符串来说都是足够的。大型编程项目中出现这样问题的故事比比皆是。一个有经验的程序员工作的一部分就是避免引入这样的渐近低效率。</p>
+<h1 id="减少过程调用"><a href="#减少过程调用" class="headerlink" title="减少过程调用"></a>减少过程调用</h1><p>像我们看到过的那样，过程调用会带来开销，而且妨碍大多数形式的程序优化。从<code>combine2</code>的代码<code>(见图5-6)</code>中我们可以看出，每次循环迭代都会调用<code>get_vec_element</code>来获取下一个向量元素。对每个向量引用，这个函数要把向量索引<code>i</code>与循环边界做比较，很明显会造成低效率。在处理任意的数组访问时，边界检查可能是个很有用的特性，但是对<code>combine2</code>代码的简单分析表明所有的引用都是合法的。</p>
+<p><img src="/5-9.png"></p>
+<p>作为替代，假设为我们的抽象数据类型增加一个函数<code>get_vec_start</code>。这个函数返回数组的起始地址，如图<code>5-9</code>所示。然后就能写出此图中<code>combine3</code>所示的过程，其内循环里没有函数调用。它没有用函数调用来获取每个向量元素，而是直接访问数组。一个纯粹主义者可能会说这种变换严重损害了程序的模块性。原则上来说，向量抽象数据类型的使用者甚至不应该需要知道向量的内容是作为数组来存储的，而不是作为诸如链表之类的某种其他数据结构来存储的。比较实际的程序员会争论说这种变换是获得高性能结果的必要步骤。</p>
+<p><img src="/table2.png"></p>
+<p>令人吃惊的是，性能没有明显的提升。事实上，整数求和的性能还略有下降。显然，内循环中的其他操作形成了瓶颈，限制性能超过调用<code>get_vec_element</code>。我们还会再回到这个函数<code>(见5.11.2节)</code>，看看为什么<code>combine2</code>中反复的边界检查不会让性能更差。而现在，我们可以将这个转换视为一系列步骤中的一步，这些步骤将最终产生显著的性能提升。</p>
+<h1 id="消除不必要的内存引用"><a href="#消除不必要的内存引用" class="headerlink" title="消除不必要的内存引用"></a>消除不必要的内存引用</h1><p><code>combine3</code>的代码将合并运算计算的值累积在指针<code>dest</code>指定的位置。通过检查编译出来的为内循环产生的汇编代码，可以看出这个属性。在此我们给出数据类型为<code>double</code>，合并运算为乘法的<code>x86-64</code>代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">Inner loop of combine3. data_t = double, OP = *</span><br><span class="line">dest in %rbx, data+i in %rdx, data+length in %rax</span><br><span class="line">.L17:                            loop:</span><br><span class="line">    vmovsd (%rbx), %xmm0             Read product from dest</span><br><span class="line">    vmulsd (%rdx), %xmm0, %xmm0      Multiply product by data[i]</span><br><span class="line">    vmovsd %xmm0, (%rbx)             Store product at dest</span><br><span class="line">    addq $8, %rdx                    Increment data+i</span><br><span class="line">    cmpq %rax, %rdx                  Compare to data+length</span><br><span class="line">    jne .L17                         If !=, goto loop</span><br></pre></td></tr></table></figure>
+
+<p>在这段循环代码中，我们看到，指针<code>dest</code>的地址存放在寄存器<code>%rbx</code>中，它还改变了代码，将第<code>i</code>个数据元素的指针保存在寄存器<code>%rdx</code>中，注释中显示为<code>data+i</code>。每次迭代，这个指针都加8。循环终止操作通过比较这个指针与保存在寄存器<code>%rax</code>中的数值来判断。我们可以看到每次迭代时，累积变量的数值都要从内存读出再写入到内存。这样的读写很浪费，因为每次迭代开始时从<code>dest</code>读出的值就是上次迭代最后写入的值。</p>
+<p>我们能够消除这种不必要的内存读写，按照图<code>5-10</code>中<code>combine4</code>所示的方式重写代码。引入一个临时变量<code>acc</code>，它在循环中用来累积计算出来的值。只有在循环完成之后结果才存放在<code>dest</code>中。正如下面的汇编代码所示，编译器现在可以用寄存器<code>%xmm0</code>来保存累积值。与<code>combine3</code>中的循环相比，我们将每次迭代的内存操作从两次读和一次写减少到只需要一次读。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Inner loop of combine4. data_t = double, OP = *</span><br><span class="line">acc in %xmm0, data+i in %rdx, data+length in %rax</span><br><span class="line">.L25:                            loop:</span><br><span class="line">    vmulsd (%rdx), %xmm0, %xmm0      Multiply acc by data[i]</span><br><span class="line">    addq $8, %rdx                    Increment data+i</span><br><span class="line">    cmpq %rax, %rdx                  Compare to data+length</span><br><span class="line">    jne .L25                         If !=, goto loop</span><br></pre></td></tr></table></figure>
+
+<p><img src="/5-10.png"></p>
+<p>我们看到程序性能有了显著的提高，如下表所示：</p>
+<p><img src="/table3.png"></p>
+<p>所有的时间改进范围从<code>2.2X</code>到<code>5.7X</code>，整数加法情况的时间下降到了每元素只需1.27个时钟周期。</p>
+<p>可能又有人会认为编译器应该能够自动将图<code>5-9</code>中所示的<code>combine3</code>的代码转换为在寄存器中累积那个值，就像图<code>5-10</code>中所示的<code>combine4</code>的代码所做的那样。然而实际上，由于内存别名使用，两个函数可能会有不同的行为。例如，考虑整数数据，运算为乘法，标识元素为1的情况。设<code>v=[2,3,5]</code>是一个由3个元素组成的向量，考虑下面两个函数调用：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">combine3(v, get_vec_start(v) + <span class="number">2</span>);</span><br><span class="line">combine4(v, get_vec_start(v) + <span class="number">2</span>);</span><br></pre></td></tr></table></figure>
+
+<p>也就是在向量最后一个元素和存放结果的目标之间创建一个别名。那么，这两个函数的执行如下：</p>
+<p><img src="/table4.png"></p>
+<p>正如前面讲到过的，<code>combine3</code>将它的结果累积在目标位置中，在本例中，目标位置就是向量的最后一个元素。因此，这个值首先被设置为1，然后设为<code>2·1=2</code>，然后设为<code>3·2=6</code>。最后一次迭代中，这个值会乘以它自己，得到最后结果36。对于<code>combine4</code>的情况来说。直到最后向量都保持不变，结束之前，最后一个元素会被设置为计算出来的值<code>1·2·3·5=30</code>。</p>
+<p>当然，我们说明<code>combine3</code>和<code>combine4</code>之间差别的例子是人为设计的。有人会说<code>combine4</code>的行为更加符合函数描述的意图。不幸的是，编译器不能判断函数会在什么情况下被调用，以及程序员的本意可能是什么。取而代之，在编译<code>combine3</code>时，保守的方法是不断地读和写内存，即使这样做效率不太高。</p>
+<p>使用了这最后的变换，至此，对于每个元素的计算，都只需要<code>1.25~5</code>个时钟周期。比起最开始采用优化时的<code>9~11</code>个周期，这是相当大的提高了。现在我们想看看是什么因素在制约着代码的性能，以及可以如何进一步提高。</p>
+<h1 id="理解现代处理器"><a href="#理解现代处理器" class="headerlink" title="理解现代处理器"></a>理解现代处理器</h1><p>到目前为止，我们运用的优化都不依赖于目标机器的任何特性。这些优化只是简单地降低了过程调用的开销，以及消除了一些重大的妨碍优化的因素，这些因素会给优化编译器造成困难。随着试图进一步提高性能，必须考虑利用处理器微体系结构的优化，也就是处理器用来执行指令的底层系统设计。要想充分提高性能，需要仔细分析程序，同时代码的生成也要针对目标处理器进行调整。尽管如此，我们还是能够运用一些基本的优化，在很大一类处理器上产生整体的性能提高。我们在这里公布的详细性能结果，对其他机器不一定有同样的效果，但是操作和优化的通用原则对各种各样的机器都适用。</p>
+<p>为了理解改进性能的方法，我们需要理解现代处理器的微体系结构。由于大量的晶体管可以被集成到一块芯片上，现代微处理器采用了复杂的硬件，试图使程序性能最大化。带来的一个后果就是处理器的实际操作与通过观察机器级程序所察觉到的大相径庭。在代码级上，看上去似乎是一次执行一条指令，每条指令都包括从寄存器或内存取值，执行一个操作，并把结果存回到一个寄存器或内存位置。在实际的处理器中，是同时对多条指令求值的，这个现象称为指令级并行。在某些设计中，可以有100或更多条指令在处理中。采用一些精细的机制来确保这种并行执行的行为，正好能获得机器级程序要求的顺序语义模型的效果。现代微处理器取得的了不起的功绩之一是：它们采用复杂而奇异的微处理器结构，其中，多条指令可以并行地执行，同时又呈现出一种简单的顺序执行指令的表象。</p>
+<p>虽然现代微处理器的详细设计超出了本书讲授的范围，对这些微处理器运行的原则有一般性的了解就足够能够理解它们如何实现指令级并行。我们会发现两种下界描述了程序的最大性能。当一系列操作必须按照严格顺序执行时，就会遇到延迟界限<code>(latency bound)</code>，因为在下一条指令开始之前，这条指令必须结束。当代码中的数据相关限制了处理器利用指令级并行的能力时，延迟界限能够限制程序性能。吞吐量界限<code>(throughput bound)</code>刻画了处理器功能单元的原始计算能力。这个界限是程序性能的终极限制。</p>
+<h2 id="整体操作"><a href="#整体操作" class="headerlink" title="整体操作"></a>整体操作</h2><p>图<code>5-11</code>是现代微处理器的一个非常简单化的示意图。我们假想的处理器设计是不太严格地基于近期的<code>Intel</code>处理器的结构。这些处理器在工业界称为超标量<code>(superscalar)</code>，意思是它可以在每个时钟周期执行多个操作，而且是乱序的<code>(out-of-order)</code>，意思就是指令执行的顺序不一定要与它们在机器级程序中的顺序一致。整个设计有两个主要部分：指令控制单元<code>(Instruction Control Unit, ICU)</code>和执行单元<code>(Execution Unit, EU)</code>。前者负责从内存中读出指令序列，并根据这些指令序列生成一组针对程序数据的基本操作；而后者执行这些操作。和第4章中研究过的按序<code>(in-order)</code>流水线相比，乱序处理器需要更大、更复杂的硬件，但是它们能更好地达到更高的指令级并行度。</p>
+<p><img src="/5-11.png"></p>
+<p><code>ICU</code>从指令高速缓存<code>(instruction cache)</code>中读取指令，指令高速缓存是一个特殊的高速存储器，它包含最近访问的指令。通常，<code>ICU</code>会在当前正在执行的指令很早之前取指，这样它才有足够的时间对指令译码，并把操作发送到<code>EU</code>。不过，一个问题是当程序遇到分支时，程序有两个可能的前进方向。一种可能会选择分支，控制被传递到分支目标。另一种可能是，不选择分支，控制被传递到指令序列的下一条指令。现代处理器采用了一种称为分支预测<code>(branch prediction)</code>的技术，处理器会猜测是否会选择分支，同时还预测分支的目标地址。使用投机执行<code>(speculative execution)</code>的技术，处理器会开始取出位于它预测的分支会跳到的地方的指令，并对指令译码，甚至在它确定分支预测是否正确之前就开始执行这些操作。如果过后确定分支预测错误，会将状态重新设置到分支点的状态，并开始取出和执行另一个方向上的指令。标记为取指控制的块包括分支预测，以完成确定取哪些指令的任务。</p>
+<p>指令译码逻辑接收实际的程序指令，并将它们转换成一组基本操作<code>(有时称为微操作)</code>。每个这样的操作都完成某个简单的计算任务，例如两个数相加，从内存中读数据，或是向内存写数据。对于具有复杂指令的机器，比如<code>x86</code>处理器，一条指令可以被译码成多个操作。关于指令如何被译码成操作序列的细节，不同的机器都会不同，这个信息可谓是高度机密。幸运的是，不需要知道某台机器实现的底层细节，我们也能优化自己的程序。</p>
+<p>在一个典型的<code>x86</code>实现中，一条只对寄存器操作的指令，例如：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">addq %rax,%rdx</span><br></pre></td></tr></table></figure>
+
+<p>会被转化成一个操作。另一方面，一条包括一个或者多个内存引用的指令，例如：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">addq %rax,8(%rdx)</span><br></pre></td></tr></table></figure>
+
+<p>会产生多个操作，把内存引用和算术运算分开。这条指令会被译码成为三个操作：一个操作从内存中加载一个值到处理器中，一个操作将加载进来的值加上寄存器<code>%rax</code>中的值，而一个操作将结果存回到内存。这种译码逻辑对指令进行分解，允许任务在一组专门的硬件单元之间进行分割。这些单元可以并行地执行多条指令的不同部分。</p>
+<p><code>EU</code>接收来自取指单元的操作。通常，每个时钟周期会接收多个操作。这些操作会被分派到一组功能单元中，它们会执行实际的操作。这些功能单元专门用来处理不同类型的操作。</p>
+<p>读写内存是由加载和存储单元实现的。加载单元处理从内存读数据到处理器的操作。这个单元有一个加法器来完成地址计算。类似，存储单元处理从处理器写数据到内存的操作。它也有一个加法器来完成地址计算。如图中所示，加载和存储单元通过数据高速缓存<code>(data cache)</code>来访问内存。数据高速缓存是一个高速存储器，存放着最近访问的数据值。</p>
+<p>使用投机执行技术对操作求值，但是最终结果不会存放在程序寄存器或数据内存中，直到处理器能确定应该实际执行这些指令。分支操作被送到<code>EU</code>，不是确定分支该往哪里去，而是确定分支预测是否正确。如果预测错误，<code>EU</code>会丢弃分支点之后计算出来的结果。它还会发信号给分支单元，说预测是错误的，并指出正确的分支目的。在这种情况中，分支单元开始在新的位置取指。如在<code>3.6.6</code>节中看到的，这样的预测错误会导致很大的性能开销。在可以取出新指令、译码和发送到执行单元之前，要花费一点时间。</p>
+<p>图<code>5-11</code>说明不同的功能单元被设计来执行不同的操作。那些标记为执行算术运算的单元通常是专门用来执行整数和浮点数操作的不同组合。随着时间的推移，在单个微处理器芯片上能够集成的晶体管数量越来越多，后续的微处理器型号都增加了功能单元的数量以及每个单元能执行的操作组合，还提升了每个单元的性能。由于不同程序间所要求的操作变化很大，因此，算术运算单元被特意设计成能够执行各种不同的操作。比如，有些程序也许会涉及整数操作，而其他则要求许多浮点操作。如果一个功能单元专门执行整数操作，而另一个只能执行浮点操作，那么，这些程序就没有一个能够完全得到多个功能单元带来的好处了。</p>
+<p>举个例子，我们的<code>Intel Core i7 Haswell</code>参考机有8个功能单元，编号为<code>0~7</code>。下面部分列出了每个单元的功能：</p>
+<ul>
+<li><code>0</code>：整数运算、浮点乘、整数和浮点数除法、分支</li>
+<li><code>1</code>：整数运算、浮点加、整数乘、浮点乘</li>
+<li><code>2</code>：加载、地址运算</li>
+<li><code>3</code>：加载、地址运算</li>
+<li><code>4</code>：存储</li>
+<li><code>5</code>：整数运算</li>
+<li><code>6</code>：整数运算、分支</li>
+<li><code>7</code>：存储、地址运算</li>
+</ul>
+<p>在上面的列表中，整数运算是指基本的操作，比如加法、位级操作和移位。乘法和除法需要更多的专用资源。我们看到存储操作要两个功能单元——一个计算存储地址，一个实际保存数据。<code>5.12</code>节将讨论存储<code>(和加载)</code>操作的机制。</p>
+<p>我们看出功能单元的这种组合具有同时执行多个同类型操作的潜力。它有4个功能单元可以执行整数操作，2个单元能执行加载操作，2个单元能执行浮点乘法。稍后我们将看到这些资源对程序获得最大性能所带来的影响。</p>
+<p>在<code>ICU</code>中，退役单元<code>(retirement unit)</code>记录正在进行的处理，并确保它遵守机器级程序的顺序语义。我们的图中展示了一个寄存器文件，它包含整数、浮点数和最近的<code>SSE</code>和<code>AVX</code>寄存器，是退役单元的一部分，因为退役单元控制这些寄存器的更新。指令译码时，关于指令的信息被放置在一个先进先出的队列中。这个信息会一直保持在队列中，直到发生以下两个结果中的一个。首先，一旦一条指令的操作完成了，而且所有引起这条指令的分支点也都被确认为预测正确，那么这条指令就可以退役<code>(retired)</code>了，所有对程序寄存器的更新都可以被实际执行了。另一方面，如果引起该指令的某个分支点预测错误，这条指令会被清空<code>(flushed)</code>，丢弃所有计算出来的结果。通过这种方法，预测错误就不会改变程序的状态了。</p>
+<p>正如我们已经描述的那样，任何对程序寄存器的更新都只会在指令退役时才会发生，只有在处理器能够确信导致这条指令的所有分支都预测正确了，才会这样做。为了加速一条指令到另一条指令的结果的传送，许多此类信息是在执行单元之间交换的，即图中的操作结果。如图中的箭头所示，执行单元可以直接将结果发送给彼此。这是<code>4.5.5</code>节中简单处理器设计中采用的数据转发技术的更复杂精细版本。</p>
+<p>控制操作数在执行单元间传送的最常见的机制称为寄存器重命名<code>(register renaming)</code>。当一条更新寄存器<code>r</code>的指令译码时，产生标记<code>t</code>，得到一个指向该操作结果的唯一的标识符。条目<code>(r,t)</code>被加入到一张表中，该表维护着每个程序寄存器<code>r</code>与会更新该寄存器的操作的标记<code>t</code>之间的关联。当随后以寄存器<code>r</code>作为操作数的指令译码时，发送到执行单元的操作会包含<code>t</code>作为操作数源的值。当某个执行单元完成第一个操作时，会生成一个结果<code>(v,t)</code>，指明标记为<code>t</code>的操作产生值<code>v</code>。所有等待<code>t</code>作为源的操作都能使用<code>v</code>作为源值，这就是一种形式的数据转发。通过这种机制，值可以从一个操作直接转发到另一个操作，而不是写到寄存器文件再读出来，使得第二个操作能够在第一个操作完成后尽快开始。重命名表只包含关于有未进行写操作的寄存器条目。当一条被译码的指令需要寄存器<code>r</code>，而又没有标记与这个寄存器相关联，那么可以直接从寄存器文件中获取这个操作数。有了寄存器重命名，即使只有在处理器确定了分支结果之后才能更新寄存器，也可以预测着执行操作的整个序列。</p>
+<h2 id="功能单元的性能"><a href="#功能单元的性能" class="headerlink" title="功能单元的性能"></a>功能单元的性能</h2><p>图<code>5-12</code>提供了<code>Intel Core i7 Haswell</code>参考机的一些算术运算的性能，有的是测量出来的，有的是引用<code>Intel</code>的文献。这些时间对于其他处理器来说也是具有代表性的。每个运算都是由以下这些数值来刻画的：一个是延迟<code>(latency)</code>，它表示完成运算所需要的总时间；另一个是发射时间<code>(issue time)</code>，它表示两个连续的同类型的运算之间需要的最小时钟周期数；还有一个是容量<code>(capacity)</code>，它表示能够执行该运算的功能单元的数量。</p>
+<p><img src="/5-12.png"></p>
+<p>我们看到，从整数运算到浮点运算，延迟是增加的。还可以看到加法和乘法运算的发射时间都为1,意思是说在每个时钟周期，处理器都可以开始一条新的这样的运算。这种很短的发射时间是通过使用流水线实现的。流水线化的功能单元实现为一系列的阶段<code>(stage)</code>，每个阶段完成一部分的运算。例如，一个典型的浮点加法器包含三个阶段<code>(所以有三个周期的延迟)</code>：一个阶段处理指数值，一个阶段将小数相加，而另一个阶段对结果进行舍入。算术运算可以连续地通过各个阶段，而不用等待一个操作完成后再开始下一个。只有当要执行的运算是连续的、逻辑上独立的时候，才能利用这种功能。发射时间为1的功能单元被称为完全流水线化的<code>(fully pipelined)</code>：每个时钟周期可以开始一个新的运算。出现容量大于1的运算是由于有多个功能单元，就如前面所述的参考机一样。</p>
+<p>我们还看到，除法器<code>(用于整数和浮点除法，还用来计算浮点平方根)</code>不是完全流水线化的——它的发射时间等于它的延迟。这就意味着在开始一条新运算之前，除法器必须完成整个除法。我们还看到，对于除法的延迟和发射时间是以范围的形式给出的，因为某些被除数和除数的组合比其他的组合需要更多的步骤。除法的长延迟和长发射时间使之成为了一个相对开销很大的运算。</p>
+<p>表达发射时间的一种更常见的方法是指明这个功能单元的最大吞吐量，定义为发射时间的倒数。一个完全流水线化的功能单元有最大的吞吐量，每个时钟周期一个运算，而发射时间较大的功能单元的最大吞吐量比较小。具有多个功能单元可以进一步提高吞吐量。对一个容量为<code>C</code>，发射时间为<code>I</code>的操作来说，处理器可能获得的吞吐量为每时钟周期<code>C/I</code>个操作。比如，我们的参考机可以每个时钟周期执行两个浮点乘法运算。我们将看到如何利用这种能力来提高程序的性能。</p>
+<p>电路设计者可以创建具有各种性能特性的功能单元。创建一个延迟短或使用流水线的单元需要较多的硬件，特别是对于像乘法和浮点操作这样比较复杂的功能。因为微处理器芯片上，对于这些单元，只有有限的空间，所以<code>CPU</code>设计者必须小心地平衡功能单元的数量和它们各自的性能，以获得最优的整体性能。设计者们评估许多不同的基准程序，将大多数资源用于最关键的操作。如图<code>5-12</code>表明的那样，在<code>Core i7 Haswell</code>处理器的设计中，整数乘法、浮点乘法和加法被认为是重要的操作，即使为了获得低延迟和较高的流水线化程度需要大量的硬件。另一方面，除法相对不大常用，而且要想实现低延迟或完全流水线化是很困难的。</p>
+<p>这些算术运算的延迟、发射时间和容量会影响合并函数的性能。我们用<code>CPE</code>值的两个基本界限来描述这种影响：</p>
+<p><img src="/table5.png"></p>
+<p>延迟界限给出了任何必须按照严格顺序完成合并运算的函数所需要的最小<code>CPE</code>值。根据功能单元产生结果的最大速率，吞吐量界限给出了<code>CPE</code>的最小界限。例如，因为只有一个整数乘法器，它的发射时间为1个时钟周期，处理器不可能支持每个时钟周期大于1条乘法的速度。另一方面，四个功能单元都可以执行整数加法，处理器就有可能持续每个周期执行4个操作的速率。不幸的是，因为需要从内存读数据，这造成了另一个吞吐量界限。两个加载单元限制了处理器每个时钟周期最多只能读取两个数据值，从而使得吞吐量界限为0.50。我们会展示延迟界限和吞吐量界限对合并函数不同版本的影响。</p>
+<h2 id="处理器操作的抽象模型"><a href="#处理器操作的抽象模型" class="headerlink" title="处理器操作的抽象模型"></a>处理器操作的抽象模型</h2><p>作为分析在现代处理器上执行的机器级程序性能的一个工具，我们会使用程序的数据流<code>(data-flow)</code>表示，这是一种图形化的表示方法，展现了不同操作之间的数据相关是如何限制它们的执行顺序的。这些限制形成了图中的关键路径<code>(critical path)</code>，这是执行一组机器指令所需时钟周期数的一个下界。</p>
+<p>在继续技术细节之前，检查一下函数<code>combine4</code>的<code>CPE</code>测量值是很有帮助的，到目前为止<code>combine4</code>是最快的代码：</p>
+<p><img src="/table6.png"></p>
+<p>我们可以看到，除了整数加法的情况，这些测量值与处理器的延迟界限是一样的。这不是巧合——它表明这些函数的性能是由所执行的求和或者乘积计算主宰的。计算<code>n</code>个元素的乘积或者和需要大约<code>L·n+K</code>个时钟周期，这里<code>L</code>是合并运算的延迟，而<code>K</code>表示调用函数和初始化以及终止循环的开销。因此，<code>CPE</code>就等于延迟界限<code>L</code>。</p>
+<h3 id="从机器级代码到数据流图"><a href="#从机器级代码到数据流图" class="headerlink" title="从机器级代码到数据流图"></a>从机器级代码到数据流图</h3><p>程序的数据流表示是非正式的。我们只是想用它来形象地描述程序中的数据相关是如何主宰程序的性能的。以<code>combine4(图5-10)</code>为例来描述数据流表示法。我们将注意力集中在循环执行的计算上，因为对于大向量来说，这是决定性能的主要因素。我们考虑类型为<code>double</code>的数据、以乘法作为合并运算的情况，不过其他数据类型和运算的组合也有几乎一样的结构。这个循环编译出的代码由4条指令组成，寄存器<code>%rdx</code>存放指向数组<code>data</code>中第<code>i</code>个元素的指针，<code>%rax</code>存放指向数组末尾的指针，而<code>%xmm0</code>存放累积值<code>acc</code>。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Inner loop of combine4. data_t = double, OP = *</span><br><span class="line">acc in %xmm0, data+i in %rdx, data+length in %rax</span><br><span class="line">.L25:                            loop:</span><br><span class="line">    vmulsd (%rdx), %xmm0, %xmm0      Multiply acc by data[i]</span><br><span class="line">    addq $8, %rdx                    Increment data+i</span><br><span class="line">    cmpq %rax, %rdx                  Compare to data+length</span><br><span class="line">    jne .L25                         If !=, goto loop</span><br></pre></td></tr></table></figure>
+
+<p>如图<code>5-13</code>所示，在我们假想的处理器设计中，指令译码器会把这4条指令扩展成为一系列的五步操作，最开始的乘法指令被扩展成一个<code>load</code>操作，从内存读出源操作数，和一个<code>mul</code>操作，执行乘法。</p>
+<p><img src="/5-13.png"></p>
+<p>作为生成程序数据流图表示的一步，图<code>5-13</code>左手边的方框和线给出了各个指令是如何使用和更新寄存器的，顶部的方框表示循环开始时寄存器的值，而底部的方框表示最后寄存器的值。例如，寄存器<code>%rax</code>只被<code>cmp</code>操作作为源值，因此这个寄存器在循环结束时有着同循环开始时一样的值。另一方面，在循环中，寄存器<code>%rdx</code>既被使用也被修改。它的初始值被<code>load</code>和<code>add</code>操作使用；它的新值由<code>add</code>操作产生，然后被<code>cmp</code>操作使用。在循环中，<code>mul</code>操作首先使用寄存器<code>%xmm0</code>的初始值作为源值，然后会修改它的值。</p>
+<p>图<code>5-13</code>中的某些操作产生的值不对应于任何寄存器。在右边，用操作间的弧线来表示。<code>load</code>操作从内存读出一个值，然后把它直接传递到<code>mul</code>操作。由于这两个操作是通过对一条<code>vmulsd</code>指令译码产生的，所以这个在两个操作之间传递的中间值没有与之相关联的寄存器。<code>cmp</code>操作更新条件码，然后<code>jne</code>操作会测试这些条件码。对于形成循环的代码片段，我们可以将访问到的寄存器分为四类：</p>
+<ul>
+<li><p>只读：这些寄存器只用作源值，可以作为数据，也可以用来计算内存地址，但是在循环中它们是不会被修改的。循环<code>combine4</code>的只读寄存器是<code>%rax</code></p>
+</li>
+<li><p>只写：这些寄存器作为数据传送操作的目的。在本循环中没有这样的寄存器</p>
+</li>
+<li><p>局部：这些寄存器在循环内部被修改和使用，迭代与迭代之间不相关。在这个循环中，条件码寄存器就是例子：<code>cmp</code>操作会修改它们，然后<code>jne</code>操作会使用它们，不过这种相关是在单次迭代之内的</p>
+</li>
+<li><p>循环：对于循环来说，这些寄存器既作为源值，又作为目的，一次迭代中产生的值会在另一次送代中用到。可以看到，<code>%rdx</code>和<code>%xmm0</code>是<code>combine4</code>的循环寄存器，对应于程序值<code>data+i</code>和<code>acc</code></p>
+</li>
+</ul>
+<p>正如我们会看到的，循环寄存器之间的操作链决定了限制性能的数据相关。图<code>5-14</code>是对图<code>5-13</code>的图形化表示的进一步改进，目标是只给出影响程序执行时间的操作和数据相关。在图<code>5-14a</code>中看到，我们重新排列了操作符，更清晰地表明了从顶部源寄存器<code>(只读寄存器和循环寄存器)</code>到底部目的寄存器<code>(只写寄存器和循环寄存器)</code>的数据流。</p>
+<p><img src="/5-14.png"></p>
+<p>在图<code>5-14a</code>中，如果操作符不属于某个循环寄存器之间的相关链，那么就把它们标识成白色。例如，比较<code>(cmp)</code>和分支<code>(jne)</code>操作不直接影响程序中的数据流。假设指令控制单元预测会选择分支，因此程序会继续循环。比较和分支操作的目的是测试分支条件，如果不选择分支的话，就通知<code>ICU</code>。我们假设这个检查能够完成得足够快，不会减慢处理器的执行。</p>
+<p>在图<code>5-14b</code>中，消除了左边标识为白色的操作符，而且只保留了循环寄存器。剩下的是一个抽象的模板，表明的是由于循环的一次迭代在循环寄存器中形成的数据相关。在这个图中可以看到，从一次迭代到下一次迭代有两个数据相关。在一边，我们看到存储在寄存器<code>%xmm0</code>中的程序值<code>acc</code>的连续的值之间有相关。通过将<code>acc</code>的旧值乘以一个数据元素，循环计算出<code>acc</code>的新值，这个数据元素是由<code>load</code>操作产生的。在另一边，我们看到循环索引<code>i</code>的连续的值之间有相关。每次迭代中，<code>i</code>的旧值用来计算<code>load</code>操作的地址，然后<code>add</code>操作也会增加它的值，计算出新值。</p>
+<p>图<code>5-15</code>给出了函数<code>combine4</code>内循环的<code>n</code>次迭代的数据流表示。可以看出，简单地重复图<code>5-14</code>右边的模板<code>n</code>次，就能得到这张图。我们可以看到，程序有两条数据相关链，分别对应于操作<code>mul</code>和 <code>add</code>对程序值<code>acc</code>和<code>data+i</code>的修改。假设浮点乘法延迟为5个周期，而整数加法延迟为1个周期，可以看到左边的链会成为关键路径，需要<code>5n</code>个周期执行。右边的链只需要<code>n</code>个周期执行，因此，它不会制约程序的性能。</p>
+<p>图<code>5-15</code>说明在执行单精度浮点乘法时，对于<code>combine4</code>，为什么我们获得了等于5个周期延迟界限的<code>CPE</code>。当执行这个函数时，浮点乘法器成为了制约资源。循环中需要的其他操作——控制和测试指针值<code>data+i</code>，以及从内存中读数据——与乘法器并行地进行。每次后继的<code>acc</code>的值被计算出来，它就反馈回来计算下一个值，不过只有等到5个周期后才能完成。</p>
+<p>其他数据类型和运算组合的数据流与图<code>5-15</code>所示的内容一样，只是在左边的形成数据相关链的数据操作不同。对于所有情况，如果运算的延迟，<code>L</code>大于1，那么可以看到测量出来的<code>CPE</code>就是<code>L</code>，表明这个链是制约性能的关键路径。</p>
+<h3 id="其他性能因素"><a href="#其他性能因素" class="headerlink" title="其他性能因素"></a>其他性能因素</h3><p>另一方面，对于整数加法的情况，我们对<code>combine4</code>的测试表明<code>CPE</code>为1.27，而根据沿着图<code>5-15</code>中左边和右边形成的相关链预测的<code>CPE</code>为1.00，测试值比预测值要慢。这说明了一个原则，那就是数据流表示中的关键路径提供的只是程序需要周期数的下界。还有其他一些因素会限制性能，包括可用的功能单元的数量和任何一步中功能单元之间能够传递数据值的数量。对于合并运算为整数加法的情况，数据操作足够快，使得其他操作供应数据的速度不够快。要准确地确定为什么程序中每个元素需要1.27个周期，需要比公开可以获得的更详细的硬件设计知识。</p>
+<p>总结一下<code>combine4</code>的性能分析：我们对程序操作的抽象数据流表示说明，<code>combine4</code>的关键路径长<code>L·n</code>是由对程序值<code>acc</code>的连续更新造成的，这条路径将<code>CPE</code>限制为最多<code>L</code>。除了整数加法之外，对于所有的其他情况，测量出的<code>CPE</code>确实等于<code>L</code>，对于整数加法，测量出的<code>CPE</code>为1.27而不是根据关键路径的长度所期望的1.00。</p>
+<p>看上去，延迟界限是基本的限制，决定了我们的合并运算能执行多快。接下来的任务是重新调整操作的结构，增强指令级并行性。我们想对程序做变换，使得唯一的限制变成吞吐量界限，得到接近于1.00的<code>CPE</code>。</p>
 <h1 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h1><ul>
 <li><a target="_blank" rel="noopener" href="https://csapp.cs.cmu.edu/"><code>Computer Systems: A Programmer&#39;s Perspective, 3/E</code></a></li>
 </ul>
