@@ -42,8 +42,9 @@
 <meta property="og:image" content="https://lu0k.github.io/table6.png">
 <meta property="og:image" content="https://lu0k.github.io/5-13.png">
 <meta property="og:image" content="https://lu0k.github.io/5-14.png">
+<meta property="og:image" content="https://lu0k.github.io/5-15.png">
 <meta property="article:published_time" content="2022-01-21T16:00:00.000Z">
-<meta property="article:modified_time" content="2022-02-27T11:57:47.090Z">
+<meta property="article:modified_time" content="2022-02-28T08:13:45.091Z">
 <meta property="article:author" content="Lu0k">
 <meta property="article:tag" content="CSAPP">
 <meta name="twitter:card" content="summary">
@@ -394,6 +395,7 @@
 <p><img src="/5-14.png"></p>
 <p>在图<code>5-14a</code>中，如果操作符不属于某个循环寄存器之间的相关链，那么就把它们标识成白色。例如，比较<code>(cmp)</code>和分支<code>(jne)</code>操作不直接影响程序中的数据流。假设指令控制单元预测会选择分支，因此程序会继续循环。比较和分支操作的目的是测试分支条件，如果不选择分支的话，就通知<code>ICU</code>。我们假设这个检查能够完成得足够快，不会减慢处理器的执行。</p>
 <p>在图<code>5-14b</code>中，消除了左边标识为白色的操作符，而且只保留了循环寄存器。剩下的是一个抽象的模板，表明的是由于循环的一次迭代在循环寄存器中形成的数据相关。在这个图中可以看到，从一次迭代到下一次迭代有两个数据相关。在一边，我们看到存储在寄存器<code>%xmm0</code>中的程序值<code>acc</code>的连续的值之间有相关。通过将<code>acc</code>的旧值乘以一个数据元素，循环计算出<code>acc</code>的新值，这个数据元素是由<code>load</code>操作产生的。在另一边，我们看到循环索引<code>i</code>的连续的值之间有相关。每次迭代中，<code>i</code>的旧值用来计算<code>load</code>操作的地址，然后<code>add</code>操作也会增加它的值，计算出新值。</p>
+<p><img src="/5-15.png"></p>
 <p>图<code>5-15</code>给出了函数<code>combine4</code>内循环的<code>n</code>次迭代的数据流表示。可以看出，简单地重复图<code>5-14</code>右边的模板<code>n</code>次，就能得到这张图。我们可以看到，程序有两条数据相关链，分别对应于操作<code>mul</code>和 <code>add</code>对程序值<code>acc</code>和<code>data+i</code>的修改。假设浮点乘法延迟为5个周期，而整数加法延迟为1个周期，可以看到左边的链会成为关键路径，需要<code>5n</code>个周期执行。右边的链只需要<code>n</code>个周期执行，因此，它不会制约程序的性能。</p>
 <p>图<code>5-15</code>说明在执行单精度浮点乘法时，对于<code>combine4</code>，为什么我们获得了等于5个周期延迟界限的<code>CPE</code>。当执行这个函数时，浮点乘法器成为了制约资源。循环中需要的其他操作——控制和测试指针值<code>data+i</code>，以及从内存中读数据——与乘法器并行地进行。每次后继的<code>acc</code>的值被计算出来，它就反馈回来计算下一个值，不过只有等到5个周期后才能完成。</p>
 <p>其他数据类型和运算组合的数据流与图<code>5-15</code>所示的内容一样，只是在左边的形成数据相关链的数据操作不同。对于所有情况，如果运算的延迟，<code>L</code>大于1，那么可以看到测量出来的<code>CPE</code>就是<code>L</code>，表明这个链是制约性能的关键路径。</p>
