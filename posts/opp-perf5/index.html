@@ -27,11 +27,15 @@
 <meta property="og:site_name" content="Lu0k">
 <meta property="og:description" content="内容简介写程序最主要的目标就是使它在所有可能的情况下都正确工作。一个运行得很快但是给出错误结果的程序没有任何用处。另一方面，在很多情况下，让程序运行得快也是一个重要的考虑因素。如果一个程序要实时地处理视频帧或者网络包，一个运行得很慢的程序就不能提供所需的功能。本章会探讨如何使用几种不同类型的程序优化技术，使程序运行得更快。">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://lu0k.github.io/table1.png">
+<meta property="og:image" content="https://lu0k.github.io/table2.png">
+<meta property="og:image" content="https://lu0k.github.io/5-38.png">
 <meta property="article:published_time" content="2022-01-29T16:00:00.000Z">
-<meta property="article:modified_time" content="2022-01-30T13:19:52.150Z">
+<meta property="article:modified_time" content="2022-02-28T11:17:46.077Z">
 <meta property="article:author" content="Lu0k">
 <meta property="article:tag" content="CSAPP">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://lu0k.github.io/table1.png">
 
 
 <link rel="canonical" href="https://lu0k.github.io/posts/opp-perf5/">
@@ -148,7 +152,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%86%85%E5%AE%B9%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">内容简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Reference"><span class="nav-number">2.</span> <span class="nav-text">Reference</span></a></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%86%85%E5%AE%B9%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">内容简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BA%94%E7%94%A8%EF%BC%9A%E6%80%A7%E8%83%BD%E6%8F%90%E9%AB%98%E6%8A%80%E6%9C%AF"><span class="nav-number">2.</span> <span class="nav-text">应用：性能提高技术</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%A1%AE%E8%AE%A4%E5%92%8C%E6%B6%88%E9%99%A4%E6%80%A7%E8%83%BD%E7%93%B6%E9%A2%88"><span class="nav-number">3.</span> <span class="nav-text">确认和消除性能瓶颈</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A8%8B%E5%BA%8F%E5%89%96%E6%9E%90"><span class="nav-number">3.1.</span> <span class="nav-text">程序剖析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E5%89%96%E6%9E%90%E7%A8%8B%E5%BA%8F%E6%9D%A5%E6%8C%87%E5%AF%BC%E4%BC%98%E5%8C%96"><span class="nav-number">3.2.</span> <span class="nav-text">使用剖析程序来指导优化</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%B0%8F%E7%BB%93"><span class="nav-number">4.</span> <span class="nav-text">小结</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Reference"><span class="nav-number">5.</span> <span class="nav-text">Reference</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -272,6 +276,110 @@
         <h1 id="内容简介"><a href="#内容简介" class="headerlink" title="内容简介"></a>内容简介</h1><p>写程序最主要的目标就是使它在所有可能的情况下都正确工作。一个运行得很快但是给出错误结果的程序没有任何用处。另一方面，在很多情况下，让程序运行得快也是一个重要的考虑因素。如果一个程序要实时地处理视频帧或者网络包，一个运行得很慢的程序就不能提供所需的功能。本章会探讨如何使用几种不同类型的程序优化技术，使程序运行得更快。</p>
 <span id="more"></span>
 
+<h1 id="应用：性能提高技术"><a href="#应用：性能提高技术" class="headerlink" title="应用：性能提高技术"></a>应用：性能提高技术</h1><p>虽然只考虑了有限的一组应用程序，但是我们能得出关于如何编写高效代码的很重要的经验教训。我们已经描述了许多优化程序性能的基本策略：</p>
+<ul>
+<li><p>高级设计。为遇到的问题选择适当的算法和数据结构。要特别警觉，避免使用那些会渐进地产生糟糕性能的算法或编码技术</p>
+</li>
+<li><p>基本编码原则。避免限制优化的因素，这样编译器就能产生高效的代码</p>
+<ul>
+<li><p>消除连续的函数调用。在可能时，将计算移到循环外。考虑有选择地妥协程序的模块性以获得更大的效率</p>
+</li>
+<li><p>消除不必要的内存引用。引入临时变量来保存中间结果。只有在最后的值计算出来时，才将结果存放到数组或全局变量中</p>
+</li>
+</ul>
+</li>
+<li><p>低级优化。结构化代码以利用硬件功能</p>
+<ul>
+<li><p>展开循环，降低开销，并且使得进一步的优化成为可能</p>
+</li>
+<li><p>通过使用例如多个累积变量和重新结合等技术，找到方法提高指令级并行</p>
+</li>
+<li><p>用功能性的风格重写条件操作，使得编译采用条件数据传送</p>
+</li>
+</ul>
+</li>
+</ul>
+<p>最后要给读者一个忠告，要警惕，在为了提高效率重写程序时避免引入错误。在引入新变量、改变循环边界和使得代码整体上更复杂时，很容易犯错误。一项有用的技术是在优化函数时，用检查代码来测试函数的每个版本，以确保在这个过程没有引入错误。检查代码对函数的新版本实施一系列的测试，确保它们产生与原来一样的结果。对于高度优化的代码，这组测试情况必须变得更加广泛，因为要考虑的情况也更多。例如，使用循环展开的检查代码需要测试许多不同的循环界限，保证它能够处理最终单步迭代所需要的所有不同的可能的数字。</p>
+<h1 id="确认和消除性能瓶颈"><a href="#确认和消除性能瓶颈" class="headerlink" title="确认和消除性能瓶颈"></a>确认和消除性能瓶颈</h1><p>至此，我们只考虑了优化小的程序，在这样的小程序中有一些很明显限制性能的地方，因此应该是集中注意力对它们进行优化。在处理大程序时，连知道应该优化什么地方都是很难的。本节会描述如何使用代码剖析程序<code>(code profiler)</code>，这是在程序执行时收集性能数据的分析工具。我们还展示了一个系统优化的通用原则，称为<code>Amdahl</code>定律<code>(Amdahl&#39;s law)</code>，参见<code>1.9.1</code>节。</p>
+<h2 id="程序剖析"><a href="#程序剖析" class="headerlink" title="程序剖析"></a>程序剖析</h2><p>程序剖析<code>(profiling)</code>运行程序的一个版本，其中插入了工具代码，以确定程序的各个部分需要多少时间。这对于确认程序中我们需要集中注意力优化的部分是很有用的。剖析的一个有力之处在于可以在现实的基准数据<code>(benchmark data)</code>上运行实际程序的同时，进行剖析。</p>
+<p><code>Unix</code>系统提供了一个剖析程序<code>GPROF</code>。这个程序产生两种形式的信息。首先，它确定程序中每个函数花费了多少<code>CPU</code>时间。其次，它计算每个函数被调用的次数，以执行调用的函数来分类。这两种形式的信息都非常有用。这些计时给出了不同函数在确定整体运行时间中的相对重要性。调用信息使得我们能理解程序的动态行为。</p>
+<p>用<code>GPROF</code>进行剖析需要3个步骤，就像C程序<code>prog.c</code>所示，它运行时命令行参数为<code>file.txt</code>：</p>
+<ul>
+<li>程序必须为剖析而编译和链接。使用<code>GCC(以及其他C编译器)</code>，就是在命令行上简单地包括运行时标志<code>-pg</code>。确保编译器不通过内联替换来尝试执行任何优化是很重要的，否则就可能无法正确刻画函数调用。我们使用优化标志<code>-Og</code>，以保证能正确跟踪函数调用</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">linux&gt;</span><span class="bash"> gcc -Og -pg prog.c -o prog</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>然后程序像往常一样执行：</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">linux&gt;</span><span class="bash"> ./prog file.txt</span></span><br></pre></td></tr></table></figure>
+
+<p>它运行得会比正常时稍微慢一点<code>(大约慢2倍)</code>，不过除此之外唯一的区别就是它产生了一个文件<code>gmon.out</code>。</p>
+<ul>
+<li>调用<code>GPROF</code>来分析<code>gmon.out</code>中的数据</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">linux&gt;</span><span class="bash"> gprof prog</span></span><br></pre></td></tr></table></figure>
+
+<p>剖析报告的第一部分列出了执行各个函数花费的时间，按照降序排列。作为一个示例，下面列出了报告的一部分，是关于程序中最耗费时间的三个函数的：</p>
+<p><img src="/table1.png"></p>
+<p>每一行代表对某个函数的所有调用所花费的时间。第一列表明花费在这个函数上的时间占整个时间的百分比。第二列显示的是直到这一行并包括这一行的函数所花费的累计时间。第三列显示的是花费在这个函数上的时间，而第四列显示的是它被调用的次数<code>(递归调用不计算在内)</code>。在例子中，函数<code>sort_words</code>只被调用了一次，但就是这一次调用需要203.66秒，而函数<code>find_ele_rec</code>被调用了965027次<code>(递归调用不计算在内)</code>，总共需要4.85秒。函数<code>Strlen</code>通过调用库函数<code>strlen</code>来计算字符串的长度。<code>GPROF</code>的结果中通常不显示库函数调用。库函数耗费的时间通常计算在调用它们的函数内。通过创建这个包装函数<code>(wrapper function)Strlen</code>，我们可以可靠地跟踪对<code>strlen</code>的调用，表明它被调用了12511031次，但是一共只需要0.30秒。</p>
+<p>剖析报告的第二部分是函数的调用历史。下面是一个递归函数<code>find_ele_rec</code>的历史：</p>
+<p><img src="/table2.png"></p>
+<p>这个历史既显示了调用<code>find_ele_rec</code>的函数，也显示了它调用的函数。头两行显示的是对这个函数的调用：被它自身递归地调用了158655725次，被函数<code>insert_string</code>调用了965027次<code>(它本身被调用了965027次)</code>。函数<code>find_ele_rec</code>也调用了另外两个函数<code>save_string</code>和<code>new_ele</code>，每个函数总共被调用了363039次。</p>
+<p>根据这个调用信息，我们通常可以推断出关于程序行为的有用信息。例如，函数<code>find_ele_rec</code>是一个递归过程，它扫描一个哈希桶<code>(hash bucket)</code>的链表，查找一个特殊的字符串。对于这个函数，比较递归调用的数量和顶层调用的数量，提供了关于遍历这些链表的长度的统计信息。这里递归与顶层调用的比率是164.4，我们可以推断出程序每次平均大约扫描164个元素。</p>
+<p><code>GPROF</code>有些属性值得注意：</p>
+<ul>
+<li><p>计时不是很准确。它的计时基于一个简单的间隔计数<code>(interval counting)</code>机制，编译过的程序为每个函数维护一个计数器，记录花费在执行该函数上的时间。操作系统使得每隔某个规则的时间间隔<code>δ</code>，程序被中断一次。<code>δ</code>的典型值的范围为<code>1.0~10.0</code>毫秒。当中断发生时，它会确定程序正在执行什么函数，并将该函数的计数器值增加8。当然，也可能这个函数只是刚开始执行，而很快就会完成，却赋给它从上次中断以来整个的执行花费。在两次中断之间也可能运行其他某个程序，却因此根本没有计算花费。对于运行时间较长的程序，这种机制工作得相当好。从统计上来说，应该根据花费在执行函数上的相对时间来计算每个函数的花费。不过，对于那些运行时间少于1秒的程序来说，得到的统计数字只能看成是粗略的估计值。</p>
+</li>
+<li><p>假设没有执行内联替换，则调用信息相当可靠。编译过的程序为每对调用者和被调用者维护一个计数器。每次调用一个过程时，就会对适当的计数器加1</p>
+</li>
+<li><p>默认情况下，不会示对库函数的计时。相反，库函数的时间都被计算到调用它们的函数的时间中</p>
+</li>
+</ul>
+<h2 id="使用剖析程序来指导优化"><a href="#使用剖析程序来指导优化" class="headerlink" title="使用剖析程序来指导优化"></a>使用剖析程序来指导优化</h2><p>作为一个用剖析程序来指导程序优化的示例，我们创建了一个包括几个不同任务和数据结构的应用。这个应用分析一个文本文档的<code>n-gram</code>统计信息，这里<code>n-gram</code>是一个出现在文档中<code>n</code>个单词的序列。对于<code>n=1</code>，我们收集每个单词的统计信息，对于<code>n=2</code>，收集每对单词的统计信息，以此类推。对于一个给定的<code>n</code>值，程序读一个文本文件，创建一张互不相同的<code>n-gram</code>的表，指出每个<code>n-gram</code>出现了多少次，然后按照出现次数的降序对单词排序。</p>
+<p>作为基准程序，我们在一个由《莎士比亚全集》组成的文件上运行这个程序，一共有965028个单词，其中23706个是互不相同的。我们发现，对于<code>n=1</code>，即使是一个写得很烂的分析程序也能在1秒以内处理完整个文件，所以我们设置<code>n=2</code>，使得事情更加有挑战。对于<code>n=2</code>的情况，<code>n-gram</code>被称为<code>bigram(读作bye-gram)</code>。我们确定《莎士比亚全集》包含363039个互不相同的<code>bigram</code>。最常见的是<code>I am</code>，出现了1892次。词组<code>to be</code>出现了1020次。<code>bigram</code>中有266018个只出现了一次。</p>
+<p>程序是由下列部分组成的。我们创建了多个版本，从各部分简单的算法开始，然后再换成更成熟完善的算法：</p>
+<ul>
+<li><p>从文件中读出每个单词，并转换成小写字母。我们最初的版本使用的是函数<code>lower1(图5-7)</code>，我们知道由于反复地调用<code>strlen</code>，它的时间复杂度是二次的</p>
+</li>
+<li><p>对字符串应用一个哈希函数，为一个有<code>s</code>个桶<code>(bucket)</code>的哈希表产生一个<code>0~s-1</code>之间的数。最初的函数只是简单地对字符的<code>ASCII</code>代码求和，再对<code>s</code>求模</p>
+</li>
+<li><p>每个哈希桶都组织成一个链表。程序沿着这个链表扫描，寻找一个匹配的条目。如果找到了，这个<code>n-gram</code>的频度就加1。否则，就创建一个新的链表元素。最初的版本递归地完成这个操作，将新元素插在链表尾部</p>
+</li>
+<li><p>一旦已经生成了这张表，我们就根据频度对所有的元素排序。最初的版本使用插入排序</p>
+</li>
+</ul>
+<p>图<code>5-38</code>是<code>n-gram</code>频度分析程序6个不同版本的剖析结果。对于每个版本，我们将时间分为下面的5类：</p>
+<ul>
+<li><p><code>Sort</code>：按照频度对<code>n-gram</code>进行排序</p>
+</li>
+<li><p><code>List</code>：为匹配<code>n-gram</code>扫描链表，如果需要，插入一个新的元素</p>
+</li>
+<li><p><code>Lower</code>：将字符串转换为小写字母</p>
+</li>
+<li><p><code>Strlen</code>：计算字符串的长度</p>
+</li>
+<li><p><code>Hash</code>：计算哈希函数</p>
+</li>
+<li><p><code>Rest</code>：其他所有函数的和</p>
+</li>
+</ul>
+<p>如图<code>5-38a</code>所示，最初的版本需要3.5分钟，大多数时间花在了排序上。这并不奇怪，因为插入排序有二次的运行时间，而程序对363039个值进行排序。</p>
+<p>在下一个版本中，我们用库函数<code>qsort</code>进行排序，这个函数是基于快速排序算法的，其预期运行时间为<code>O(nlogn)</code>。在图中这个版本称为<code>Quicksort</code>。更有效的排序算法使花在排序上的时间降低到可以忽略不计，而整个运行时间降低到大约5.4秒。图<code>5-38b</code>是剩下各个版本的时间，所用的比例能使我们看得更清楚。</p>
+<p><img src="/5-38.png"></p>
+<p>改进了排序，现在发现链表扫描变成了瓶颈。想想这个低效率是由于函数的递归结构引起的，我们用一个迭代的结构替换它，显示为<code>Iter first</code>。令人奇怪的是，运行时间增加到了大约7.5秒。根据更近一步的研究，我们发现两个链表函数之间有一个细微的差别。递归版本将新元素插入到链表尾部，而迭代版本把它们插到链表头部。为了使性能最大化，我们希望频率最高的<code>n-gram</code>出现在链表的开始处。这样一来，函数就能快速地定位常见的情况。假设<code>n-gram</code>在文档中是均匀分布的，我们期望频度高的单词的第一次出现在频度低的单词之前。通过将新的<code>n-gram</code>插入尾部，第一个函数倾向于按照频度的降序排序，而第二个函数则相反。因此我们创建第三个链表扫描函数，它使用迭代，但是将新元素插入到链表的尾部。使用这个版本，显示为<code>Iter last</code>，时间降到了大约5.3秒，<br>比递归版本稍微好一点。这些测量展示了对程序做实验作为优化工作一部分的重要性。开始时，我们假设将递归代码转换成迭代代码会改进程序的性能，而没有考虑添加元素到链表末尾和开头的差别。</p>
+<p>接下来，我们考虑哈希表的结构。最初的版本只有1021个桶<code>(通常会选择桶的个数为质数，以增强哈希函数将关键字均匀分布在桶中的能力)</code>。对于一个有363039个条目的表来说，这就意味着平均负载<code>(load)</code>是<code>363039/1021=355.6</code>。这就解释了为什么有那么多时间花在了执行链表操作上了——搜索包括测试大量的候选<code>n-gram</code>。它还解释了为什么性能对链表的排序这么敏感。然后，我们将桶的数量增加到了199999，平均负载降低到了1.8。不过，很奇怪的是，整体运行时间只下降到5.1秒，差距只有0.2秒。</p>
+<p>进一步观察，我们可以看到，表变大了但是性能提高很小，这是由于哈希函数选择的不好。简单地对字符串的字符编码求和不能产生一个大范围的值。特别是，一个字母最大的编码值是122，因而<code>n</code>个字符产生的和最多是<code>122n</code>。在文档中，最长的<code>bigram(honorificabilitudinitatibus thou)</code>的和也不过是3371，所以，我们哈希表中大多数桶都是不会被使用的。此外，可交换的哈希函数，例如加法，不能对一个字符串中不同的可能的字符顺序做出区分。例如，单词<code>rat</code>和<code>tar</code>会产生同样的和。</p>
+<p>我们换成一个使用移位和异或操作的哈希函数。使用这个版本，显示为<code>Better Hash</code>，时间下降到了0.6秒。一个更加系统化的方法是更加仔细地研究关键字在桶中的分布，如果哈希函数的输出分布是均匀的，那么确保这个分布接近于人们期望的那样。</p>
+<p>最后，我们把运行时间降到了大部分时间是花在<code>strlen</code>上，而大多数对<code>strlen</code>的调用是作为小写字母转换的一部分。我们已经看到了函数<code>lower1</code>有二次的性能，特别是对长字符串来说。这篇文档中的单词足够短，能避免二次性能的灾难性的结果；最长的<code>bigram</code>只有32个字符。不过换成使用<code>lower2</code>，显示为<code>Linear Lower</code>得到很好的性能，整个时间降到了0.2秒。</p>
+<p>通过这个练习，我们展示了代码剖析能够帮助将一个简单应用程序所需的时间从3.5分钟降低到0.2秒，得到的性能提升约为1000倍。剖析程序帮助我们把注意力集中在程序最耗时的部分上，同时还提供了关于过程调用结构的有用信息。代码中的一些瓶颈，例如二次的排序函数，很容易看出来；而其他的，例如插入到链表的开始还是结尾，只有通过仔细的分析才能看出。</p>
+<p>我们可以看到，剖析是工具箱中一个很有用的工具，但是它不应该是唯一一个。计时测量不是很准确，特别是对较短的运行时间<code>(小于1秒)</code>来说。更重要的是，结果只适用于被测试的那些特殊的数据。例如，如果在由较少数量的较长字符串组成的数据上运行最初的函数，我们会发现小写字母转换函数才是主要的性能瓶颈。更糟糕的是，如果它只剖析包含短单词的文档，我们可能永远不会发现隐藏着的性能瓶颈，例如<code>lower1</code>的二次性能。通常，假设在有代表性的数据上运行程序，剖析能帮助我们对典型的情况进行优化，但是我们还应该确保对所有可能的情况，程序都有相当的性能。这主要包括避免得到糟糕的渐近性能<code>(asymptotic performance)</code>的算法<code>(例如插入算法)</code>和坏的编程实践<code>(例如lower1)</code>。</p>
+<p><code>1.9.1</code>中讨论了<code>Amdahl</code>定律，它为通过有针对性的优化来获取性能提升提供了一些其他的见解。对于<code>n-gram</code>代码来说，当用<code>quicksort</code>代替了插入排序后，我们看到总的执行时间从209.0秒下降到5.4秒。初始版本的209.0秒中的203.7秒用于执行插入排序，得到<code>α=0.974</code>，被此次优化加速的时间比例。使用<code>quicksort</code>，花在排序上的时间变得微不足道，得到预计的加速比为<code>209/a=39.0</code>，接近于测量加速比38.5。我们之所以能获得大的加速比，是因为排序在整个执行时间中占了非常大的比例。然而，当一个瓶颈消除，而新的瓶颈出现时，就需要关注程序的其他部分以获得更多的加速比。</p>
+<h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><p>虽然关于代码优化的大多数论述都描述了编译器是如何能生商效代码的，但是应用程序员有很多方法来协助编泽器完成这项务。没有任何编译器能用一个好的算法或数据结构代替低效率的算法或数据结构，因此程序设计的这些方面仍然应该是程序员主要关心的。我们还看到妨碍优化的因素，例如内存别名使用和过程调用，严重限制了编译器执行大量优化的能力。同样，程序员必须对消除这些妨碍优化的因素负主要的责任。这些应该被看作好的编程习惯的一部分，因为它们可以用来消除不必要的工作。</p>
+<p>基本级别之外调整性能需要一些对处理器微体系结构的理解，描述处理器用来实现它的指令集体系结构的底层机制。对于乱序处理器的情况，只需要知道一些关于操作、容量、延迟和功能单元发射时间的信息，就能够基本地预测程序的性能了。</p>
+<p>我们研究了一系列技术，包括循环展开、创建多个累积变量和重新结合，它们可以利用现代处理器提供的指令级并行。随着对优化的深入，研究产生的汇编代码以及试着理解机器如何执行计算变得重要起来。确认由程序中的数据相关决定的关键路径，尤其是循环的不同迭代之间的数据相关，会收获良多。我们还可以根据必须要计算的操作数量以及执行这些操作的功能单元的数量和发射时间，计算一个计算的吞吐量界限。</p>
+<p>包含条件分支或与内存系统复杂交互的程序，比我们最开始考虑的简单循环程序，更难以分析和优化。基本策略是使分支更容易预测，或者使它们很容易用条件数据传送来实现。我们还必须注意存储和加载操作。将数值保存在局部变量中，使得它们可以存放在寄存器中，这会很有帮助。</p>
+<p>当处理大型程序时，将注意力集中在最耗时的部分变得很重要。代码剖析程序和相关的工具能帮助我们系统地评价和改进程序性能。我们描述了<code>GPROF</code>，一个标准的<code>Unix</code>剖析工具。还有更加复杂完善的剖析程序可用，例如<code>Intel</code>的<code>VTUNE</code>程序开发系统，还有<code>Linux</code>系统基本上都有的<code>VALGRIND</code>。这些工具可以在过程级分解执行时间，估计程序每个基本块<code>(basic block)</code>的性能。<code>(基本块是内部没有控制转移的指令序列，因此基本块总是整个被执行的。)</code></p>
 <h1 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h1><ul>
 <li><a target="_blank" rel="noopener" href="https://csapp.cs.cmu.edu/"><code>Computer Systems: A Programmer&#39;s Perspective, 3/E</code></a></li>
 </ul>
