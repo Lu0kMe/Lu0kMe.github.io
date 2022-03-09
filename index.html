@@ -424,7 +424,7 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1>
+          <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>CVE-2021-4034是一个本地权限提升漏洞，该漏洞存在于<code>Polkit</code>工具包中的<code>pkexec</code>中。<code>Polkit</code>是一个用于定义和处理授权的工具包，用于允许非特权进程与特权进程对话。用户可以使用其中的<code>pkexec</code>以提升的权限执行命令。<code>pkexec</code>是一个<code>SUID-root</code>程序，如果成功利用此漏洞，任何非特权用户均可以在易受攻击的主机上获得<code>root</code>权限。</p>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/posts/cve-2021-4034/#more" rel="contents">
