@@ -27,35 +27,35 @@
 <meta property="og:site_name" content="Lu0k">
 <meta property="og:description" content="内容简介处理器必须执行一系列指令，每条指令执行某个简单操作，例如两个数相加。指令被编码为由一个或多个字节序列组成的二进制格式。一个处理器支持的指令和指令的字节级编码称为它的指令集体系结构(ISA, Instruction-Set Architecture)。ISA在编译器编写者和处理器设计人员之间提供了一个概念抽象层，编译器编写者只需要知道允许哪些指令，以及它们是如何编码的；而处理器设计者必须建造">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://lu0k.github.io/4-17.png">
-<meta property="og:image" content="https://lu0k.github.io/4-18.png">
-<meta property="og:image" content="https://lu0k.github.io/4-19.png">
-<meta property="og:image" content="https://lu0k.github.io/4-20.png">
-<meta property="og:image" content="https://lu0k.github.io/4-21.png">
-<meta property="og:image" content="https://lu0k.github.io/4-22.png">
-<meta property="og:image" content="https://lu0k.github.io/4-23.png">
-<meta property="og:image" content="https://lu0k.github.io/4-24.png">
-<meta property="og:image" content="https://lu0k.github.io/4-25.png">
-<meta property="og:image" content="https://lu0k.github.io/4-26.png">
-<meta property="og:image" content="https://lu0k.github.io/4-27.png">
-<meta property="og:image" content="https://lu0k.github.io/4-28.png">
-<meta property="og:image" content="https://lu0k.github.io/4-29.png">
-<meta property="og:image" content="https://lu0k.github.io/4-30.png">
-<meta property="og:image" content="https://lu0k.github.io/4-31.png">
-<meta property="og:image" content="https://lu0k.github.io/4-32.png">
-<meta property="og:image" content="https://lu0k.github.io/GIPS.png">
-<meta property="og:image" content="https://lu0k.github.io/4-33.png">
-<meta property="og:image" content="https://lu0k.github.io/4-34.png">
-<meta property="og:image" content="https://lu0k.github.io/4-35.png">
-<meta property="og:image" content="https://lu0k.github.io/4-36.png">
-<meta property="og:image" content="https://lu0k.github.io/4-37.png">
-<meta property="og:image" content="https://lu0k.github.io/4-38.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/proc-arch2/4-17.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/proc-arch2/4-18.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/proc-arch2/4-19.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/proc-arch2/4-20.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/proc-arch2/4-21.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/proc-arch2/4-22.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/proc-arch2/4-23.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/proc-arch2/4-24.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/proc-arch2/4-25.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/proc-arch2/4-26.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/proc-arch2/4-27.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/proc-arch2/4-28.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/proc-arch2/4-29.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/proc-arch2/4-30.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/proc-arch2/4-31.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/proc-arch2/4-32.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/proc-arch2/GIPS.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/proc-arch2/4-33.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/proc-arch2/4-34.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/proc-arch2/4-35.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/proc-arch2/4-36.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/proc-arch2/4-37.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/proc-arch2/4-38.png">
 <meta property="article:published_time" content="2022-01-08T16:00:00.000Z">
 <meta property="article:modified_time" content="2022-01-16T13:53:39.136Z">
 <meta property="article:author" content="Lu0k">
 <meta property="article:tag" content="CSAPP">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://lu0k.github.io/4-17.png">
+<meta name="twitter:image" content="https://lu0k.github.io/posts/proc-arch2/4-17.png">
 
 
 <link rel="canonical" href="https://lu0k.github.io/posts/proc-arch2/">
@@ -315,24 +315,24 @@
 <p>处理器无限循环，执行这些阶段。在我们简化的实现中，发生任何异常时，处理器就会停止：它执行<code>halt</code>指令或非法指令，或它试图读或者写非法地址。在更完整的设计中，处理器会进入异常处理模式，开始执行由异常的类型决定的特殊代码。</p>
 <p>从前面的讲述可以看出，执行一条指令是需要进行很多处理的。我们不仅必须执行指令所表明的操作，还必须计算地址、更新栈指针以及确定下一条指令的地址。幸好每条指令的整个流程都比较相似。因为我们想使硬件数量尽可能少，并且最终将把它映射到一个二维的集成电路芯片的表面，在设计硬件时，一个非常简单而一致的结构是非常重要的。降低复杂度的一种方法是让不同的指令共享尽量多的硬件。例如，我们的每个处理器设计都只含有一个算术<code>/</code>逻辑单元，根据所执行的指令类型的不同，它的使用方式也不同。在硬件上复制逻辑块的成本比软件中有重复代码的成本大得多。而且在硬件系统中处理许多特殊情况和特性要比用软件来处理困难得多。</p>
 <p>我们面临的一个挑战是将每条不同指令所需要的计算放入到上述那个通用框架中。我们会使用图<code>4-17</code>中所示的代码来描述不同<code>Y86-64</code>指令的处理。图<code>4-18~</code>图<code>4-21</code>中的表描述了不同<code>Y86-64</code>指令在各个阶段是怎样处理的。很值得仔细研究一下些表。表中的这种格式很容易映射到硬件。表中的每一行都描述了一个信号或存储状态的分配<code>(用分配操作←来表示)</code>。阅读时可以把它看成是从上至下的顺序求值。当我们将这些计算映射到硬件时，会发现其实并不需要严格按照顺序来执行这些求值。</p>
-<p><img src="/4-17.png"></p>
+<p><img src="/posts/proc-arch2/4-17.png"></p>
 <p>图<code>4-18</code>给出了对<code>OPq(整数和逻辑运算)</code>、<code>rrmovq(寄存器—寄存器传送)</code>和<code>irmovq(立即数—寄存器传送)</code>类型的指令所需的处理。让我们先来考虑一下整数操作。回顾图<code>4-2</code>，可以看到我们小心地选择了指令编码，这样四个整数操作<code>(addq、subq、andq和xorq)</code>都有相同的<code>icode</code>值。我们可以以相同的步骤顺序来处理它们，除了<code>ALU</code>计算必须根据<code>ifun</code>中编码的具体的指令操作来设定。</p>
-<p><img src="/4-18.png"></p>
+<p><img src="/posts/proc-arch2/4-18.png"></p>
 <p>整数操作指令的处理遵循上面列出的通用模式。在取指阶段，我们不需要常数字，所以<code>valP</code>就计算为<code>PC+2</code>。在译码阶段，我们要读两个操作数。在执行阶段，它们和功能指示符<code>ifun</code>一起再提供给<code>ALU</code>，这样一来<code>valE</code>就成为了指令结果。这个计算是用表达式<code>valB OP valA</code>来表达的，这里<code>OP</code>代表<code>ifun</code>指定的操作。要注意两个参数的顺序——这个顺序与<code>Y86-64(和x86-64)</code>的习惯是一致的。例如，指令<code>subq %rax,%rdx</code>计算的是<code>R[%rdx]-R[%rax]</code>的值。这些指令在访存阶段什么也不做，而在写回阶段，<code>valE</code>被写入寄存器<code>rB</code>，然后<code>PC</code>设为<code>valP</code>，整个指令的执行就结束了。</p>
 <p>执行<code>rrmovq</code>指令和执行算术运算类似。不过，不需要取第二个寄存器操作数。我们将<code>ALU</code>的第二个输入设为0，先把它和第一个操作数相加，得到<code>valE=valA</code>，然后再把这个值写到寄存器文件。对<code>irmovq</code>的处理与此类似，除了<code>ALU</code>的第一个输入为常数值<code>valC</code>。另外，因为是长指令格式，对于<code>irmovq</code>，程序计数器必须加10。所有这些指令都不改变条件码。</p>
 <p>图<code>4-19</code>给出了内存读写指令<code>rmmovq</code>和<code>mrmovq</code>所需要的处理。基本流程也和前面的一样，不过是用<code>ALU</code>来加<code>valC</code>和<code>valB</code>，得到内存操作的有效地址<code>(偏移量与基址寄存器值之和)</code>。在访存阶段，会将寄存器值<code>valA</code>写到内存，或者从内存中读出<code>valM</code>。</p>
-<p><img src="/4-19.png"></p>
+<p><img src="/posts/proc-arch2/4-19.png"></p>
 <p>图<code>4-20</code>给出了处理<code>pushq</code>和<code>popq</code>指令所需的步骤。它们可以算是最难实现的<code>Y86-64</code>指令了，因为它们既涉及访问内存，又要增加或减少栈指针。虽然这两条指令的流程比较相似，但是它们还是有很重要的区别。</p>
-<p><img src="/4-20.png"></p>
+<p><img src="/posts/proc-arch2/4-20.png"></p>
 <p><code>pushq</code>指令开始时很像我们前面讲过的指令，但是在译码阶段，用<code>%rsp</code>作为第二个寄存器操作数的标识符，将栈指针赋值为<code>valB</code>。在执行阶段，用<code>ALU</code>将栈指针减8。减过8的值就是内存写的地址，在写回阶段还会存回到<code>%rsp</code>中。将<code>valE</code>作为写操作的地址，是遵循<code>Y86-64(和x86-64)</code>的惯例，也就是在写之前，<code>pushq</code>应该先将栈指针减去8，即使栈指针的更新实际上是在内存操作完成之后才进行的。</p>
 <p><code>popq</code>指令的执行与<code>pushq</code>的执行类似，除了在译码阶段要读两次栈指针以外。这样做看上去很多余，但是我们会看到让<code>valA</code>和<code>valB</code>都存放栈指针的值，会使后面的流程跟其他的指令更相似，增强设计的整体一致性。在执行阶段，用<code>ALU</code>给栈指针加8，但是用没加过8的原始值作为内存操作的地址。在写回阶段，要用加过8的栈指针更新栈指针寄存器，还要将寄存器<code>rA</code>更新为从内存中读出的值。用没加过8的值作为内存读地址，保持了<code>Y86-64(和x86-64)</code>的惯例，<code>popq</code>应该首先读内存，然后再增加栈指针。</p>
 <p>图4-21表明了三类控制转移指令的处理：各种跳转、<code>call</code>和<code>ret</code>。可以看到，我们能用同前面指令一样的整体流程来实现这些指令。</p>
-<p><img src="/4-21.png"></p>
+<p><img src="/posts/proc-arch2/4-21.png"></p>
 <p>同对整数操作一样，我们能够以一种统一的方式处理所有的跳转指令，因为它们的不同只在于判断是否要选择分支的时候。除了不需要一个寄存器指示符字节以外，跳转指令在取指和译码阶段都和前面讲的其他指令类似。在执行阶段，检查条件码和跳转条件来确定是否要选择分支，产生出一个一位信号<code>Cnd</code>。在更新<code>PC</code>阶段，检查这个标志，如果这个标志为1，就将<code>PC</code>设为<code>valC(跳转目标)</code>，如果为0，就设为<code>vaIP(下一条指令的地址)</code>。我们的表示法<code>x?a:b</code>类似于C语句中的条件表达式——当<code>x</code>非零时，它等于<code>a</code>，当<code>x</code>为零时，等于<code>b</code>。</p>
 <p>指令<code>call</code>和<code>ret</code>与指令<code>pushq</code>和<code>popq</code>类似，除了我们要将程序计数器的值入栈和出栈以外。对指令<code>call</code>，我们要将<code>valP</code>，也就是<code>call</code>指令后紧跟着的那条指令的地址，压入栈中。在更新<code>PC</code>阶段，将<code>PC</code>设为<code>valC</code>，也就是调用的目的地。对指令<code>ret</code>，在更新<code>PC</code>阶段，我们将<code>valM</code>，即从栈中取出的值，赋值给<code>PC</code>。</p>
 <p>我们创建了一个统一的框架，能处理所有不同类型的<code>Y86-64</code>指令。虽然指令的行为大不相同，但是我们可以将指令的处理组织成6个阶段。现在我们的任务是创建硬件设计来实现这些阶段，并把它们连接起来。</p>
 <h2 id="SEQ硬件结构"><a href="#SEQ硬件结构" class="headerlink" title="SEQ硬件结构"></a>SEQ硬件结构</h2><p>实现所有<code>Y86-64</code>指令所需要的计算可以被组织成6个基本阶段：取指、译码、执行、访存、写回和更新PC。图<code>4-22</code>给出了一个能执行这些计算的硬件结构的抽象表示。程序计数器放在寄存器中，在图中左下角<code>(标明为PC)</code>。然后，信息沿着线流动<code>(多条线组合在一起就用宽一点的灰线来表示)</code>，先向上，再向右。同各个阶段相关的硬件单元<code>(hardware units)</code>负责执行这些处理。在右边，反馈线路向下，包括要写到寄存器文件的更新值，以及更新的程序计数器值。正如在<code>4.3.3</code>节中讨论的那样，在<code>SEQ</code>中，所有硬件单元的处理都在一个时钟周期内完成。这张图省略了一些小的组合逻辑块，还省略了所有用来操作各个硬件单元以及将相应的值路由到这些单元的控制逻辑。稍后会补充这些细节。我们从下往上画处理器和流程的方法似乎有点奇怪。在开始设计流水线化的处理器时，我们会解释这么画的原因。</p>
-<p><img src="/4-22.png"></p>
+<p><img src="/posts/proc-arch2/4-22.png"></p>
 <p>硬件单元与各个处理阶段相关联：</p>
 <ul>
 <li><p>取指：将程序计数器寄存器作为地址，指令内存读取指令的字节。<code>PC</code>增加器<code>(PC incrementer)</code>计算<code>valP</code>。即增加了的程序计数器</p>
@@ -349,7 +349,7 @@
 <li><p><code>PC</code>更新：程序计数器的新值选择自：<code>valP</code>，下一条指令的地址；<code>valC</code>，调用指令或跳转指令指定的目标地址；<code>valM</code>，从内存读取的返回地址</p>
 </li>
 </ul>
-<p><img src="/4-23.png"></p>
+<p><img src="/posts/proc-arch2/4-23.png"></p>
 <p>图<code>4-23</code>更详细地给出了实现<code>SEQ</code>所需要的硬件<code>(分析每个阶段时，我们会看到完整的细节)</code>。我们看到一组和前面一样的硬件单元，但是现在线路看得更清楚了。这幅图以及其他的硬件图都使用的是下面的画图惯例：</p>
 <ul>
 <li><p>白色方框表示时钟寄存器。程序计数器<code>PC</code>是<code>SEQ</code>中唯一的时钟寄存器</p>
@@ -368,7 +368,7 @@
 </li>
 </ul>
 <p>图<code>4-18~</code>图<code>4-21</code>中所有的计算都有这样的性质，每一行都代表某个值的计算<code>(如valP)</code>，或者激活某个硬件单元<code>(如内存)</code>。图<code>4-24</code>的第二栏列出了这些计算和动作。除了我们已经讲过的那些信号以外，还列出了四个寄存器<code>ID</code>信号：<code>srcA</code>，<code>valA</code>的源；<code>srcB</code>，<code>valB</code>的源；<code>dstE</code>，写入<code>valE</code>的寄存器；以及<code>dstM</code>，写入<code>valM</code>的寄存器。</p>
-<p><img src="/4-24.png"></p>
+<p><img src="/posts/proc-arch2/4-24.png"></p>
 <p>图中，右边两栏给出的是指令<code>OPq</code>和<code>mrmovq</code>的计算，来说明要计算的值。要将这些计算映射到硬件上，我们要实现控制逻辑，它能在不同硬件单元之间传送数据，以及操作这些单元，使得对每个不同的指令执行指定的运算。这就是控制逻辑块的目标，控制逻辑块在图<code>4-23</code>中用灰色圆角方框表示。我们的任务就是依次经过每个阶段，创建这些块的详细设计。</p>
 <h2 id="SEQ时序"><a href="#SEQ时序" class="headerlink" title="SEQ时序"></a>SEQ时序</h2><p>在介绍图<code>4-18~</code>图<code>4-21</code>的表时，我们说过要把它们看成是用程序符号写的，那些赋值是从上到下顺序执行的。然而，图<code>4-23</code>中硬件结构的操作运行根本完全不同，一个时钟变化会引发一个经过组合逻辑的流，来执行整个指令。让我们来看看这些硬件怎样实现表中列出的这一行为。</p>
 <p><code>SEQ</code>的实现包括组合逻辑和两种存储器设备：时钟寄存器<code>(程序计数器和条件码寄存器)</code>，随机访问存储器<code>(寄存器文件、指令内存和数据内存)</code>。组合逻辑不需要任何时序或控制——只要输入变化了，值就通过逻辑门网络传播。正如提到过的那样，我们也将读随机访问存储器看成和组合逻辑一样的操作，根据地址输入产生输出字。对于较小的存储器来说<code>(例如寄存器文件)</code>，这是一个合理的假设，而对于较大的电路来说，可以用特殊的时钟电路来模拟这个效果。由于指令内存只用来读指令，因此我们可以将这个单元看成是组合逻辑。</p>
@@ -382,12 +382,12 @@
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">0x000</span>: irmovq $<span class="number">0x100</span>,%rbx     # %rbx &lt;-- <span class="number">0x100</span></span><br><span class="line"><span class="number">0x00a</span>: irmovq $<span class="number">0x200</span>,%rdx     # %rdx &lt;-- <span class="number">0x200</span></span><br><span class="line"><span class="number">0x014</span>: addq %rdx,%rbx         # %rbx &lt;-- <span class="number">0x300</span> CC &lt;-- <span class="number">000</span></span><br><span class="line"><span class="number">0x016</span>: je dest                # Not taken</span><br><span class="line"><span class="number">0x01f</span>: rmmovq %rbx,<span class="number">0</span>(%rdx)    # M[<span class="number">0x200</span>] &lt;-- <span class="number">0x300</span></span><br><span class="line"><span class="number">0x029</span>: dest: halt</span><br></pre></td></tr></table></figure>
 
 <p>标号为<code>1~4</code>的各个图给出了4个状态单元，还有组合逻辑，以及状态单元之间的连接。组合逻辑环绕着条件码寄存器，因为有的组合逻辑<code>(例如ALU)</code>产生输入到条件码寄存器，而其他部分<code>(例如分支计算和PC选择逻辑)</code>又将条件码寄存器作为输入。图中寄存器文件和数据内存有独立的读连接和写连接，因为读操作沿着这些单元传播，就好像它们是组合逻辑，而写操作是由时钟控制的。</p>
-<p><img src="/4-25.png"></p>
+<p><img src="/posts/proc-arch2/4-25.png"></p>
 <p>图<code>4-25</code>中的不同颜色的代码表明电路信号是如何与正在被执行的不同指令相联系的。我们假设处理是从设置条件码开始的，按照<code>ZF</code>、<code>SF</code>和<code>OF</code>的顺序，设为100。在时钟周期3开始的时候<code>(点1)</code>，状态单元保持的是第二条<code>irmovq</code>指令<code>(表中第2行)</code>更新过的状态，该指令用浅灰色表示。组合逻辑用白色表示，表明它还没有来得及对变化了的状态做出反应。时钟周期开始时，地址<code>0x014</code>载入程序计数器中。这样就会取出和处理<code>addq</code>指令<code>(表中第3行)</code>。值沿着组合逻辑流动，包括读随机访问存储器。在这个周期末尾<code>(点2)</code>，组合逻辑为条件码产生了新的值<code>(000)</code>，程序寄存器<code>%rbx</code>的更新值，以及程序计数器的新值<code>(0x016)</code>。在此时，组合逻辑已经根据<code>addq</code>指令被更新了，但是状态还是保持着第二条<code>irmovq</code>指令<code>(用浅灰色表示)</code>设置的值。</p>
 <p>当时钟上升开始周期4时<code>(点3)</code>，会更新程序计数器、寄存器文件和条件码寄存器，因此我们用蓝色来表示，但是组合逻辑还没有对这些变化做出反应，所以用白色表示。在这个周期内，会取出并执行<code>je</code>指令<code>(表中第4行)</code>，在图中用深灰色表示。因为条件码<code>ZF</code>为0，所以不会选择分支。在这个周期末尾<code>(点4)</code>，程序计数器已经产生了新值<code>0x01f</code>。组合逻辑已经根据<code>je</code>指令<code>(用深灰色表示)</code>被更新过了，但是直到下个周期开始之前，状态还是保持着<code>addq</code>指令<code>(用蓝色表示)</code>设置的值。</p>
 <p>如此例所示，用时钟来控制状态单元的更新，以及值通过组合逻辑来传播，足够控制我们<code>SEQ</code>实现中每条指令执行的计算了。每次时钟由低变高时，处理器开始执行一条新指令。</p>
 <h2 id="SEQ阶段的实现"><a href="#SEQ阶段的实现" class="headerlink" title="SEQ阶段的实现"></a>SEQ阶段的实现</h2><p>本节会设计实现<code>SEQ</code>所需要的控制逻辑块的<code>HCL</code>描述。完整的<code>SEQ</code>的<code>HCL</code>描述请参见网络旁注 <code>ARCH: HCL</code>。我们没有讲的那部分<code>SEQ</code>的<code>HCL</code>描述，是不同整数和布尔信号的定义，它们可以作<br>为<code>HCL</code>操作的参数。其中包括不同硬件信号的名字，以及不同指令代码、功能码、寄存器名字、<code>ALU</code>操作和状态码的常数值。只列出了那些在控制逻辑中必须被显式引用的常数。图<code>4-26</code>列出了我们使用的常数。按照习惯，常数值都是大写的。</p>
-<p><img src="/4-26.png"></p>
+<p><img src="/posts/proc-arch2/4-26.png"></p>
 <p>除了图<code>4-18~</code>图<code>4-21</code>中所示的指令以外，还包括了对<code>nop</code>和<code>halt</code>指令的处理。<code>nop</code>指令只是简单地经过各个阶段，除了要将<code>PC</code>加1，不进行任何处理。<code>halt</code>指令使得处理器状态被设置为<code>HLT</code>，导致处理器停止运行。</p>
 <h3 id="取指阶段"><a href="#取指阶段" class="headerlink" title="取指阶段"></a>取指阶段</h3><p>如图<code>4-27</code>所示，取指阶段包括指令内存硬件单元，以<code>PC</code>作为第一个<code>(字节0)</code>的地址，这个单元一次从内存读出10个字节。第一个字节被解释成指令字节，<code>(标号为Split的单元)</code>分为两个4位的数。然后，标号为<code>icode</code>和<code>ifun</code>的控制逻辑块计算指令和功能码，或者使之等于从内存读出的值，或者当指令地址不合法时<code>(由信号imem_error指明)</code>，使这些值对应于<code>nop</code>指令。根据<code>icode</code>的值，我们可以计算三个一位的信号<code>(用虚线表示)</code>：</p>
 <ul>
@@ -398,12 +398,12 @@
 <li><p><code>need_valC</code>：这个指令包括一个常数字吗？</p>
 </li>
 </ul>
-<p><img src="/4-27.png"></p>
+<p><img src="/posts/proc-arch2/4-27.png"></p>
 <p><code>(当指令地址越界时会产生的)</code>信号<code>instr_valid</code>和<code>imem_error</code>在访存阶段被用来产生状态码。让我们再来看一个例子，<code>need_regids</code>的<code>HCL</code>描述只是确定了<code>icode</code>的值是否为一条带有寄存器指示值字节的指令。</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">bool</span> need_regids = icode in &#123; IRRMOVQ, IOPQ, IPUSHQ, IPOPQ, IIRMOVQ, IRMMOVQ, IMRMOVQ &#125;;</span><br></pre></td></tr></table></figure>
 
 <h3 id="译码和写回阶段"><a href="#译码和写回阶段" class="headerlink" title="译码和写回阶段"></a>译码和写回阶段</h3><p>图<code>4-28</code>给出了<code>SEQ</code>中实现译码和写回阶段的逻辑的详细情况。把这两个阶段联系在起是因为它们都要访问寄存器文件。</p>
-<p><img src="/4-28.png"></p>
+<p><img src="/posts/proc-arch2/4-28.png"></p>
 <p>寄存器文件有四个端口。它支持同时进行两个读<code>(在端口A和B上)</code>和两个写<code>(在端口E和M上)</code>。每个端口都有一个地址连接和一个数据连接，地址连接是一个寄存器<code>ID</code>，而数据连接是一组64根线路，既可以作为寄存器文件的输出字<code>(对读端口来说)</code>，也可以作为它的输入字<code>(对写端口来说)</code>。两个读端口的地址输入为<code>srcA</code>和<code>srcB</code>，而两个写端口的地址输入为<code>dstE</code>和<code>dstM</code>。如果某个地址端口上的值为特殊标识符<code>0xF(RNONE)</code>，则表明不需要访问寄存器。</p>
 <p>根据指令代码<code>icode</code>以及寄存器指示值<code>rA</code>和<code>rB</code>，可能还会根据执行阶段计算出的<code>Cnd</code>条件信号，图<code>4-28</code>底部的四个块产生出四个不同的寄存器文件的寄存器<code>ID</code>。寄存器<code>ID srcA</code>表明应该读哪个寄存器以产生<code>valA</code>。所需要的值依赖于指令类型，如图<code>4-18~</code>图<code>4-21</code>中译码阶段第一行中所示。将所有这些条目都整合到一个计算中就得到下面的<code>srcA</code>的<code>HCL</code>描述<code>(回想RRSP是%rsp的寄存器ID)</code>：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">word srcA = [</span><br><span class="line">    icode in &#123; IRRMOVQ, IRMMOVQ, IOPQ, IPUSHQ &#125; : rA;</span><br><span class="line">    icode in &#123; IPOPQ, IRET &#125; : RRSP;</span><br><span class="line">    <span class="number">1</span> : RNONE;    # Do<span class="number">&#x27;</span>t need <span class="keyword">register</span></span><br><span class="line">];</span><br></pre></td></tr></table></figure>
@@ -412,7 +412,7 @@
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">#WARNING: Conditional move <span class="keyword">not</span> implemented correctly here</span><br><span class="line">word dstE = [</span><br><span class="line">    icode in &#123; IRRMOVQ &#125; : rB;</span><br><span class="line">    icode in &#123; IIRMOVQ, IOPQ&#125; : rB;</span><br><span class="line">    icode in &#123; IPUSHQ, IPOPQ, ICALL, IRET &#125; : RRSP;</span><br><span class="line">    <span class="number">1</span> : RNONE;    # Don<span class="number">&#x27;</span>t write any <span class="keyword">register</span></span><br><span class="line">];</span><br></pre></td></tr></table></figure>
 
 <h3 id="执行阶段"><a href="#执行阶段" class="headerlink" title="执行阶段"></a>执行阶段</h3><p>执行阶段包括算术<code>/</code>逻辑单元<code>(ALU)</code>。这个单元根据<code>alufun</code>信号的设置，对输入<code>aluA</code>和<code>aluB</code>执行<code>ADD</code>、<code>SUBTRACT</code>、<code>AND</code>或<code>EXCLUSIVEOR</code>运算。如图<code>4-29</code>所示，这些数据和控制信号是由三个控制块产生的。<code>ALU</code>的输出就是<code>valE</code>信号。</p>
-<p><img src="/4-29.png"></p>
+<p><img src="/posts/proc-arch2/4-29.png"></p>
 <p>在图<code>4-18~</code>图<code>4-21</code>中，执行阶段的第一步就是每条指令的<code>ALU</code>计算。列出的操作数<code>aluB</code>在前面，后面是<code>aluA</code>，这样是为了保证<code>subq</code>指令是<code>valB</code>减去<code>valA</code>。可以看到，根据指令的类型，<code>aluA</code>的值可以是<code>valA</code>、<code>valC</code>，或者是<code>-8</code>或<code>+8</code>。因此我们可以用下面的方式来表达产生<code>aluA</code>的控制块的行为：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">word aluA = [</span><br><span class="line">    icode in &#123; IRRMOVQ, IOPQ &#125; : valA;</span><br><span class="line">    icode in &#123; IIRMOVQ, IRMMOVQ, IMRMOVQ &#125; : valC;</span><br><span class="line">    icode in &#123; ICALL, IPUSHQ &#125; : <span class="number">-8</span>;</span><br><span class="line">    icode in &#123; IRET, IPOPQ &#125; : <span class="number">8</span>;</span><br><span class="line">    # Other instructions don<span class="number">&#x27;</span>t need ALU</span><br><span class="line">];</span><br></pre></td></tr></table></figure>
 
@@ -424,7 +424,7 @@
 
 <p>标号为<code>cond</code>的硬件单元会根据条件码和功能码来确定是否进行条件分支或者条件数据传送<code>(图4-3)</code>。它产生信号<code>cnd</code>，用于设置条件传送的<code>dstE</code>，也用在条件分支的下一个<code>PC</code>逻辑中。对于其他指令，取决于指令的功能码和条件码的设置，<code>Cnd</code>信号可以被设置为1或者0。但是控制逻辑会忽略它。我们省略这个单元的详细设计。</p>
 <h3 id="访存阶段"><a href="#访存阶段" class="headerlink" title="访存阶段"></a>访存阶段</h3><p>访存阶段的任务就是读或者写程序数据。如图<code>4-30</code>所示，两个控制块产生内存地址和内存输入数据<code>(为写操作)</code>的值。另外两个块产生表明应该执行读操作还是写操作的控制信号。当执行读操作时，数据内存产生值<code>valM</code>。</p>
-<p><img src="/4-30.png"></p>
+<p><img src="/posts/proc-arch2/4-30.png"></p>
 <p>图<code>4-18~</code>图<code>4-21</code>的访存阶段给出了每个指令类型所需要的内存操作。可以看到内存读和写的地址总是<code>valE</code>或<code>valA</code>。这个块用<code>HCL</code>描述就是：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">word mem_addr = [</span><br><span class="line">    icode in &#123; IRMMOVQ, IPUSHQ, ICALL, IMRMOVQ &#125; : valE;</span><br><span class="line">    icode in &#123; IPOPQ, IRET &#125; : valA;</span><br><span class="line">    # Other instructions don<span class="number">&#x27;</span>t need address</span><br><span class="line">];</span><br></pre></td></tr></table></figure>
 
@@ -432,30 +432,30 @@
 <h3 id="更新PC阶段"><a href="#更新PC阶段" class="headerlink" title="更新PC阶段"></a>更新PC阶段</h3><p><code>SEQ</code>中最后一个阶段会产生程序计数器的新值<code>(见图4-31)</code>。如图<code>4-18~</code>图<code>4-21</code>中最后步骤所示，依据指令的类型和是否要选择分支，新的<code>PC</code>可能是<code>valC</code>、<code>valM</code>或<code>valP</code>。用<code>HCL</code>来描述这个选择就是：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">word new_pc = [</span><br><span class="line">    # Call. Use instruction constant</span><br><span class="line">    icode == ICALL : valC;</span><br><span class="line">    # Taken branch. Use instruction constant</span><br><span class="line">    icode == IJXX &amp;&amp; Cnd : valC;</span><br><span class="line">    # Completion of RET instruction. Use value from <span class="built_in">stack</span></span><br><span class="line">    icode == IRET : valM;</span><br><span class="line">    # Default: Use incremented PC</span><br><span class="line">    <span class="number">1</span> : valP;</span><br><span class="line">];</span><br></pre></td></tr></table></figure>
 
-<p><img src="/4-31.png"></p>
+<p><img src="/posts/proc-arch2/4-31.png"></p>
 <h3 id="SEQ小结"><a href="#SEQ小结" class="headerlink" title="SEQ小结"></a>SEQ小结</h3><p>现在我们已经浏览了<code>Y86-64</code>处理器的一个完整的设计。可以看到，通过将执行每条不同指令所需的步骤组织成一个统一的流程，就可以用很少量的各种硬件单元以及一个时钟来控制计算的顺序，从而实现整个处理器。不过这样一来，控制逻辑就必须要在这些单元之间路由信号，并根据指令类型和分支条件产生适当的控制信号。</p>
 <p><code>SEQ</code>唯一的问题就是它太慢了。时钟必须非常慢，以使信号能在一个周期内传播所有的阶段。让我们来看看处理一条<code>ret</code>指令的例子。在时钟周期起始时，从更新过的<code>PC</code>开始，要从指令内存中读出指令，从寄存器文件中读出栈指针，<code>ALU</code>将栈指针加8，为了得到程序计数器的下一个值，还要从内存中读出返回地址。所有这一切都必须在这个周期结束之前完成。</p>
 <p>这种实现方法不能充分利用硬件单元，因为每个单元只在整个时钟周期的一部分时间内才被使用。我们会看到引入流水线能获得更好的性能。</p>
 <h1 id="流水线的通用原理"><a href="#流水线的通用原理" class="headerlink" title="流水线的通用原理"></a>流水线的通用原理</h1><p>在试图设计一个流水线化的<code>Y86-64</code>处理器之前，让我们先来看看流水线化的系统的一些通用属性和原理。对于曾经在自助餐厅的服务线上工作过或者开车通过自动汽车清洗线的人，都会非常熟悉这种系统。在流水线化的系统中，待执行的任务被划分成了若干个独立的阶段。在自助餐厅，这些阶段包括提供沙拉、主菜、甜点以及饮料。在汽车清洗中，这些阶段包括喷水和打肥皂、擦洗、上蜡和烘干。通常都会允许多个顾客同时经过系统，而不是要等到一个用户完成了所有从头至尾的过程才让下一个开始。在一个典型的自助餐厅流水线上，顾客按照相同的顺序经过各个阶段，即使他们并不需要某些菜。在汽车清洗的情况中，当前面一辆汽车从喷水阶段进入擦洗阶段时，下一辆就可以进入喷水阶段了。通常，汽车必须以相同的速度通过这个系统，避免撞车。</p>
 <p>流水线化的一个重要特性就是提高了系统的吞吐量<code>(throughput)</code>，也就是单位时间内服务的顾客总数，不过它也会轻微地增加延迟<code>(latency)</code>，也就是服务一个用户所需要的时间。例如，自助餐厅里的一个只需要甜点的顾客，能很快通过一个非流水线化的系统，只在甜点阶段停留。但是在流水线化的系统中，这个顾客如果试图直接去甜点阶段就有可招致其他顾客的愤怒了。</p>
 <h2 id="计算流水线"><a href="#计算流水线" class="headerlink" title="计算流水线"></a>计算流水线</h2><p>让我们把注意力放到计算流水线上来，这里的<code>顾客</code>就是指令，每个阶段完成指令执行计算的一部分。图<code>4-32a</code>给出了一个很简单的非流水线化的硬件系统例子。它是由一些执行计算的逻辑以及一个保存计算结果的寄存器组成的。时钟信号控制在每个特定的时间间隔加载寄存器。<code>CD</code>播放器中的译码器就是这样的一个系统。输入信号是从<code>CD</code>表面读出的位，逻辑电路对这些位进行译码，产生音频信号。图中的计算块是用组合逻辑来实现的，意味着信号会穿过一系列逻辑门，在一定时间的延迟之后，输出就成为了输入的某个函数。</p>
-<p><img src="/4-32.png"></p>
+<p><img src="/posts/proc-arch2/4-32.png"></p>
 <p>在现代逻辑设计中，电路延迟以微微秒或皮秒<code>(picosecond,简写成ps)</code>，也就是10<sup>-12</sup>秒为单位来计算。在这个例子中，我们假设组合逻辑需要<code>300ps</code>，而加载寄存器需要<code>20ps</code>，图<code>4-32</code>还给出了一种时序图，称为流水线图<code>(pipeline diagram)</code>。在图中，时间从左向右流动。从上到下写着一组操作<code>(在此称为I1、I2和I3)</code>。实心的长方形表示这些指令执行的时间。这个实现中，在开始下一条指令之前必须完成前一个。因此，这些方框在垂直方向上并没有相互重叠。下面这个公式给出了运行这个系统的最大吞吐量：</p>
-<p><img src="/GIPS.png"></p>
+<p><img src="/posts/proc-arch2/GIPS.png"></p>
 <p>我们以每秒千兆条指令<code>(GIPS)</code>，也就是每秒十亿条指令，为单位来描述吞吐量。从头到尾执行一条指令所需要的时间称为延迟<code>(latency)</code>。在此系统中，延迟为<code>320ps</code>，也就是吞吐量的倒数。假设将系统执行的计算分成三个阶段<code>(A、B和C)</code>，每个阶段需要<code>100ps</code>，如图<code>4-33</code>所示，然后在各个阶段之间放上流水线寄存器<code>(pipeline register)</code>，这样每条指令都会按照三步经过这个系统，从头到尾需要三个完整的时钟周期。如图<code>4-33</code>中的流水线图所示，只要<code>I1</code>从<code>A</code>进入<code>B</code>，就可以让<code>I2</code>进入阶段<code>A</code>了，以此类推。在稳定状态下，三个阶段都应该是活动的，每个时钟周期，一条指令离开系统，一条新的进入。从流水线图中第三个时钟周期就能看出这一点，此时，<code>I1</code>是在阶段<code>C</code>，而<code>I2</code>是在阶段<code>B</code>，而<code>I3</code>是在阶段<code>A</code>。在这个系统中，我们将时钟周期设为<code>100+20 = 120ps</code>，得到的吞吐量大约为<code>8.33GIPS</code>。因为处理一条指令需要3个时钟周期，所以这条流水线的延迟就是<code>3x120 = 360ps</code>。我们将系统吞吐量提高到原来的<code>8.3/3.12 = 2.67</code>倍，代价是增加了一些硬件，以及延迟的少量增加<code>(360/320 = 1.12)</code>。延迟变大是由于增加的流水线寄存器的时间开销。</p>
-<p><img src="/4-33.png"></p>
+<p><img src="/posts/proc-arch2/4-33.png"></p>
 <h2 id="流水线操作的详细说明"><a href="#流水线操作的详细说明" class="headerlink" title="流水线操作的详细说明"></a>流水线操作的详细说明</h2><p>为了更好地理解流水线是怎样工作的，让我们来详细看看流水线计算的时序和操作，图<code>4-34</code>给出了前面我们看到过的三阶段流水线<code>(图4-33)</code>的流水线图。就像流水线图上方指明的那样，流水线阶段之间的指令转移是由时钟信号来控制的。每隔<code>120ps</code>，信号从0上升至1，开始下一组流水线阶段的计算。</p>
-<p><img src="/4-34.png"></p>
+<p><img src="/posts/proc-arch2/4-34.png"></p>
 <p>图<code>4-35</code>跟踪了时刻<code>240~360</code>之间的电路活动，指令<code>I1</code>经过阶段<code>C</code>，<code>I2</code>经过阶段<code>B</code>，而<code>I3</code>经过阶段<code>A</code>。就在时刻<code>240(点1)</code>时钟上升之前，阶段<code>A</code>中计算的指令<code>I2</code>的值已经到达第一个流水线寄存器的输入，但是该寄存器的状态和输出还保持为指令<code>I1</code>在阶段<code>A</code>中计算的值。指令<code>I1</code>在阶段<code>B</code>中计算的值已经到达第二个流水线寄存器的输入。当时钟上升时，这些输入被加载到流水线寄存器中，成为寄存器的输出<code>(点2)</code>。另外，阶段<code>A</code>的输入被设置成发起指令<code>I3</code>的计算。然后信号传播通过各个阶段的组合逻辑<code>(点3)</code>。就像图中点3处的曲线化的波阵面<code>(curved wavefront)</code>表明的那样，信号可能以不同的速率通过各个不同的部分。在时刻<code>360</code>之前，结果值到达流水线寄存器的输入<code>(点4)</code>。当时刻<code>360</code>时钟上升时，各条指令会前进经过一个流水线阶段。</p>
-<p><img src="/4-35.png"></p>
+<p><img src="/posts/proc-arch2/4-35.png"></p>
 <p>从这个对流水线操作详细的描述中，我们可以看到减缓时钟不会影响流水线的行为，信号传播到流水线寄存器的输入，但是直到时钟上升时才会改变寄存器的状态。另一方面，如果时钟运行得太快，就会有灾难性的后果。值可能会来不及通过组合逻辑，因此当时钟上升时，寄存器的输入还不是合法的值。</p>
 <p>根据对<code>SEQ</code>处理器时序的讨论<code>(4.3.3节)</code>，我们看到这种在组合逻辑块之间采用时钟寄存器的简单机制，足够控制流水线中的指令流。随着时钟周而复始地上升和下降，不同的指令就会通过流水线的各个阶段，不会相互干扰。</p>
 <h2 id="流水线的局限性"><a href="#流水线的局限性" class="headerlink" title="流水线的局限性"></a>流水线的局限性</h2><p>图<code>4-33</code>的例子给出了一个理想的流水线化的系统，在这个系统中，我们可以将计算分成三个相互独立的阶段，每个阶段需要的时间是原来逻辑需要时间的三分之一。不幸的是，会出现其他一些因素，降低流水线的效率。</p>
 <h3 id="不一致的划分"><a href="#不一致的划分" class="headerlink" title="不一致的划分"></a>不一致的划分</h3><p>图<code>4-36</code>展示的系统中和前面一样，我们将计算划分为了三个阶段，但是通过这些阶段的延迟从<code>50ps</code>到<code>150ps</code>不等。通过所有阶段的延迟和仍然为<code>300ps</code>。不过，运行时钟的速率是由最慢的阶段的延迟限制的。流水线图表明，每个时钟周期，阶段<code>A</code>都会空闲<code>(用白色方框表示)100ps</code>，而阶段<code>C</code>会空闲<code>50ps</code>。只有阶段<code>B</code>会一直处于活动状态。我们必须将时钟周期设为<code>150+20 = 170ps</code>，得到吞吐量为<code>5.88GIPS</code>。另外，由于时钟周期减慢了，延迟也增加到了<code>510ps</code>。</p>
-<p><img src="/4-36.png"></p>
+<p><img src="/posts/proc-arch2/4-36.png"></p>
 <p>对硬件设计者来说，将系统计算设计划分成一组具有相同延迟的阶段是一个严峻的挑战。通常，处理器中的某些硬件单元，如<code>ALU</code>和内存，是不能被划分成多个延迟较小的单元的。这就使得创建一组平衡的阶段非常困难。在设计流水线化的<code>Y86-64</code>处理器中，我们不会过于关注这一层次的细节，但是理解时序优化在实际系统设计中的重要性还是非常重要的。</p>
 <h3 id="流水线过深，收益反而下降"><a href="#流水线过深，收益反而下降" class="headerlink" title="流水线过深，收益反而下降"></a>流水线过深，收益反而下降</h3><p>图<code>4-37</code>说明了流水线技术的另一个局限性。在这个例子中，我们把计算分成了6个阶段，每个阶段需要<code>50ps</code>。在每对阶段之间插入流水线寄存器就得到了一个六阶段流水线。这个系统的最小时钟周期为<code>50+20 = 20ps</code>，吞吐量为<code>14.29GIPS</code>。因此，通过将流水线的阶段数加倍，我们将性能提高了<code>14.29/8.33 = 1.71</code>。虽然我们将每个计算时钟的时间缩短了两倍，但是由于通过流水线寄存器的延迟，吞吐量并没有加倍。这个延迟成了流水线吞吐量的一个制约因素。在我们的新设计中，这个延迟占到了整个时钟周期的<code>28.6%</code>。</p>
-<p><img src="/4-37.png"></p>
+<p><img src="/posts/proc-arch2/4-37.png"></p>
 <p>为了提高时钟频率，现代处理器采用了很深的<code>(15或更多的阶段)</code>流水线。处理器架构师将指令的执行划分成很多非常简单的步骤，这样一来每个阶段的延迟就很小。电路设计者小心地设计流水线寄存器，使其延迟尽可能得小。芯片设计者也必须小心地设计时钟传播网络，以保证时钟在整个芯片上同时改变。所有这些都是设计高速微处理器面临的挑战。</p>
 <h2 id="带反馈的流水线系统"><a href="#带反馈的流水线系统" class="headerlink" title="带反馈的流水线系统"></a>带反馈的流水线系统</h2><p>到目前为止，我们只考虑一种系统，其中传过流水线的对象，无论是汽车、人或者指令，相互都是完全独立的。但是，对于像<code>x86-64</code>或<code>Y86-64</code>这样执行机器程序的系统来说，相邻指令之间很可能是相关的。例如，考虑下面这个<code>Y86-64</code>指令序列：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">irmovq $50, %rax</span><br><span class="line">addq %rax , %rbx</span><br><span class="line">mrmovq 100( %rbx ), %rdx</span><br></pre></td></tr></table></figure>
@@ -466,7 +466,7 @@
 
 <p><code>jne</code>指令<code>(第3行)</code>产生了一个控制相关<code>(control dependency)</code>，因为条件测试的结果会决定要执行的新指令是<code>irmovq</code>指令<code>(第4行)</code>还是<code>halt</code>指令<code>(第7行)</code>。在我们的<code>SEQ</code>设计中，这些相关都是由反馈路径来解决的，如图<code>4-22</code>的右边所示。这些反馈将更新了的寄存器值向下传送到寄存器文件，将新的<code>PC</code>值向下传送到<code>PC</code>寄存器。</p>
 <p>图<code>4-38</code>举例说明了将流水线引入含有反馈路径的系统中的危险。在原来的系统中<code>(图4-38a)</code>中，每条指令的结果都反馈给下一条指令。流水线图<code>(图4-38b)</code>就说明了这个情况，<code>I1</code>的结果成为<code>I2</code>的输入，依次类推。如果试图以最直接的方式将它转换成一个三阶段流水线<code>(图4-38c)</code>，我们将改变系统的行为。如图<code>4-38d</code>所示，<code>I1</code>的结果成为<code>I4</code>的输入。为了通过流水线技术加速系统，我们改变了系统的行为。</p>
-<p><img src="/4-38.png"></p>
+<p><img src="/posts/proc-arch2/4-38.png"></p>
 <p>当我们将流水线技术引入<code>Y86-64</code>处理器时，必须正确处理反馈的影响。很明显，像图<code>4-38</code>中的例子那样改变系统的行为是不可接受的。我们必须以某种方式来处理指令间的数据和控制相关，以使得到的行为与<code>ISA</code>定义的模型相符。</p>
 <h1 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h1><ul>
 <li><a target="_blank" rel="noopener" href="https://csapp.cs.cmu.edu/"><code>Computer Systems: A Programmer&#39;s Perspective, 3/E</code></a></li>

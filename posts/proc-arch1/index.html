@@ -27,32 +27,32 @@
 <meta property="og:site_name" content="Lu0k">
 <meta property="og:description" content="内容简介处理器必须执行一系列指令，每条指令执行某个简单操作，例如两个数相加。指令被编码为由一个或多个字节序列组成的二进制格式。一个处理器支持的指令和指令的字节级编码称为它的指令集体系结构(ISA, Instruction-Set Architecture)。ISA在编译器编写者和处理器设计人员之间提供了一个概念抽象层，编译器编写者只需要知道允许哪些指令，以及它们是如何编码的；而处理器设计者必须建造">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://lu0k.github.io/4-1.png">
-<meta property="og:image" content="https://lu0k.github.io/4-2.png">
-<meta property="og:image" content="https://lu0k.github.io/4-3.png">
-<meta property="og:image" content="https://lu0k.github.io/4-4.png">
-<meta property="og:image" content="https://lu0k.github.io/4-5.png">
-<meta property="og:image" content="https://lu0k.github.io/4-6.png">
-<meta property="og:image" content="https://lu0k.github.io/4-7.png">
-<meta property="og:image" content="https://lu0k.github.io/4-8.png">
-<meta property="og:image" content="https://lu0k.github.io/4-9.png">
-<meta property="og:image" content="https://lu0k.github.io/4-10.png">
-<meta property="og:image" content="https://lu0k.github.io/4-11.png">
-<meta property="og:image" content="https://lu0k.github.io/4-12.png">
-<meta property="og:image" content="https://lu0k.github.io/4-13.png">
-<meta property="og:image" content="https://lu0k.github.io/4-14.png">
-<meta property="og:image" content="https://lu0k.github.io/min3.png">
-<meta property="og:image" content="https://lu0k.github.io/4-15.png">
-<meta property="og:image" content="https://lu0k.github.io/mux4.png">
-<meta property="og:image" content="https://lu0k.github.io/4-16.png">
-<meta property="og:image" content="https://lu0k.github.io/file.png">
-<meta property="og:image" content="https://lu0k.github.io/data.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/proc-arch1/4-1.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/proc-arch1/4-2.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/proc-arch1/4-3.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/proc-arch1/4-4.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/proc-arch1/4-5.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/proc-arch1/4-6.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/proc-arch1/4-7.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/proc-arch1/4-8.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/proc-arch1/4-9.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/proc-arch1/4-10.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/proc-arch1/4-11.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/proc-arch1/4-12.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/proc-arch1/4-13.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/proc-arch1/4-14.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/proc-arch1/min3.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/proc-arch1/4-15.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/proc-arch1/mux4.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/proc-arch1/4-16.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/proc-arch1/file.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/proc-arch1/data.png">
 <meta property="article:published_time" content="2022-01-07T16:00:00.000Z">
 <meta property="article:modified_time" content="2022-01-15T10:05:29.115Z">
 <meta property="article:author" content="Lu0k">
 <meta property="article:tag" content="CSAPP">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://lu0k.github.io/4-1.png">
+<meta name="twitter:image" content="https://lu0k.github.io/posts/proc-arch1/4-1.png">
 
 
 <link rel="canonical" href="https://lu0k.github.io/posts/proc-arch1/">
@@ -302,7 +302,7 @@
 <p><code>ARCH: VLOG</code>给出了用<code>Verilog</code>硬件描述语言描述的流水线化的<code>Y86-64</code>处理器。其中包括为基本的硬件构建块和整个的处理器结构创建模块。我们自动地将控制逻辑的<code>HCL</code>描述翻译成<code>Verilog</code>。首先用我们的模拟器调试<code>HCL</code>描述，能消除很多在硬件设计中会出现的棘手的问题。给定一个<code>Verilog</code>描述，有商业和开源工具来支持模拟和逻辑合成<code>(logic synthesis)</code>，产生实际的微处理器电路设计。</p>
 <h1 id="Y86-64指令集"><a href="#Y86-64指令集" class="headerlink" title="Y86-64指令集"></a>Y86-64指令集</h1><p>定义一个指令集体系结构<code>(例如Y86-64)</code>包括定义各种状态单元、指令集和它们的编码、一组编程规范和异常事件处理。</p>
 <h2 id="程序员可见状态"><a href="#程序员可见状态" class="headerlink" title="程序员可见状态"></a>程序员可见状态</h2><p>如图<code>4-1</code>所示，<code>Y86-64</code>程序中的每条指令都会读取或修改处理器状态的某些部分。这称为程序员可见状态，这里的<code>程序员</code>既可以是用汇编代码写程序的人，也可以是产生机器级代码的编译器。在处理器实现中，只要我们保证机器级程序能够访问程序员可见状态，就不需要完全按照<code>ISA</code>暗示的方式来表示和组织这个处理器状态。<code>Y86-64</code>的状态类似于<code>x86-64</code>。有15个程序寄存器：<code>%rax</code>、<code>%rbx</code>、<code>%rcx</code>、<code>%rdx</code>、<code>%rsp</code>、<code>%rbp</code>、<code>%rsi</code>、<code>%rdi</code>和<code>%r8</code>到<code>%r14</code>。<code>(我们省略了x86-64的寄存器%r15以简化指令的编码。)</code>每个程序寄存器存储一个64位的字。寄存器<code>%rsp</code>被入栈、出栈、调用和返回指令作为栈指针。除此之外，寄存器没有固定的含义或固定值。有3个一位的条件码：<code>ZF</code>、<code>SF</code>和<code>OF</code>，它们保存着最近的算术或逻辑指令所造成影响的有关信息。程序计数器<code>(PC)</code>存放当前正在执行指令的地址。</p>
-<p><img src="/4-1.png"></p>
+<p><img src="/posts/proc-arch1/4-1.png"></p>
 <p>内存从概念上来说就是一个很大的字节数组，保存着程序和数据。<code>Y86-64</code>程序用虚拟地址来引用内存位置。硬件和操作系统软件联合起来将虚拟地址翻译成实际或物理地址，指明数据实际存在内存中哪个地方。第9章将更详细地研究虚拟内存。现在，我们只认为虚拟内存系统向<code>Y86-64</code>程序提供了一个单一的字节数组映像。</p>
 <p>程序状态的最后一个部分是状态码<code>Stat</code>，它表明程序执行的总体状态。它会指示是正常运行，还是出现了某种异常，例如当一条指令试图去读非法的内存地址时。在<code>4.1.4</code>节中会讲述可能的状态码以及异常处理。</p>
 <h2 id="Y86-64指令"><a href="#Y86-64指令" class="headerlink" title="Y86-64指令"></a>Y86-64指令</h2><p>图<code>4-2</code>给出了<code>Y86-64 ISA</code>中各个指令的简单描述。这个指令集就是我们处理器实现的目标。<code>Y86-64</code>指令集基本上是<code>x86-64</code>指令集的一个子集。它只包括8字节整数操作，寻址方式较少，操作也较少。因为我们只有8字节数据，所以称之为<code>字(word)</code>不会有任何歧义。在这个图中，左边是指令的汇编码表示，右边是字节编码。图<code>4-3</code>给出了其中一些指令更详细的内容。汇编代码格式类似于<code>x86-64</code>的<code>ATT</code>格式。</p>
@@ -323,22 +323,22 @@
 <li><p><code>halt</code>指令停止指令的执行。<code>x86-64</code>中有一个与之相当的指令<code>hlt</code>。<code>x86-64</code>的应用程序不允许使用这条指令，因为它会导致整个系统暂停运行。对于<code>Y86-64</code>来说，执行<code>halt</code>指令会导致处理器停止，并将状态码设置为HLT<code>(参见4.1.4节)</code></p>
 </li>
 </ul>
-<p><img src="/4-2.png"></p>
+<p><img src="/posts/proc-arch1/4-2.png"></p>
 <h2 id="指令编码"><a href="#指令编码" class="headerlink" title="指令编码"></a>指令编码</h2><p>图<code>4-2</code>还给出了指令的字节级编码。每条指令需要<code>1~10</code>个字节不等，这取决于需要哪些字段。每条指令的第一个字节表明指令的类型。这个字节分为两个部分，每部分4位：高4位是代码<code>(code)</code>部分，低4位是功能<code>(function)</code>部分。如图<code>4-2</code>所示，代码值为<code>0~0xB</code>。功能值只有在一组相关指令共用一个代码时才有用。图<code>4-3</code>给出了整数操作、分支和条件传送指令的具体编码。可以观察到，<code>rrmovq</code>与条件传送有同样的指令代码。可以把它看作是一个<code>无条件传送</code>，就好像<code>jmp</code>指令是无条件跳转一样，它们的功能代码都是0。</p>
-<p><img src="/4-3.png"></p>
+<p><img src="/posts/proc-arch1/4-3.png"></p>
 <p>如图<code>4-4</code>所示，15个程序寄存器中每个都有一个相对应的范围在0到<code>0xE</code>之间的寄存器标识符<code>(register ID)</code>。<code>Y86-64</code>中的寄存器编号跟<code>x86-64</code>中的相同。程序寄存器存在<code>CPU</code>中的一个寄存器文件中，这个寄存器文件就是一个小的、以寄存器<code>ID</code>作为地址的随机访问存储器。在指令编码中以及在我们的硬件设计中，当需要指明不应访问任何寄存器时，就用<code>ID</code>值<code>0xF</code>来表示。</p>
-<p><img src="/4-4.png"></p>
+<p><img src="/posts/proc-arch1/4-4.png"></p>
 <p>有的指令只有一个字节长，而有的需要操作数的指令编码就更长一些。首先，可能有附加的寄存器指示符字节<code>(register specifier byte)</code>，指定一个或两个寄存器。在图<code>4-2</code>中，这些寄存器字段称为<code>rA</code>和<code>rB</code>。从指令的汇编代码表示中可以看到，根据指令类型，指令可以指定用于数据源和目的的寄存器，或是用于地址计算的基址寄存器。没有寄存器操作数的指令，例如分支指令和<code>call</code>指令，就没有寄存器指示符字节。那些只需要一个寄存器操作数的指令<code>(irmovg、pushq和popq)</code>将另一个寄存器指示符设为<code>0xF</code>。这种约定在我们的处理器实现中非常有用。</p>
 <p>有些指令需要一个附加的8字节常数字<code>(constant word)</code>。这个字能作为<code>irmovq</code>的立即数数据，<code>rmmovg</code>和<code>mrmovq</code>的地址指示符的偏移量，以及分支指令和调用指令的目的地址。注意，分支指令和调用指令的目的是一个绝对地址，而不像<code>IA32</code>中那样使用<code>PC(程序计数器)</code>相对寻址方式。处理器使用<code>PC</code>相对寻址方式，分文指令的编码会更加简洁，同时这样也能允许代码从内存的一部分复制到另一部分而不需要更新所有的分支目标地址。因为我们更关心描述的简单性，所以就使用了绝对寻址方式。同<code>IA32</code>一样，所有整数采用小端法编码。当指令按照反汇编格式书写时，这些字节就以相反的顺序出现。</p>
 <p>例如，用十六进制来表示指令<code>rmmovq %rsp,0x123456789abcd(%rdx)</code>的字节编码。从图<code>4-2</code>我们可以看到，<code>rmmovq</code>的第一个字节为40。源寄存器<code>%rsp</code>应该编码放在<code>rA</code>字段中，而基址寄存器<code>%rdx</code>应该编码放在<code>rB</code>字段中。根据图<code>4-4</code>中的寄存器编号，我们得到寄存器指示符字节42。最后，偏移量编码放在8字节的常数字中。首先在<code>0x123456789abcd</code>的前面填充上0变成8个字节，变成字节序列<code>00 01 23 45 67 89 ab cd</code>，写成按字节反序就是<code>cd ab 89 67 45 23 01 00</code>。将它们都连接起来就得到指令的编码<code>4042cdab896745230100</code>。</p>
 <p>指令集的一个重要性质就是字节编码必须有唯一的解释。任意一个字节序列要么是一个唯一的指令序列的编码，要么就不是一个合法的字节序列。<code>Y86-64</code>就具有这个性质，因为每条指令的第一个字节有唯一的代码和功能组合，给定这个字节，我们就可以决定所有其他附加字节的长度和含义。这个性质保证了处理器可以无二义性地执行目标代码程序。即使代码嵌入在程序的其他字节中，只要从序列的第一个字节开始处理，我们仍然可以很容易地确定指令序列。反过来说，如果不知道一段代码序列的起始位置，我们就不能准确地确定怎样将序列划分成单独的指令。对于试图直接从目标代码字节序列中抽取出机器级程序的反汇编程序和其他一些工具来说，这就带来了问题。</p>
 <h2 id="Y86-64异常"><a href="#Y86-64异常" class="headerlink" title="Y86-64异常"></a>Y86-64异常</h2><p>对<code>Y86-64</code>来说，程序员可见的状态<code>(图4-1)</code>包括状态码<code>Stat</code>，它描述程序执行的总体状态。这个代码可能的值如图<code>4-5</code>所示。代码值1，命名为<code>AOK</code>，表示程序执行正常，而其它一些代码则表示发生了某种类型的异常。代码值2，命名为<code>HLT</code>，表示处理器执行了一条<code>hlt</code>指令。代码值3，命名为<code>ADR</code>，表示处理器试图从一个非法内存地址读或者向一个非法内存地址写，可能是当取指令的时候，也可能是当读或者写数据的时候。我们会限制最大的地址<code>(确切的限定值因实现而异)</code>，任何访问超出这个限定值的地址都会引发<code>ADR</code>异常。代码值4，命名为<code>INS</code>，表示遇到了非法的指令代码。</p>
-<p><img src="/4-5.png"></p>
+<p><img src="/posts/proc-arch1/4-5.png"></p>
 <p>对于<code>Y86-64</code>，当遇到这些异常的时候，我们就简单地让处理器停止执行指令。在更完整的设计中，处理器通常会调用一个异常处理程序<code>(exception handler)</code>，这个过程被指定用来处理遇到的某种类型的异常。就像在第8章中讲述的，异常处理程序可以被配置成不同的结果，例如，中止程序或者调用一个用户自定义的信号处理程序<code>(signal handler)</code>。</p>
 <h2 id="Y86-64程序"><a href="#Y86-64程序" class="headerlink" title="Y86-64程序"></a>Y86-64程序</h2><p>图<code>4-6</code>给出了下面这个C函数的<code>x86-64</code>和<code>Y86-64</code>汇编代码：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">long sum(long *start, long count)</span><br><span class="line">&#123;</span><br><span class="line">    long sum = 0;</span><br><span class="line">    while (count) &#123;</span><br><span class="line">        sum += *start;</span><br><span class="line">        start++;</span><br><span class="line">        count--;</span><br><span class="line">    &#125;</span><br><span class="line">    return sum;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p><img src="/4-6.png"></p>
+<p><img src="/posts/proc-arch1/4-6.png"></p>
 <p><code>x86-64</code>代码是由<code>GCC</code>编译器产生的。<code>Y86-64</code>代码与之类似，但有以下不同点：</p>
 <ul>
 <li><code>Y86-64</code>将常数加载到寄存器<code>(第2~3行)</code>，因为它在算术指令中不能使用立即数</li>
@@ -346,7 +346,7 @@
 <li>我们手工编写的<code>Y86-64</code>实现有一个优势，即<code>subq</code>指令<code>(第11行)</code>同时还设置了条件码，因此<code>GCC</code>生成代码中的<code>testq</code>指令<code>(第9行)</code>就不是必需的。不过为此，<code>Y86-64</code>代码必须用<code>andq</code>指令<code>(第5行)</code>在进入循环之前设置条件码</li>
 </ul>
 <p>图<code>4-7</code>给出了用<code>Y86-64</code>汇编代码编写的一个完整的程序文件的例子。这个程序既包括数据，也包括指令。伪指令<code>(directive)</code>指明应该将代码或数据放在什么位置，以及如何对齐。这个程序详细说明了栈的放置、数据初始化、程序初始化和程序结束等问题。</p>
-<p><img src="/4-7.png"></p>
+<p><img src="/posts/proc-arch1/4-7.png"></p>
 <p>在这个程序中，以<code>.</code>开头的词是汇编器伪指令<code>(assembler directives)</code>，它们告诉汇编器调整地址，以便在那儿产生代码或插入一些数据。伪指令<code>.pos 0(第2行)</code>告诉汇编器应该从地址0处开始产生代码。这个地址是所有<code>Y86-64</code>程序的起点。接下来的一条指令<code>(第3行)</code>初始化栈指针。我们可以看到程序结尾处<code>(第40行)</code>声明了标号<code>stack</code>，并且用一个<code>.pos</code>伪指令<code>(第39行)</code>指明地址<code>0x200</code>。因此栈会从这个地址开始，向低地址增长。我们必须保证栈不会增长得太大以至于覆盖了代码或者其他程序数据。</p>
 <p>程序的第<code>8~13</code>行声明了一个4个字的数组，值分别为：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">0x000d000d000d, 0x00c000c000c0</span><br><span class="line">0x0b000b000b00, 0xa000a000a000</span><br></pre></td></tr></table></figure>
@@ -354,7 +354,7 @@
 <p>标号<code>array</code>表明了这个数组的起始，并且在8字节边界处对齐<code>(用.align伪指令指定)</code>。第<code>16~19</code>行给出了<code>main</code>过程，在过程中对那个四字数组调用了<code>sum</code>函数，然后停止。</p>
 <p>正如例子所示，由于我们创建<code>Y86-64</code>代码的唯一工具是汇编器，程序员必须执行本来通常交给编译器、链接器和运行时系统来完成的任务。幸好我们只用<code>Y86-64</code>来写一些小的程序，对此一些简单的机制就足够了。</p>
 <p>图<code>4-8</code>是<code>YAS</code>的汇编器对图<code>4-7</code>中代码进行汇编的结果。为了便于理解，汇编器的输出结果是<code>ASCII</code>码格式。汇编文件中有指令或数据的行上，目标代码包含一个地址，后面跟着<code>1~10</code>个字节的值。</p>
-<p><img src="/4-8.png"></p>
+<p><img src="/posts/proc-arch1/4-8.png"></p>
 <p>我们实现了一个指令集模拟器，称为<code>YIS</code>，它的目的是模拟<code>Y86-64</code>机器代码程序的执行，而不用试图去模拟任何具体处理器实现的行为。这种形式的模拟有助于在有实际硬件可用之前调试程序，也有助于检查模拟硬件或者在硬件上运行程序的结果。用<code>YIS</code>运行例子的目标代码，产生如下输出：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">Stopped in 34 steps at PC = 0x13. Status &#x27;HLT&#x27;, CC Z=1 S=0 O=0</span><br><span class="line">Changes to registers:</span><br><span class="line">%rax: 0x0000000000000000 0x0000abcdabcdabcd</span><br><span class="line">%rsp: 0x0000000000000000 0x0000000000000200</span><br><span class="line">%rdi: 0x0000000000000000 0x0000000000000038</span><br><span class="line">%r8:  0x0000000000000000 0x0000000000000008</span><br><span class="line">%r9:  0x0000000000000000 0x0000000000000001</span><br><span class="line">%r10: 0x0000000000000000 0x0000a000a000a000</span><br><span class="line">Changes to memory:</span><br><span class="line">0x01f0: 0x0000000000000000 0x0000000000000055</span><br><span class="line">0x01f8: 0x0000000000000000 0x0000000000000013</span><br></pre></td></tr></table></figure>
 
@@ -368,7 +368,7 @@
 <h1 id="HCL语言"><a href="#HCL语言" class="headerlink" title="HCL语言"></a>HCL语言</h1><p>在硬件设计中，用电子电路来计算对位进行运算的函数，以及在各种存储器单元中存储位。大多数现代电路技术都是用信号线上的高电压或低电压来表示不同的位值。在当前的技术中，逻辑1是用<code>1.0</code>伏特左右的高电压表示的，而逻辑0是用<code>0.0</code>伏特左右的低电压表示的。要实现一个数字系统需要三个主要的组成部分：计算对位进行操作的函数的组合逻辑、存储位的存储器单元，以及控制存储器单元更新的时钟信号。</p>
 <p>本节简要描述这些不同的组成部分。我们还将介绍<code>HCL(Hardware Control Language, 硬件控制语言)</code>，用这种语言来描述不同处理器设计的控制逻辑。</p>
 <h2 id="逻辑门"><a href="#逻辑门" class="headerlink" title="逻辑门"></a>逻辑门</h2><p>逻辑门是数字电路的基本计算单元。它们产生的输出，等于它们输入位值的某个布尔函数。图<code>4-9</code>是布尔函数<code>AND</code>、<code>OR</code>和<code>NOT</code>的标准符号，C语言中运算符<code>(2.1.8节)</code>的逻辑门下面是对应的<code>HCL</code>表达式：<code>AND</code>用<code>&amp;&amp;</code>表示，<code>OR</code>用<code>||</code>表示，而<code>NOT</code>用<code>!</code>表示。我们用这些符号而不用C语言中的位运算符<code>&amp;</code>、<code>|</code>和<code>~</code>，这是因为逻辑门只对单个位的数进行操作，而不是整个字。</p>
-<p><img src="/4-9.png"></p>
+<p><img src="/posts/proc-arch1/4-9.png"></p>
 <p>虽然图中只说明了<code>AND</code>和<code>OR</code>门的两个输入的版本，但是常见的是它们作为<code>n</code>路操作，<code>n&gt;2</code>。不过，在<code>HCL</code>中我们还是把它们写作二元运算符，所以，三个输入的<code>AND</code>门，输入为<code>a</code>、<code>b</code>和<code>c</code>，用<code>HCL</code>表示就是<code>a&amp;&amp;b&amp;&amp;c</code>。逻辑门总是活动的<code>(active)</code>。一旦一个门的输入变化了，在很短的时间内，输出就会相应地变化。</p>
 <h2 id="组合电路和布尔表达式"><a href="#组合电路和布尔表达式" class="headerlink" title="组合电路和布尔表达式"></a>组合电路和布尔表达式</h2><p>将很多的逻辑门组合成一个网，就能构建计算块<code>(computational block)</code>，称为组合电路<code>(combinational circuits)</code>。如何构建这些网有几个限制：</p>
 <ul>
@@ -382,12 +382,12 @@
 <p>图<code>4-10</code>是一个我们觉得非常有用的简单组合电路的例子。它有两个输入<code>a</code>和<code>b</code>，有唯一的输出<code>eq</code>，当<code>a</code>和<code>b</code>都是<code>1(从上面的AND门可以看出)</code>或都是<code>0(从下面的AND门可以看出)</code>时，输出为1。用<code>HCL</code>来写这个网的函数就是：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">bool</span> eq = (a &amp;&amp; b) || (!a &amp;&amp; !b);</span><br></pre></td></tr></table></figure>
 
-<p><img src="/4-10.png"></p>
+<p><img src="/posts/proc-arch1/4-10.png"></p>
 <p>这段代码简单地定义了位级<code>(数据类型bool表明了这一点)</code>信号eq，它是输入<code>a</code>和<code>b</code>的函数，从这个例子可以看出<code>HCL</code>使用了C语言风格的语法，<code>=</code>将一个信号名与一个表达式联系起来。不过同C不一样，我们不把它看成执行了一次计算并将结果放入内存中某个位置。相反，它只是给表达式一个名字。</p>
 <p>图<code>4-11</code>给出了另一个简单但很有用的组合电路，称为多路复用器<code>(muliplexon, 通常称为MUX)</code>。多路复用器根据输入控制信号的值，从一组不同的数据信号中选出一个。在这个单个位的多路复用器中，两个数据信号是输入位<code>a</code>和<code>b</code>，控制信号是输入位<code>s</code>。当<code>s</code>为1时，输出等于<code>a</code>；而当<code>s</code>为0时，输出等于<code>b</code>。在这个电路中，我们可以看出两个<code>AND</code>门决定了是否将它们相对应的数据输入传送到<code>OR</code>门。当<code>s</code>为0时，上面的<code>AND</code>门将传送信号<code>b(因为这个门的另一个输入是!s)</code>，而当<code>s</code>为1时，下面的<code>AND</code>门将传送信号<code>a</code>。接下来，我们来写输出信号的<code>HCL</code>表达式，使用的就是组合逻辑中相同的操作：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">bool</span> out = (s &amp;&amp; a) |(!s &amp;&amp; b);</span><br></pre></td></tr></table></figure>
 
-<p><img src="/4-11.png"></p>
+<p><img src="/posts/proc-arch1/4-11.png"></p>
 <p><code>HCL</code>表达式很清楚地表明了组合逻辑电路和C语言中逻辑表达式的对应之处。它们都是用布尔操作来对输入进行计算的函数。值得注意的是，这两种表达计算的方法之间有以下区别：</p>
 <ul>
 <li>因为组合电路是由一系列的逻辑门组成，它的属性是输出会持续地响应输入的变化。如果电路的输入变化了，在一定的延迟之后，输出也会相应地变化。相比之下，C表达式只会在程序执行过程中被遇到时才进行求值</li>
@@ -399,13 +399,13 @@
 <p>这里函数<code>func</code>是不会被调用的，因为表达式<code>(a&amp;&amp;!a)</code>求值为0。而组合逻辑没有部分求值这条规则，逻辑门只是简单地响应输入的变化。</p>
 <h2 id="字级组合电路和整数表达式"><a href="#字级组合电路和整数表达式" class="headerlink" title="字级组合电路和整数表达式"></a>字级组合电路和整数表达式</h2><p>通过将逻辑门组合成大的网，可以构造出能计算更加复杂函数的组合电路。通常，我们设计能对数据字<code>(word)</code>进行操作的电路。有一些位级信号，代表一个整数或一些控制模式，例如，我们的处理器设计将包含有很多字，字的大小的范围为4位到64位，代表整数、地址、指令代码和寄存器标识符。</p>
 <p>执行字级计算的组合电路根据输入字的各个位，用逻辑门来计算输出字的各个位。例如图<code>4-12</code>中的一个组合电路，它测试两个64位字<code>A</code>和<code>B</code>是否相等。也就是，当且仅当<code>A</code>的每一位都和<code>B</code>的相应位相等时，输出才为1。这个电路是用64个图<code>4-10</code>中所示的单个位相等电路实现的。这些单个位电路的输出用一个<code>AND</code>门连起来，形成了这个电路的输出。</p>
-<p><img src="/4-12.png"></p>
+<p><img src="/posts/proc-arch1/4-12.png"></p>
 <p>在<code>HCL</code>中，我们将所有字级的信号都声明为<code>int</code>，不指定字的大小。这样做是为了简单。在全功能的硬件描述语言中，每个字都可以声明为有特定的位数。<code>HCL</code>允许比较字是否相等，因此图<code>4-12</code>所示的电路的函数可以在字级上表达成：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">bool</span> Eq = (A == B);</span><br></pre></td></tr></table></figure>
 
 <p>这里参数<code>A</code>和<code>B</code>是<code>int</code>型的。注意我们使用和C语言中一样的语法习惯，<code>=</code>表示赋值，而<code>==</code>是相等运算符。如图<code>4-12</code>中右边所示，在画字级电路的时候，我们用中等粗度的线来表示携带字的每个位的线路，而用虚线来表示布尔信号结果。</p>
 <p>图<code>4-13</code>是字级的多路复用器电路。这个电路根据控制输入位<code>s</code>，产生一个64位的字<code>Out</code>，等于两个输入字<code>A</code>或者<code>B</code>中的一个。这个电路由64个相同的子电路组成，每个子电路的结构都类似于图<code>4-11</code>中的位级多路复用器。不过这个字级的电路并没有简单地复制64次位级多路复用器，它只产生一次<code>!s</code>，然后在每个位的地方都重复使用它，从而减少反相器或非门<code>(inverters)</code>的数量。</p>
-<p><img src="/4-13.png"></p>
+<p><img src="/posts/proc-arch1/4-13.png"></p>
 <p>处理器中会用到很多种多路复用器，使得我们能根据某些控制条件，从许多源中选出一个字。在<code>HCL</code>中，多路复用函数是用情况表达式<code>(case expression)</code>来描述的。情况表达式的通用格式如下：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[</span><br><span class="line">    select1 : expr1;</span><br><span class="line">    select2 : expr2;</span><br><span class="line">    .</span><br><span class="line">    .</span><br><span class="line">    .</span><br><span class="line">    selectk : exprk;</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
 
@@ -415,20 +415,20 @@
 
 <p>在这段代码中，第二个选择表达式就是1，表明如果前面没有情况被选中，那就选择这种情况。这是<code>HCL</code>中一种指定默认情况的方法。几乎所有的情况表达式都是以此结尾的。</p>
 <p>允许不互斥的选择表达式使得<code>HCL</code>代码的可读性更好。实际的硬件多路复用器的信号必须互斥，它们要控制哪个输入字应该被传送到输出，就像图<code>4-13</code>中的信号<code>s</code>和<code>!s</code>。要将一个<code>HCL</code>情况表达式翻译成硬件，逻辑合成程序需要分析选择表达式集合，并解决任何可能的冲突，确保只有第一个满足的情况才会被选中。</p>
-<p><img src="/4-14.png"></p>
+<p><img src="/posts/proc-arch1/4-14.png"></p>
 <p>选择表达式可以是任意的布尔表达式，可以有任意多的情况。这就使得情况表达式能描述带复杂选择标准的、多种输入信号的块。例如，考虑图<code>4-14</code>中所示的四路复用器的图。这个电路根据控制信号<code>s1</code>和<code>s0</code>，从4个输入字<code>A</code>、<code>B</code>、<code>C</code>和<code>D</code>中选择一个，将控制信号看作一个两位的二进制数。我们可以用<code>HCL</code>来表示这个电路，用布表达式描述控制位模式的不同组合：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">word Out4 = [</span><br><span class="line">    !s1 &amp;&amp; !s0 : A; # <span class="number">00</span></span><br><span class="line">    !s1        : B; # <span class="number">01</span></span><br><span class="line">    !s0        : C; # <span class="number">10</span></span><br><span class="line">    <span class="number">1</span>          : D; # <span class="number">11</span></span><br><span class="line">];</span><br></pre></td></tr></table></figure>
 
 <p>右边的注释<code>(任何以#开头到行尾结束的文字都是注释)</code>表明了<code>s1</code>和<code>s0</code>的什么组合会导致该种情况会被选中。可以看到选择表达式有时可以简化，因为只有第一个匹配的情况才会被选中。例如，第二个表达式可以写成<code>!s1</code>，而不用写得更完整<code>!s1&amp;&amp;s0</code>，因为另一种可能<code>s1</code>等于0已经出现在了第一个选择表达式中了。类似地，第三个表达式可以写作<code>!s0</code>，而第四个可以简单地写成1。</p>
 <p>来看最后一个例子，假设我们想设计一个逻辑电路来找一组字<code>A</code>、<code>B</code>和<code>C</code>中的最小值，如下图所示：</p>
-<p><img src="/min3.png"></p>
+<p><img src="/posts/proc-arch1/min3.png"></p>
 <p>用<code>HCL</code>来表达就是：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">word Min3 = [</span><br><span class="line">    A &lt;= B &amp;&amp; A &lt;= C : A;</span><br><span class="line">    B &lt;= A &amp;&amp; B &lt;= C : B;</span><br><span class="line">    <span class="number">1</span>                : C;</span><br><span class="line">];</span><br></pre></td></tr></table></figure>
 
 <p>组合逻辑电路可以设计成在字级数据上执行许多不同类型的操作。具体的设计已经超出了我们讨论的范围。算术&#x2F;逻辑单元<code>(ALU)</code>是一种很重要的组合电路，图<code>4-15</code>是它的一个抽象的图示。这个电路有三个输入：标号为<code>A</code>和<code>B</code>的两个数据输入，以及一个控制输入。根据控制输入的设置，电路会对数据输入执行不同的算术或逻辑操作。可以看到，这个<code>ALU</code>中画的四个操作对应于<code>Y86-64</code>指令集支持的四种不同的整数操作，而控制值和这些操作的功能码相对应<code>(图4-3)</code>。我们还注意到减法的操作数顺序，是输入<code>B</code>减去输入<code>A</code>。之所以这样做，是为了使这个顺序与<code>subq</code>指令的参数顺序一致。</p>
-<p><img src="/4-15.png"></p>
+<p><img src="/posts/proc-arch1/4-15.png"></p>
 <h2 id="集合关系"><a href="#集合关系" class="headerlink" title="集合关系"></a>集合关系</h2><p>在处理器设计中，很多时候都需要将一个信号与许多可能匹配的信号做比较，以此来检测正在处理的某个指令代码是否属于某一类指令代码。下面来看一个简单的例子，假设想从一个两位信号<code>code</code>中选择高位和低位来为图<code>4-14</code>中的四路复用器产生信号<code>s1</code>和<code>s0</code>，如下图所示：</p>
-<p><img src="/mux4.png"></p>
+<p><img src="/posts/proc-arch1/mux4.png"></p>
 <p>在这个电路中，两位的信号<code>code</code>就可以用来控制对4个数据字<code>A</code>、<code>B</code>、<code>C</code>和<code>D</code>做选择，根据可能的<code>code</code>值，可以用相等测试来表示信号<code>s1</code>和<code>s0</code>的产生：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">bool</span> s1 = code == <span class="number">2</span> || code == <span class="number">3</span>;</span><br><span class="line"><span class="keyword">bool</span> s0 = code == <span class="number">1</span> || code == <span class="number">3</span>;</span><br></pre></td></tr></table></figure>
 
@@ -448,14 +448,14 @@
 </ul>
 <p>正如我们看到的那样，在说到硬件和机器级编程时，<code>寄存器</code>这个词是两个有细微差别的事情。在硬件中，寄存器直接将它的输入和输出线连接到电路的其他部分。在机器级编程中，寄存器代表的是<code>CPU</code>中为数不多的可寻址的字，这里的地址是寄存器<code>ID</code>。这些字通常都存在寄存器文件中，虽然我们会看到硬件有时可以直接将一个字从一个指令传送到另一个指令，以避免先写寄存器文件再读出来的延迟。需要避免歧义时，我们会分别称呼这两类寄存器为<code>硬件寄存器</code>和<code>程序寄存器</code>。</p>
 <p>图<code>4-16</code>更详细地说明了一个硬件寄存器以及它是如何工作的。大多数时候，寄存器都保持在稳定状态<code>(用x表示)</code>，产生的输出等于它的当前状态。信号沿着寄存器前面的组合逻辑传播，这时，产生了一个新的寄存器输入<code>(用y表示)</code>，但只要时钟是低电位的，寄存器的输出就仍然保持不变。当时钟变成高电位的时候，输入信号就加载到寄存器中，成为下一个状态<code>y</code>，直到下一个时钟上升沿，这个状态就一直是寄存器的新输出。关键是寄存器是作为电路不同部分中的组合逻辑之间的屏障。每当每个时钟到达上升沿时，值才会从寄存器的输入传送到输出。我们的<code>Y86-64</code>处理器会用时钟寄存器保存程序计数器<code>(PC)</code>、条件代码<code>(CC)</code>和程序状态<code>(Stat)</code>。</p>
-<p><img src="/4-16.png"></p>
+<p><img src="/posts/proc-arch1/4-16.png"></p>
 <p>下面的图展示了一个典型的寄存器文件：</p>
-<p><img src="/file.png"></p>
+<p><img src="/posts/proc-arch1/file.png"></p>
 <p>寄存器文件有两个读端口<code>(A和B)</code>，还有一个写端口<code>(W)</code>。这样一个多端口随机访问存储器允许同时进行多个读和写操作。图中所示的寄存器文件中，电路可以读两个程序寄存器的值，同时更新第三个寄存器的状态。每个端口都有一个地址输入，表明该选择哪个程序寄存器，另外还有一个数据输出或对应该程序寄存器的输入值。地址是用图<code>4-4</code>中编码表示的寄存器标识符。两个读端口有地址输入<code>srcA</code>和<code>srcB(source A和source B的缩写)</code>和数据输出<code>valA</code>和<code>valB(value A和value B的缩写)</code>。写端口有地址输入<code>dstw(destination W的缩写)</code>，以及数据输入<code>valw(value W的缩写)</code>。</p>
 <p>虽然寄存器文件不是组合电路，因为它有内部存储。不过，在我们的实现中，从寄存器文件读数据就好像它是一个以地址为输入、数据为输出的一个组合逻辑块。当<code>srcA</code>或<code>srcB</code>被设成某个寄存器<code>ID</code>时，在一段延迟之后，存储在相应程序寄存器的值就会出现在<code>valA</code>或<code>valB</code>上。例如，将<code>srcA</code>设为3，就会读出程序寄存器<code>%rbx</code>的值，然后这个值就会出现在输出<code>valA</code>上。</p>
 <p>向寄存器文件写入字是由时钟信号控制的，控制方式类似于将值加载到时钟寄存器。每次时钟上升时，输入<code>valw</code>上的值会被写入输入<code>dstw</code>上的寄存器<code>ID</code>指示的程序寄存器。当<code>dstw</code>设为特殊的<code>ID</code>值<code>0xF</code>时，不会写任何程序寄存器。由于寄存器文件既可以读也可以写，一个很自然的问题就是<code>如果我们试图同时读和写同一个寄存器会发生什么?</code>答案简单明了：如果更新一个寄存器，同时在读端口上用同一个寄存器<code>ID</code>，我们会看到一个从旧值到新值的变化。当我们把这个寄存器文件加入到处理器设计中，我们保证会考虑到这个属性的。</p>
 <p>处理器有一个随机访问存储器来存储程序数据，如下图所示：</p>
-<p><img src="/data.png"></p>
+<p><img src="/posts/proc-arch1/data.png"></p>
 <p>这个内存有一个地址输入，一个写的数据输入以及一个读的数据输出。同寄存器文件一样，从内存中读的操作方式类似于组合逻辑；如果我们在输入<code>address</code>上提供一个地址，并将<code>write</code>控制信号设置为0，那么在经过一些延迟之后，存储在那个地址上的值会出现在输出<code>data</code>上，如果地址超出范围，<code>error</code>信号会设置为1，否则就设置为0。写内存是由时钟控制的：我们将<code>address</code>设置为期望的地址，将<code>data in</code>设置为期望的值，而<code>write</code>设置为1，然后当我们控制时钟时，只要地址是合法的，就会更新内存中指定的位置，与读操作一样，如果地址是不合法的，<code>error</code>信号会被设置为1。这个信号是由组合逻辑产生的，因为所需要的边界检查纯粹就是地址输入的函数，不涉及保存任何状态。</p>
 <p>我们的处理器还包括另外一个只读存储器，用来读指令。在大多数实际系统中，这两个存储器被合并为一个具有双端口的存储器：一个用来读指令，另一个用来读或者写数据。</p>
 <h1 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h1><ul>

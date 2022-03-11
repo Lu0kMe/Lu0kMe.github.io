@@ -27,21 +27,21 @@
 <meta property="og:site_name" content="Lu0k">
 <meta property="og:description" content="内容简介计算机执行机器代码，用字节序列编码低级的操作，包括处理数据、管理内存、读写存储设备上的数据，以及利用网络通信。编译器基于编程语言的规则、目标机器的指令集和操作系统遵循的惯例，经过一系列的阶段生成机器代码。GCC C语言编译器以汇编代码的形式产生输出，汇编代码是机器代码的文本表示，给出程序中的每一条指令。然后GCC调用汇编器和链接器，根据汇编代码生成可执行的机器代码。">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://lu0k.github.io/struct.png">
-<meta property="og:image" content="https://lu0k.github.io/align1.png">
-<meta property="og:image" content="https://lu0k.github.io/align2.png">
-<meta property="og:image" content="https://lu0k.github.io/align3.png">
-<meta property="og:image" content="https://lu0k.github.io/3-39.png">
-<meta property="og:image" content="https://lu0k.github.io/3-40.png">
-<meta property="og:image" content="https://lu0k.github.io/3-42.png">
-<meta property="og:image" content="https://lu0k.github.io/3-43.png">
-<meta property="og:image" content="https://lu0k.github.io/3-44.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/mlr-program4/struct.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/mlr-program4/align1.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/mlr-program4/align2.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/mlr-program4/align3.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/mlr-program4/3-39.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/mlr-program4/3-40.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/mlr-program4/3-42.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/mlr-program4/3-43.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/mlr-program4/3-44.png">
 <meta property="article:published_time" content="2021-12-31T16:00:00.000Z">
 <meta property="article:modified_time" content="2022-01-08T10:17:19.140Z">
 <meta property="article:author" content="Lu0k">
 <meta property="article:tag" content="CSAPP">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://lu0k.github.io/struct.png">
+<meta name="twitter:image" content="https://lu0k.github.io/posts/mlr-program4/struct.png">
 
 
 <link rel="canonical" href="https://lu0k.github.io/posts/mlr-program4/">
@@ -288,7 +288,7 @@
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">rec</span> &#123;</span></span><br><span class="line">    <span class="keyword">int</span> i;</span><br><span class="line">    <span class="keyword">int</span> j;</span><br><span class="line">    <span class="keyword">int</span> a[<span class="number">2</span>];</span><br><span class="line">    <span class="keyword">int</span> *p;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 
 <p>这个结构包括4个字段：两个4字节<code>int</code>、一个由两个类型为<code>int</code>的元素组成的数组和一个8字节整型指针，总共是24个字节：</p>
-<p><img src="/struct.png"></p>
+<p><img src="/posts/mlr-program4/struct.png"></p>
 <p>可以观察到，数组<code>a</code>是嵌入到这个结构中的。上图中顶部的数字给出的是各个字段相对于结构开始处的字节偏移。为了访问结构的字段，编译器产生的代码要将结构的地址加上适当的偏移。例如，假设<code>struct rec*</code>类型的变量<code>r</code>放在寄存器<code>%rdi</code>中。那么下面的代码将元素<code>r-&gt;i</code>复制到元素<code>r-&gt;j</code>：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">; Registers: r in %rdi</span><br><span class="line">movl (%rdi), %eax    ; Get r-&gt;i</span><br><span class="line">movl %eax, 4(%rdi)   ; Store in r-&gt;j</span><br></pre></td></tr></table></figure>
 
@@ -384,9 +384,9 @@
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">S1</span> &#123;</span></span><br><span class="line">    <span class="keyword">int</span> i;</span><br><span class="line">    <span class="keyword">char</span> c;</span><br><span class="line">    <span class="keyword">int</span> j;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 
 <p>假设编译器用最小的9字节分配，画出图来是这样的：</p>
-<p><img src="/align1.png"></p>
+<p><img src="/posts/mlr-program4/align1.png"></p>
 <p>它是不可能满足字段<code>i(偏移为0)</code>和<code>j(偏移为5)</code>的4字节对齐要求的。取而代之地，编译器在字段<code>c</code>和<code>j</code>之间插入一个3字节的间隙<code>(在此用蓝色阴影示)</code>：</p>
-<p><img src="/align2.png"></p>
+<p><img src="/posts/mlr-program4/align2.png"></p>
 <p>结果，<code>j</code>的偏移量为8，而整个结构的大小为12字节。此外，编译器必须保证任何<code>struct S1*</code>类型的指针<code>p</code>都满足4字节对齐。用我们前面的符号，设指针<code>p</code>的值为x<sub>p</sub>。那么，x<sub>p</sub>必须是4的倍数。这就保证了<code>p-&gt;i(地址</code>x<sub>p</sub><code>)</code>和<code>p-&gt;j(地址</code>x<sub>p</sub><code>+8)</code>都满足它们的4字节对齐要求。</p>
 <p>另外，编译器结构的末尾可能需要一些填充，这样结构数组中的每个元素都会满足它的对齐要求。例如，考虑下面这个结构声明：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">S2</span> &#123;</span></span><br><span class="line">    <span class="keyword">int</span> i;</span><br><span class="line">    <span class="keyword">int</span> j;</span><br><span class="line">    <span class="keyword">char</span> c;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
@@ -395,7 +395,7 @@
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">S2</span> <span class="title">d</span>[4];</span></span><br></pre></td></tr></table></figure>
 
 <p>分配9个字节，不可能满足<code>d</code>的每个元素的对齐要求，因为这些元素的地址分别为x<sub>d</sub>、x<sub>d</sub>+9、x<sub>d</sub>+18和x<sub>d</sub>+27。相反，编译器会为结构<code>S2</code>分配12个字节，最后3个字节是浪费的空间：</p>
-<p><img src="/align3.png"></p>
+<p><img src="/posts/mlr-program4/align3.png"></p>
 <p>这样一来，<code>d</code>的元素的地址分别为x<sub>d</sub>、x<sub>d</sub>+12、x<sub>d</sub>+24和x<sub>d</sub>+36。只要x<sub>d</sub>是4的倍数，所有的对齐限制就都可以满足了。</p>
 <h1 id="机器级程序"><a href="#机器级程序" class="headerlink" title="机器级程序"></a>机器级程序</h1><p>到目前为止，我们已经分别讨论机器级代码如何实现程序的控制部分和如何实现不同的数据结构。在本节中，我们会看看数据和控制如何交互。首先，深人审视一下指针，它是C编程语言中最重要的概念之一，但是许多程序员对它的理解都非常浅显。我们复习符号调试器GDB的使用，用它仔细检查机器级程序的详细运行。接下来，看看理解机器级程序如何帮助我们研究缓冲区溢出，这是现实世界许多系统中一种很重要的安全漏洞。最后，查看机器级程序如何实现函数要求的栈空间大小在每次执行时都可能不同的情况。</p>
 <h2 id="理解指针"><a href="#理解指针" class="headerlink" title="理解指针"></a>理解指针</h2><p>指针是C语言的一个核心特色。它们以一种统一方式，对不同数据结构中的元素产生引用。对于编程新手来说，指针总是会带来很多的困惑，但是基本概念其实非常简单。在此，我们重点介绍一些指针和它们映射到机器代码的关键原则。</p>
@@ -420,7 +420,7 @@
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">linux&gt;</span><span class="bash"> gdb prog</span></span><br></pre></td></tr></table></figure>
 
 <p>通常的方法是在程序中感兴趣的地方附近设置断点。断点可以设置在函数入口后面，或是一个程序的地址处。程序在执行过程中遇到一个断点时，程序会停下来，并将控制返回给用户。在断点处，我们能够以各种方式查看各个寄存器和内存位置。我们也可以单步跟踪程序，一次只执行几条指令，或是前进到下一个断点。</p>
-<p><img src="/3-39.png"></p>
+<p><img src="/posts/mlr-program4/3-39.png"></p>
 <p>正如我们的示例表明的那样，GDB的命令语法有点晦涩，但是在线帮助信息<code>(用GDB的help命令调用)</code>能克服这些毛病。相对于使用命令行接口来访问GDB，许多程序员更愿意使用DDD，它是GDB的一个扩展，提供了图形用户界面。</p>
 <h2 id="内存越界引用和缓冲区溢出"><a href="#内存越界引用和缓冲区溢出" class="headerlink" title="内存越界引用和缓冲区溢出"></a>内存越界引用和缓冲区溢出</h2><p>我们已经看到，C语言对于数组引用不进行任何边界检查，而且局部变量和状态信息<code>(例如保存的寄存器值和返回地址)</code>都存放在栈中。这两种情况结合到一起就能导致严重的程序错误，对越界的数组元素的写操作会破坏存储在栈中的状态信息。当程序使用这个被破坏的状态，试图重新加载寄存器或执行<code>ret</code>指令时，就会出现很严重的错误。</p>
 <p>一种特别常见的状态破坏称为缓冲区溢出<code>(buffer overflow)</code>。通常，在栈中分配某个字符数组来保存一个字符串，但是字符串的长度超出了为数组分配的空间。下面这个程序示例就说明了这个问题：</p>
@@ -431,7 +431,7 @@
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">; void echo()</span><br><span class="line">echo:</span><br><span class="line">    subq $24, %rsp     ; Allocate 24 bytes on stack</span><br><span class="line">    movq %rsp, %rdi    ; Compute buf as %rsp</span><br><span class="line">    call gets          ; Call gets</span><br><span class="line">    movq %rsp, %rdi    ; Compute buf as %rsp</span><br><span class="line">    call puts          ; Call puts</span><br><span class="line">    addq $24, %rsp     ; Deallocate stack space</span><br><span class="line">    ret                ; Return</span><br></pre></td></tr></table></figure>
 
 <p>图<code>3-40</code>画出了<code>echo</code>执行时栈的组织。</p>
-<p><img src="/3-40.png"></p>
+<p><img src="/posts/mlr-program4/3-40.png"></p>
 <p>该程序把栈指针减去了24<code>(第2行)</code>，在栈上分配了24个字节。字符数组<code>buf</code>位于栈顶，可以看到，<code>%rsp</code>被复制到<code>%rdi</code>作为调用<code>gets</code>和<code>puts</code>的参数。这个调用的参数和存储的返回指针之间的16字节是未被使用的。只要用户输入不超过7个字符，gets返回的字符串<code>(包括结尾的null)</code>就能够放进为<code>buf</code>分配的空间里。不过，长一些的字符串就会导致<code>gets</code>覆盖栈上存储的某些信息。随着字符串变长，下面的信息会被破坏：</p>
 <table>
 <thead>
@@ -472,7 +472,7 @@
 <p>然而，一个执著的攻击者总是能够用蛮力克服随机化，他可以反复地用不同的地址进行攻击。一种常见的把戏就是在实际的攻击代码前插入很长一段的<code>nop(读作no op, nooperatioin的缩写)</code>指令。执行这种指令除了对程序计数器加一，使之指向下一条指令之外，没有任何的效果。只要攻击者能够猜中这段序列中的某个地址，程序就会经过这个序列，到达攻击代码。这个序列常用的术语是<code>空操作雪橇(nop sled)</code>，意思是程序会滑过这个序列。如果我们建立一个256个字节的<code>nop sled</code>，那么枚举2<sup>15</sup><code>=32768</code>个起始地址，就能破解<code>n=</code>2<sup>23</sup>的随机化，这对于一个顽固的攻击者来说，是完全可行的。对于64位的情况，要尝试枚举2<sup>24</sup><code>=16777216</code>就有点儿令人畏惧了。我们可以看到栈随机化和其他一些ASLR技术能够增加成功攻击一个系统的难度，因而大大降低了病毒或者蠕虫的传播速度，但是也不能提供完全的安全保障。</p>
 <h3 id="栈破坏检测"><a href="#栈破坏检测" class="headerlink" title="栈破坏检测"></a>栈破坏检测</h3><p>计算机的第二道防线是能够检测到何时栈已经被破坏。我们在<code>echo</code>函数示例<code>(图3-40)</code>中看到，破坏通常发生在当超越局部缓冲区的边界时。在C语言中，没有可靠的方法来防止对数组的越界写。但是，我们能够在发生了越界写的时候，在造成任何有害结果之前，尝试检测到它。</p>
 <p>最近的GCC版本在产生的代码中加入了一种栈保护者<code>(stack protector)</code>机制，来检测缓冲区越界。其思想是在栈帧中任何局部缓冲区与栈状态之间存储一个特殊的金丝雀<code>(canary)</code>值，如图<code>3-42</code>所示。这个金丝雀值，也称为哨兵值<code>(guard value)</code>，是在程序每次运行时随机产生的，因此，攻击者没有简单的办法能够知道它是什么。在恢复寄存器状态和从函数返回之前，程序检查这个金丝雀值是否被该函数的某个操作或者该函数调用的某个函数的某个操作改变了。如果是的，那么程序异常中止。</p>
-<p><img src="/3-42.png"></p>
+<p><img src="/posts/mlr-program4/3-42.png"></p>
 <p>最近的GCC版本会试着确定一个函数是否容易遭受栈溢出攻击，并且自动插入这种溢出检测。实际上，对于前面的栈溢出展示，我们不得不用命令行选项<code>-fno-stack-protector</code>来阻止GCC产生这种代码。当不用这个选项来编译<code>echo</code>函数时，也就是允许使用栈保护者，得到下面的汇编代码：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">; void echo()</span><br><span class="line">echo:</span><br><span class="line">    subq $24, %rsp         ; Allocate 24 bytes on stack</span><br><span class="line">    movq %fs:40, %rax      ; Retrieve canary</span><br><span class="line">    movq %rax, 8(%rsp)     ; Store on stack</span><br><span class="line">    xorl %eax, %eax        ; Zero out register</span><br><span class="line">    movq %rsp, %rdi        ; Compute buf as %rsp</span><br><span class="line">    call gets              ; Call gets</span><br><span class="line">    movq %rsp, %rdi        ; Compute buf as %rsp</span><br><span class="line">    call puts              ; Call puts</span><br><span class="line">    movq 8(%rsp), %rax     ; Retrieve canary</span><br><span class="line">    xorq %fs:40, %rax      ; Compare to stored value</span><br><span class="line">    je .L9                 ; If =, goto ok</span><br><span class="line">    call __stack_chk_fail  ; Stack corrupted!</span><br><span class="line">.L9:                     ; ok:</span><br><span class="line">   addq $24, %rsp          ; Deallocate stack space</span><br><span class="line">   ret</span><br></pre></td></tr></table></figure>
 
@@ -484,9 +484,9 @@
 <p>我们讲到的这些技术——随机化、栈保护和限制哪部分内存可以存储可执行代码——是用于最小化程序缓冲区溢出攻击漏洞三种最常见的机制。它都具有这样的属性，即不需要程序员做任何特殊的努力，带来的性能代价都非常小，甚至没有。单独每一种机制都降低了漏洞的等级，而组合起来，它们变得更加有效。不幸的是，仍然有方法能够攻击计算机，因而蠕虫和病毒继续危害着许多机器的完整性。</p>
 <h2 id="支持变长栈帧"><a href="#支持变长栈帧" class="headerlink" title="支持变长栈帧"></a>支持变长栈帧</h2><p>到目前为止，我们已经检查了各种函数的机器级代码，但它们有一个共同点，即编译器能够预先确定需要为栈帧分配多少空间。但是有些函数，需要的局部存储是变长的。例如，当函数调用<code>alloca</code>时就会发生这种情况。<code>alloca</code>是一个标准库函数，可以在栈上分配任意字节数量的存储。当代码声明一个局部变长数组时，也会发生这种情况。</p>
 <p>图<code>3-43a</code>的代码给出了一个包含变长数组的例子。该函数声明了<code>n</code>个指针的局部数组<code>p</code>，这里<code>n</code>由第一个参数给出。这要求在栈上分配<code>8n</code>个字节，这里<code>n</code>的值每次调用该函数时都会不同。因此编译器无法确定要给该函数的栈帧分配多少空间。此外，该程序还产生一个对局部变量<code>i</code>的地址引用，因此该变量必须存储在栈中。在执行过程中，程序必须能够访问局部变量<code>i</code>和数组<code>p</code>中的元素。返回时，该函数必须释放这个栈帧，并将栈指针设置为存储返回地址的位置。</p>
-<p><img src="/3-43.png"></p>
+<p><img src="/posts/mlr-program4/3-43.png"></p>
 <p>为了管理变长栈帧，<code>x86-64</code>代码使用寄存器<code>%rbp</code>作为帧指针<code>(frame pointer)(有时称 为基指针(base pointer)，这也是%rbp中bp两个字母的由来)</code>。当使用帧指针时，栈帧的组织结构与图<code>3-44</code>中函数<code>vframe</code>的情况一样。可以看到代码必须把<code>%rbp</code>之前的值保存到栈中，因为它是一个被调用者保存寄存器。然后在函数的整个执行过程中，都使得<code>%rbp</code>指向那个时刻栈的位置，然后用固定长度的局部变量<code>(例如i)</code>相对于<code>%rbp</code>的偏移量来引用它们。</p>
-<p><img src="/3-44.png"></p>
+<p><img src="/posts/mlr-program4/3-44.png"></p>
 <p>图<code>3-43b</code>是GCC为函数<code>vframe</code>生成的部分代码。在函数的开始，代码建立栈帧，并为数组<code>p</code>分配空间。首先把<code>%rbp</code>的当前值压入栈中，将<code>%rbp</code>设置为指向当前的栈位置<code>(第2~3行)</code>。然后，在栈上分配16个字节，其中前8个字节用于存储局部变量<code>i</code>，而后8个字节是未被使用的。接着，为数组p分配空间<code>(第5~11行)</code>。当程序到第11行的时候，已经<code>(1)</code>在栈上分配了<code>8n</code>字节，并<code>(2)</code>在已分配的区域内放置好数组<code>p</code>，至少有<code>8n</code>字节可供其使用。</p>
 <p>初始化循环的代码展示了如何引用局部变量<code>i</code>和<code>p</code>的例子。第13行表明数组元素<code>p[i]</code>被设置为<code>q</code>。该指令用寄存器<code>%rcx</code>中的值作为<code>p</code>的起始地址。我们可以看到修改局部变量<code>i(第15行)</code>和读局部变量<code>(第17行)</code>的例子。<code>i</code>的地址是引用<code>-8(%rbp)</code>，也就是相对于帧指针偏移量为<code>-8</code>的地方。</p>
 <p>在函数的结尾，<code>leave</code>指令将帧指针恢复到它之前的值<code>(第20行)</code>。这条指令不需要参数，等价于执行下面两条指令：</p>

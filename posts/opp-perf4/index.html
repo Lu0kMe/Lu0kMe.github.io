@@ -27,22 +27,22 @@
 <meta property="og:site_name" content="Lu0k">
 <meta property="og:description" content="内容简介写程序最主要的目标就是使它在所有可能的情况下都正确工作。一个运行得很快但是给出错误结果的程序没有任何用处。另一方面，在很多情况下，让程序运行得快也是一个重要的考虑因素。如果一个程序要实时地处理视频帧或者网络包，一个运行得很慢的程序就不能提供所需的功能。本章会探讨如何使用几种不同类型的程序优化技术，使程序运行得更快。">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://lu0k.github.io/table1.png">
-<meta property="og:image" content="https://lu0k.github.io/table2.png">
-<meta property="og:image" content="https://lu0k.github.io/table3.png">
-<meta property="og:image" content="https://lu0k.github.io/5-31.png">
-<meta property="og:image" content="https://lu0k.github.io/5-32.png">
-<meta property="og:image" content="https://lu0k.github.io/5-33.png">
-<meta property="og:image" content="https://lu0k.github.io/5-34.png">
-<meta property="og:image" content="https://lu0k.github.io/5-35.png">
-<meta property="og:image" content="https://lu0k.github.io/5-36.png">
-<meta property="og:image" content="https://lu0k.github.io/5-37.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/opp-perf4/table1.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/opp-perf4/table2.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/opp-perf4/table3.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/opp-perf4/5-31.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/opp-perf4/5-32.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/opp-perf4/5-33.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/opp-perf4/5-34.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/opp-perf4/5-35.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/opp-perf4/5-36.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/opp-perf4/5-37.png">
 <meta property="article:published_time" content="2022-01-28T16:00:00.000Z">
 <meta property="article:modified_time" content="2022-02-28T11:17:46.078Z">
 <meta property="article:author" content="Lu0k">
 <meta property="article:tag" content="CSAPP">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://lu0k.github.io/table1.png">
+<meta name="twitter:image" content="https://lu0k.github.io/posts/opp-perf4/table1.png">
 
 
 <link rel="canonical" href="https://lu0k.github.io/posts/opp-perf4/">
@@ -287,7 +287,7 @@
 <p>我们还看到功能单元的吞吐量界限也是程序执行时间的一个下界。也就是说，假设一个程序一共需要<code>N</code>个某种运算的计算，而微处理器只有<code>C</code>个能执行这个操作的功能单元，并且这些单元的发射时间为<code>I</code>。那么，这个程序的执行至少需要<code>N·I/C</code>个周期。</p>
 <p>在本节中，我们会考虑其他一些制约程序在实际机器上性能的因素。</p>
 <h2 id="寄存器溢出"><a href="#寄存器溢出" class="headerlink" title="寄存器溢出"></a>寄存器溢出</h2><p>循环并行性的好处受汇编代码描述计算的能力限制。如果我们的并行度<code>p</code>超过了可用的寄存器数量，那么编译器会诉诸溢出<code>(spilling)</code>，将某些临时值存放到内存中，通常是在运行时堆栈上分配空间。举个例子，将<code>combine6</code>的多累积变量模式扩展到<code>k=10</code>和<code>k=20</code>，其结果的比较如下表所示：</p>
-<p><img src="/table1.png"></p>
+<p><img src="/posts/opp-perf4/table1.png"></p>
 <p>我们可以看到对这种循环展开程度的增加没有改善<code>CPE</code>，有些甚至还变差了。现代<code>x86-64</code>处理器有16个寄存器，并可以使用16个<code>YMM</code>寄存器来保存浮点数。一旦循环变量的数量超过了可用寄存器的数量，程序就必须在栈上分配一些变量。例如，下面的代码片段展示了在<code>10X10</code>循环展开的内循环中，累积变量<code>acc0</code>是如何更新的：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Updating of accumulator acc0 in 10 x 10 urolling</span><br><span class="line">vmulsd (%rdx), %xmm0, %xmm0       acc0 *= data[i]</span><br></pre></td></tr></table></figure>
 
@@ -302,13 +302,13 @@
 <p>那么一个C语言程序员怎么能够保证分支预测处罚不会阻碍程序的效率呢？对于参考机来说，预测错误处罚是19个时钟周期，赌注很高。对于这个问题没有简单的答案，但是下面的通用原则是可用的。</p>
 <h3 id="不要过分关心可预测的分支"><a href="#不要过分关心可预测的分支" class="headerlink" title="不要过分关心可预测的分支"></a>不要过分关心可预测的分支</h3><p>我们已经看到错误的分支预测的影响可能非常大，但是这并不意味着所有的程序分支都会减缓程序的执行。实际上，现代处理器中的分支预测逻辑非常善于辨别不同的分支指令的有规律的模式和长期的趋势。例如，在合并函数中结束循环的分支通常会被预测为选择分支，因此只在最后一次会导致预测错误处罚。</p>
 <p>再来看另一个例子，当从<code>combine2</code>变化到<code>combine3</code>时，我们把函数<code>get_vec_element</code>从函数的内循环中拿了出来，考虑一下我们观察到的结果，如下所示：</p>
-<p><img src="/table2.png"></p>
+<p><img src="/posts/opp-perf4/table2.png"></p>
 <p><code>CPE</code>基本上没变，即使这个转变消除了每次迭代中用于检查向量索引是否在界限内的两个条件语句。对这个函数来说，这些检测总是确定索引是在界内的，所以是高度可预测的。</p>
 <p>作为一种测试边界检查对性能影响的方法，考虑下面的合并代码，修改<code>combine4</code>的内循环，用执行<code>get_vec_element</code>代码的内联函数结果替换对数据元素的访问。我们称这个新版本为<code>combine4b</code>。这段代码执行了边界检查，还通过向量数据结构来引用向量元素。</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* Include bounds check in loop */</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">combine4b</span><span class="params">(vec_ptr v, <span class="keyword">data_t</span> *dest)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">long</span> i;</span><br><span class="line">    <span class="keyword">long</span> length = vec_length(v);</span><br><span class="line">    <span class="keyword">data_t</span> acc = IDENT;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; length; i++) &#123;</span><br><span class="line">        <span class="keyword">if</span> (i &gt;= <span class="number">0</span> &amp;&amp; i &lt; v-&gt;len) &#123;</span><br><span class="line">            acc = acc OP v-&gt;data[i];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    *dest = acc;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>然后，我们直接比较使用和不使用边界检查的函数的<code>CPE</code>：</p>
-<p><img src="/table3.png"></p>
+<p><img src="/posts/opp-perf4/table3.png"></p>
 <p>对整数加法来，带边界检测的版本会慢一点，但对其他三种情况来说，性能是一样的。这些情况受限于它们各自的合并操作的延迟。执行边界检测所需的额外计算可以与合并操作并行执行。处理器能够预测这些分支的结果，所以这些求值都不会对形成程序执行中关键路径的指令的取指和处理产生太大的影响。</p>
 <h3 id="书写适合用条件传送实现的代码"><a href="#书写适合用条件传送实现的代码" class="headerlink" title="书写适合用条件传送实现的代码"></a>书写适合用条件传送实现的代码</h3><p>分支预测只对有规律的模式可行。程序中的许多测试是完全不可预测的，依赖于数据的任意特性，例如一个数是负数还是正数。对于这些测试，分支预测逻辑会处理得很糟糕。对于本质上无法预测的情况，如果编译器能够产生使用条件数据传送而不是使用条件控制转移的代码，可以极大地提高程序的性能。这不是C语言程序员可以直接控制的，但是有些表达条件行为的方法能够更直接地被翻译成条件传送，而不是其他操作。</p>
 <p>我们发现<code>GCC</code>能够为以一种更功能性的风格书写的代码产生条件传送，在这种风格的代码中，我们用条件操作来计算值，然后用这些值来更新程序状态，这种风格对立于一种更命令式的风格，这种风格中，我们用条件语句来有选择地更新程序状态。</p>
@@ -325,30 +325,30 @@
 <p>如图<code>5-11</code>所示，现代处理器有专门的功能单元来执行加载和存储操作，这些单元有内部的缓冲区来保存未完成的内存操作请求集合。例如，我们的参考机有两个加载单元，每一个可以保存多达72个未完成的读请求。它还有一个存储单元，其存储缓冲区能保存最多42个写请求。每个这样的单元通常可以每个时钟周期开始一个操作。</p>
 <h2 id="加载的性能"><a href="#加载的性能" class="headerlink" title="加载的性能"></a>加载的性能</h2><p>一个包含加载操作的程序的性能既依赖于流水线的能力，也依赖于加载单元的延迟。在参考机上运行合并操作的实验中，我们看到除了使用<code>SIMD</code>操作时以外，对任何数据类型组合和合并操作来说，<code>CPE</code>从没有到过0.50以下。一个制约示例的<code>CPE</code>的因素是，对于每个被计算的元素，所有的示例都需要从内存读一个值。对两个加载单元而言，其每个时钟周期只能启动一条加载操作，所以<code>CPE</code>不可能小于0.50。对于每个被计算的元素必须加载<code>k</code>个值的应用，我们不可能获得低于<code>k/2</code>的<code>CPE(例如参见家庭作业5.15)</code>。</p>
 <p>到目前为止，我们在示例中还没有看到加载操作的延迟产生的影响。加载操作的地址只依赖于循环索引<code>i</code>，所以加载操作不会成为限制性能的关键路径的一部分。</p>
-<p><img src="/5-31.png"></p>
+<p><img src="/posts/opp-perf4/5-31.png"></p>
 <p>要确定一台机器上加载操作的延迟，我们可以建立由一系列加载操作组成的一个计算，一条加载操作的结果决定下一条操作的地址。作为一个例子，考虑函数图<code>5-31</code>中的函数<code>list_len</code>，它计算一个链表的长度。在这个函数的循环中，变量<code>ls</code>的每个后续值依赖于指针引用<code>ls-&gt;next</code>读出的值。测试表明函数<code>list_len</code>的<code>CPE</code>为4.00，我们认为这直接表明了加载操作的延迟。要弄懂这一点，考虑循环的汇编代码：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Inner loop of list_len</span><br><span class="line">ls in %rdi, len in %rax</span><br><span class="line">.L3:                         loop:</span><br><span class="line">    addq $1, %rax                Increment len</span><br><span class="line">    movq (%rdi), %rdi            ls = ls-&gt;next</span><br><span class="line">    testq %rdi, %rdi             Test ls</span><br><span class="line">    jne .L3                      If nonnull, goto loop</span><br></pre></td></tr></table></figure>
 
 <p>第3行上的<code>movq</code>指令是这个循环中关键的瓶颈。后面寄存器<code>%rdi</code>的每个值都依赖于加载操作的结果，而加载操作又以<code>%rdi</code>中的值作为它的地址。因此，直到前一次迭代的加载操作完成，下一次迭代的加载操作才能开始。这个函数的<code>CPE</code>等于4.00，是由加载操作的延迟决定的。事实上，这个测试结果与文档中参考机的<code>L1</code>级<code>cache</code>的4周期访问时间是一致的，相关内容将在<code>6.4</code>节中讨论。</p>
 <h2 id="存储的性能"><a href="#存储的性能" class="headerlink" title="存储的性能"></a>存储的性能</h2><p>在迄今为止所有的示例中，我们只分析了大部分内存引用都是加载操作的函数，也就是从内存位置读到寄存器中。与之对应的是存储<code>(store)</code>操作，它将一个寄存器值写到内存。这个操作的性能，尤其是与加载操作的相互关系，包括一些很细微的问题。</p>
 <p>与加载操作一样，在大多数情况中，存储操作能够在完全流水线化的模式中工作，每个周期开始一条新的存储。例如，考虑图<code>5-32</code>中所示的函数，它们将一个长度为<code>n</code>的数组<code>dest</code>的元素设置为0。我们测试结果为<code>CPE</code>等于1.00。对于只具有单个存储功能单元的机器，这已经达到了最佳情况。</p>
-<p><img src="/5-32.png"></p>
+<p><img src="/posts/opp-perf4/5-32.png"></p>
 <p>与到目前为止我们已经考虑过的其他操作不同，存储操作并不影响任何寄存器值。因此，就其本性来说，一系列存储操作不会产生数据相关。只有加载操作会受存储操作结果的影响，因为只有加载操作能从由存储操作写的那个位置读回值。图<code>5-33</code>所示的函数<code>write_read</code>说明了加载和存储操作之间可能的相互影响。这幅图也展示了该函数的两个示例执行，是对两元素数组<code>a</code>调用的，该数组的初始内容为<code>-10</code>和<code>17</code>，参数<code>cnt</code>等于<code>3</code>。这些执行说明了加载和存储操作的一些细微之处。</p>
-<p><img src="/5-33.png"></p>
+<p><img src="/posts/opp-perf4/5-33.png"></p>
 <p>在图<code>5-33</code>的示例A中，参数<code>src</code>是一个指向数组元素<code>a[0]</code>的指针，而<code>dest</code>是一个指向数组元素<code>a[1]</code>的指针。在此种情况中，指针引用<code>*src</code>的每次加载都会得到值<code>-10</code>。因此，在两次迭代之后，数组元素就会分别保持固定为<code>-10</code>和<code>-9</code>。从<code>src</code>读出的结果不受对<code>dest</code>的写的影响。在较大次数的迭代上测试这个示例得到<code>CPE</code>等于1.3。</p>
 <p>在图<code>5-33</code>的示例B中，参数<code>src</code>和<code>dest</code>都是指向数组元素<code>a[0]</code>的指针。在这种情况中，指针引用<code>*src</code>的每次加载都会得到指针引用<code>*dest</code>的前次执行存储的值。因而，一系列不断增加的值会被存储在这个位置。通常，如果调用函数<code>write_read</code>时参数<code>src</code>和<code>dest</code>指向同一个内存位置，而参数<code>cnt</code>的值为<code>n&gt;0</code>，那么净效果是将这个位置设置为<code>n-1</code>。这个示例说明了一个现象，我们称之为写<code>/</code>读相关<code>(write/read dependency)</code>——一个内存读的结果依赖于一个最近的内存写。我们的性能测试表明示例B的<code>CPE</code>为7.3。写<code>/</code>读相关导致处理速度下降约6个时钟周期。</p>
-<p><img src="/5-34.png"></p>
+<p><img src="/posts/opp-perf4/5-34.png"></p>
 <p>为了了解处理器如何区别这两种情况，以及为什么一种情况比另一种运行得慢，我们必须更加仔细地看看加载和存储执行单元，如图<code>5-34</code>所示。存储单元包含一个存储缓冲区，它包含已经被发射到存储单元而又还没有完成的存储操作的地址和数据，这里的完成包括更新数据高速缓存。提供这样一个缓冲区，使得一系列存储操作不必等待每个操作都更新高速缓存就能够执行。当一个加载操作发生时，它必须检查存储缓冲区中的条目，看有没有地址相匹配。如果有地址相匹配<code>(意味着在写的字节与在读的字节有相同的地址)</code>，它就取出相应的数据条目作为加载操作的结果。</p>
 <p><code>GCC</code>生成的<code>write_read</code>内循环代码如下：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Inner loop of write_read</span><br><span class="line">src in %rdi, dst in %rsi, val in %rax</span><br><span class="line">.L3:                         loop:</span><br><span class="line">movq %rax, (%rsi)                Write val to dst</span><br><span class="line">movq (%rdi), %rax                t = *src</span><br><span class="line">addq $1, %rax                    val = t+1</span><br><span class="line">subq $1, %rdx                    cnt--</span><br><span class="line">jne .L3                          If != 0, goto loop</span><br></pre></td></tr></table></figure>
 
 <p>图<code>5-35</code>给出了这个循环代码的数据流表示。指令<code>movq %rax, (%rsi)</code>被翻译成两个操作：<code>s_addr</code>指令计算存储操作的地址，在存储缓冲区创建一个条目，并且设置该条目的地址字段。<code>s_data</code>操作设置该条目的数据字段。正如我们会看到的，两个计算是独立执行的，这对程序的性能来说很重要。这使得参考机中不同的功能单元来执行这些操作。</p>
-<p><img src="/5-35.png"></p>
+<p><img src="/posts/opp-perf4/5-35.png"></p>
 <p>除了由于写和读寄存器造成的操作之间的数据相关，操作符右边的弧线表示这些操作隐含的相关。特别地，<code>s_addr</code>操作的地址计算必须在<code>s_data</code>操作之前。此外，对指令<code>movq (%rdi), %rax</code>译码得到的<code>load</code>操作必须检查所有未完成的存储操作的地址，在这个操作和<code>s_addr</code>操作之间创建一个数据相关。这张图中<code>s_data</code>和<code>load</code>操作之间有虚弧线。这个数据相关是有条件的：如果两个地址相同，<code>load</code>操作必须等待直到<code>s_data</code>将它的结果存放到存储缓冲区中，但是如果两个地址不同，两个操作就可以独立地进行。</p>
-<p><img src="/5-36.png"></p>
+<p><img src="/posts/opp-perf4/5-36.png"></p>
 <p>图<code>5-36</code>说明了<code>write_read</code>内循环操作之间的数据相关。在图<code>5-36a</code>中，重新排列了操作，让相关显得更清楚。我们标出了三个涉及加载和存储操作的相关，希望引起大家特别的注意。标号为<code>(1)</code>的弧线表示存储地址必须在数据被存储之前计算出来。标号为<code>(2)</code>的弧线表示需要<code>load</code>操作将它的地址与所有未完成的存储操作的地址进行比较。最后，标号为<code>(3)</code>的虚弧线表示条件数据相关，当加载和存储地址相同时会出现。</p>
 <p>图<code>5-36b</code>说明了当移走那些不直接影响选代与迭代之间数据流的操作之后，会发生什么。这个数据流图给出两个相关链：左边的一条，存储、加载和增加数据值<code>(只对地址相同的情况有效)</code>，右边的一条，减小变量<code>cnt</code>。</p>
-<p><img src="/5-37.png"></p>
+<p><img src="/posts/opp-perf4/5-37.png"></p>
 <p>现在我们可以理解函数<code>write_read</code>的性能特征了。图<code>5-37</code>说明的是内循环的多次迭代形成的数据相关。对于图<code>5-33</code>示例A的情况，有不同的源和目的地址，加载和存储操作可以独立进行，因此唯一的关键路径是由减少变量<code>cnt</code>形成的，这使得<code>CPE</code>等于1.0。对于图<code>5-33</code>示例B的情况，源地址和目的地址相同，<code>s_data</code>和<code>load</code>指令之间的数据相关使得关键路径的形成包括了存储、加载和增加数据。我们发现顺序执行这三个操作一共需要7个时钟周期。</p>
 <p>这两个例子说明，内存操作的实现包括许多细微之处。对于寄存器操作，在指令被译码成操作的时候，处理器就可以确定哪些指令会影响其他哪些指令。另一方面，对于内存操作，只有到加载和存储的地址被计算出来以后，处理器才能确定哪些指令会影响其他的哪些。高效地处理内存操作对许多程序的性能来说至关重要。内存子系统使用了很多优化，例如当操作可以独立地进行时，就利用这种潜在的并行性。</p>
 <h1 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h1><ul>

@@ -27,18 +27,18 @@
 <meta property="og:site_name" content="Lu0k">
 <meta property="og:description" content="内容简介计算机执行机器代码，用字节序列编码低级的操作，包括处理数据、管理内存、读写存储设备上的数据，以及利用网络通信。编译器基于编程语言的规则、目标机器的指令集和操作系统遵循的惯例，经过一系列的阶段生成机器代码。GCC C语言编译器以汇编代码的形式产生输出，汇编代码是机器代码的文本表示，给出程序中的每一条指令。然后GCC调用汇编器和链接器，根据汇编代码生成可执行的机器代码。">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://lu0k.github.io/3-45.png">
-<meta property="og:image" content="https://lu0k.github.io/3-46.png">
-<meta property="og:image" content="https://lu0k.github.io/3-47&3-48.png">
-<meta property="og:image" content="https://lu0k.github.io/3-49.png">
-<meta property="og:image" content="https://lu0k.github.io/3-50.png">
-<meta property="og:image" content="https://lu0k.github.io/3-51.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/mlr-program5/3-45.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/mlr-program5/3-46.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/mlr-program5/3-47&3-48.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/mlr-program5/3-49.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/mlr-program5/3-50.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/mlr-program5/3-51.png">
 <meta property="article:published_time" content="2022-01-01T16:00:00.000Z">
 <meta property="article:modified_time" content="2022-02-26T14:05:51.105Z">
 <meta property="article:author" content="Lu0k">
 <meta property="article:tag" content="CSAPP">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://lu0k.github.io/3-45.png">
+<meta name="twitter:image" content="https://lu0k.github.io/posts/mlr-program5/3-45.png">
 
 
 <link rel="canonical" href="https://lu0k.github.io/posts/mlr-program5/">
@@ -290,9 +290,9 @@
 <p>2000年<code>Pentium 4</code>中引入了<code>SSE2</code>，媒体指令开始包括那些对标量浮点数据进行操作的指令，使用<code>XMM</code>或<code>YMM</code>寄存器的低32位或64位中的单个值。这个标量模式提供了一组寄存器和指令，它们更类似于其他处理器支持浮点数的方式。所有能够执行<code>x86-64</code>代码的处理器都支持<code>SSE2</code>或更高的版本，因此<code>x86-64</code>浮点数是基于<code>SSE</code>或<code>AVX</code>的，包括传递过程参数和返回值的规则。</p>
 <p>我们的讲述基于<code>AVX2</code>，即<code>AVX</code>的第二个版本，它是在2013年<code>Core i7 Haswell</code>处理器中引入的。当给定命令行参数<code>-mavx2</code>时，GCC会生成<code>AVX2</code>代码。基于不同版本的<code>SSE</code>以及第一个版本的<code>AVX</code>的代码从概念上来说是类似的，不过指令名和格式有所不同。我们只介绍用GCC编译浮点程序时会出现的那些指令。其中大部分是标量<code>AVX</code>指令，我们也会说明对整个数据向量进行操作的指令出现的情况。和整数操作一样，注意我们表述中使用的<code>ATT</code>格式不同于相关文档中使用的<code>Intel</code>格式。特别地，这两种版本中列出指令操作数的顺序是不同的。</p>
 <p>如图<code>3-45</code>所示，<code>AVX</code>浮点体系结构允许数据存储在16个<code>YMM</code>寄存器中，它们的名字为<code>%ymm0～%ymm15</code>。每个<code>YMM</code>寄存器都是256位<code>(32字节)</code>。当对标量数据操作时，这些寄存器只保存浮点数，而且只使用低32位<code>(对于float)</code>或64位<code>(对于double)</code>。汇编代码用寄存器的<code>SSE XMM</code>寄存器名字<code>%xmm0~%xmm15</code>来引用它们，每个<code>XMM</code>寄存器都是对应的<code>YMM</code>寄存器的低128位<code>(16字节)</code>。</p>
-<p><img src="/3-45.png"></p>
+<p><img src="/posts/mlr-program5/3-45.png"></p>
 <h2 id="浮点传送和转换操作"><a href="#浮点传送和转换操作" class="headerlink" title="浮点传送和转换操作"></a>浮点传送和转换操作</h2><p>图<code>3-46</code>给出了一组在内存和<code>XMM</code>寄存器之间以及从一个<code>XMM</code>寄存器到另一个不做任何转换的传送浮点数的指令。引用内存的指令是标量指令，意味着它们只对单个而不是一组封装好的数据值进行操作。数据要么保存在内存中<code>(由表中的</code>M<sub>32</sub><code>和</code>M<sub>64</sub><code>指明)</code>，要么保存在<code>XMM</code>寄存器中<code>(在表中用X表示)</code>。无论数据对齐与否，这些指令都能正确执行，不过代码优化规则建议32位内存数据满足4字节对齐，64位数据满足8字节对齐。内存引用的指定方式与整数<code>MOV</code>指令的一样，包括偏移量、基址寄存器、变址寄存器和伸缩因子的所有可能的组合。</p>
-<p><img src="/3-46.png"></p>
+<p><img src="/posts/mlr-program5/3-46.png"></p>
 <p>GCC只用标量传送操作从内存传送数据到<code>XMM</code>寄存器或从<code>XMM</code>寄存器传送数据到内存。对于在两个<code>XMM</code>寄存器之间传送数据，GCC会使用两种指令之一，即用<code>vmovaps</code>传送单精度数，用<code>vmovapd</code>传送双精度数。对于这些情况，程序复制整个寄存器还是只复制低位值既不会影响程序功能，也不会影响执行速度，所以使用这些指令还是针对标量数据的指令没有实质上的差别。指令名字中的字母<code>a</code>表示<code>aligned(对齐的)</code>。当用于读写内存时，如果地址不满足16字节对齐，它们会导致异常。在两个寄存器之间传送数据，绝不会出现错误对齐的状况。</p>
 <p>下面是一个不同浮点传送操作的例子，考虑以下C函数：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">float</span> <span class="title">float_mov</span><span class="params">(<span class="keyword">float</span> v1, <span class="keyword">float</span> *src, <span class="keyword">float</span> *dst)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">float</span> v2 = *src;</span><br><span class="line">    *dst = v1;</span><br><span class="line">    <span class="keyword">return</span> v2;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -302,7 +302,7 @@
 
 <p>这个例子中可以看到它使用了<code>vmovaps</code>指令把数据从一个寄存器复制到另一个，使用了<code>vmovss</code>指令把数据从内存复制到<code>XMM</code>寄存器以及从<code>XMM</code>寄存器复制到内存。</p>
 <p>图<code>3-47</code>和图<code>3-48</code>给出了在浮点数和整数数据类型之间以及不同浮点格式之间进行转换的指令集合。这些都是对单个数据值进行操作的标量指令。图<code>3-47</code>中的指令把一个从<code>XMM</code>寄存器或内存中读出的浮点值进行转换，并将结果写入一个通用寄存器<code>(例如%rax，%ebx等)</code>。把浮点值转换成整数时，指令会执行截断<code>(truncation)</code>，把值向0进行舍入，这是C和大多数其他编程语言的要求。</p>
-<p><img src="/3-47&3-48.png"></p>
+<p><img src="/posts/mlr-program5/3-47&3-48.png"></p>
 <p>图<code>3-48</code>中的指令把整数转换成浮点数。它们使用的是不太常见的三操作数格式，有两个源和一个目的。第一个操作数读自于内存或一个通用目的寄存器。这里可以忽略第二个操作数，因为它的值只会影响结果的高位字节。而我们的目标必须是<code>XMM</code>寄存器。在最常见的使用场景中，第二个源和目的操作数都是一样的，就像下面这条指令：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vcvtsi2sdq	%rax, %xmm1, %xmm1</span><br></pre></td></tr></table></figure>
 
@@ -344,7 +344,7 @@
 
 <p>这个函数会把<code>x</code>存放在<code>%xmm0</code>中，<code>y</code>放在<code>%rdi</code>中，而<code>z</code>放在<code>%rsi</code>中。</p>
 <h2 id="浮点运算操作"><a href="#浮点运算操作" class="headerlink" title="浮点运算操作"></a>浮点运算操作</h2><p>图<code>3-49</code>描述了一组执行算术运算的标量<code>AVX2</code>浮点指令。每条指令有一个<code>(S1)</code>或两个<code>(S1, S2)</code>源操作数，和一个目的操作数D。第一个源操作数<code>S1</code>可以是一个<code>XMM</code>寄存器或一个内存位置。第二个源操作数和目的操作数都必须是XMM寄存器。每个操作都有一条针对单精度的指令和一条针对双精度的指令。结果存放在目的寄存器中。</p>
-<p><img src="/3-49.png"></p>
+<p><img src="/posts/mlr-program5/3-49.png"></p>
 <p>来看一个例子，考虑下面的浮点函数：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">double</span> <span class="title">funct</span><span class="params">(<span class="keyword">double</span> a, <span class="keyword">float</span> x, <span class="keyword">double</span> b, <span class="keyword">int</span> i)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> a*x - b/i;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
@@ -360,7 +360,7 @@
 
 <p>可以看到函数从标号为<code>.LC2</code>的内存位置读出值<code>1.8</code>，从标号为<code>.LC3</code>的位置读入值<code>32.0</code>。观察这些标号对应的值，可以看出每一个都是通过一对<code>.long</code>声明和十进制表示的值指定的。该怎样把这些数解释为浮点值呢？看看标号为<code>.LC2</code>的声明，有两个值：<code>3435973837(0xcccccccd)</code>和<code>1073532108(0x3ffccccc)</code>。因为机器采用的是小端法字节顺序，第一个值给出的是低位4字节，第二个给出的是高位4字节。从高位字节，可以抽取指数字段为<code>0x3ff(1023)</code>，减去偏移<code>1023</code>得到指数0。将两个值的小数位连接起来，得到小数字段<code>0xccccccccccccd</code>，二进制小数表示为<code>0.8</code>，加上隐含的1得到<code>1.8</code>。</p>
 <h2 id="在浮点代码中使用位级操作"><a href="#在浮点代码中使用位级操作" class="headerlink" title="在浮点代码中使用位级操作"></a>在浮点代码中使用位级操作</h2><p>有时，我们会发现GCC生成的代码会在<code>XMM</code>寄存器上执行位级操作，得到有用的浮点结果。图<code>3-50</code>展示了一些相关的指令，类似于它们在通用寄存器上对应的操作。这些操作都用于封装好的数据，即它们更新整个目的<code>XMM</code>寄存器，对两个源寄存器的所有位都实施指定的位级操作。和前面一样，我们只对标量数据感兴趣，只想了解这些指令对目的寄存器的低4或8字节的影响。从下面的例子中可以看出，运用这些操作通常可以简单方便地操作浮点数。</p>
-<p><img src="/3-50.png"></p>
+<p><img src="/posts/mlr-program5/3-50.png"></p>
 <h2 id="浮点比较操作"><a href="#浮点比较操作" class="headerlink" title="浮点比较操作"></a>浮点比较操作</h2><p><code>AVX2</code>提供了两条用于比较浮点数值的指令：</p>
 <table>
 <thead>
@@ -420,7 +420,7 @@
 </tbody></table>
 <p>当任一操作数为<code>NaN</code>时，就会出现无序的情况。可以通过奇偶标志位发现这种情况，通常<code>jp(jump on parity)</code>指令是条件跳转，条件就是浮点比较得到一个无序的结果。除了这种情况以外，进位和零标志位的值都和对应的无符号比较一样：当两个操作数相等时，设置<code>ZF</code>；当S<sub>2</sub> &lt; S<sub>1</sub>时，设置<code>CF</code>。像<code>ja</code>和<code>jb</code>这样的指令可以根据标志位的各种组合进行条件跳转。</p>
 <p>来看一个浮点比较的例子，图<code>3-51a</code>中的C函数会根据参数<code>x</code>与<code>0.0</code>的相对关系进行分类，返回一个枚举类型作为结果。C中的枚举类型是编码为整数的，所以函数可能的值为：0<code>(NEG)</code>，1<code>(ZERO)</code>，2<code>(POS)</code>和3<code>(OTHER)</code>。当<code>x</code>的值为<code>NaN</code>时，会出现最后一种结果。</p>
-<p><img src="/3-51.png"></p>
+<p><img src="/posts/mlr-program5/3-51.png"></p>
 <p>GCC为<code>find_range</code>生成图<code>3-51b</code>中的代码。这段代码的效率不是很高：它比较了<code>x</code>和<code>0.0</code>三次，即使一次比较就能获得所需的信息。它还生成了浮点常数两次：一次使用<code>vxorps</code>，另一次从内存读出这个值。让我们追踪这个函数，看看四种可能的比较结果：</p>
 <ul>
 <li><p><code>x &lt; 0.0</code>：第4行的<code>ja</code>分支指令会选择跳转，跳转到结尾，返回值为0</p>

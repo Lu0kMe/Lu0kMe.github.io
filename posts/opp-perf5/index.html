@@ -27,15 +27,15 @@
 <meta property="og:site_name" content="Lu0k">
 <meta property="og:description" content="内容简介写程序最主要的目标就是使它在所有可能的情况下都正确工作。一个运行得很快但是给出错误结果的程序没有任何用处。另一方面，在很多情况下，让程序运行得快也是一个重要的考虑因素。如果一个程序要实时地处理视频帧或者网络包，一个运行得很慢的程序就不能提供所需的功能。本章会探讨如何使用几种不同类型的程序优化技术，使程序运行得更快。">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://lu0k.github.io/table1.png">
-<meta property="og:image" content="https://lu0k.github.io/table2.png">
-<meta property="og:image" content="https://lu0k.github.io/5-38.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/opp-perf5/table1.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/opp-perf5/table2.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/opp-perf5/5-38.png">
 <meta property="article:published_time" content="2022-01-29T16:00:00.000Z">
 <meta property="article:modified_time" content="2022-02-28T11:17:46.077Z">
 <meta property="article:author" content="Lu0k">
 <meta property="article:tag" content="CSAPP">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://lu0k.github.io/table1.png">
+<meta name="twitter:image" content="https://lu0k.github.io/posts/opp-perf5/table1.png">
 
 
 <link rel="canonical" href="https://lu0k.github.io/posts/opp-perf5/">
@@ -321,10 +321,10 @@
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">linux&gt;</span><span class="bash"> gprof prog</span></span><br></pre></td></tr></table></figure>
 
 <p>剖析报告的第一部分列出了执行各个函数花费的时间，按照降序排列。作为一个示例，下面列出了报告的一部分，是关于程序中最耗费时间的三个函数的：</p>
-<p><img src="/table1.png"></p>
+<p><img src="/posts/opp-perf5/table1.png"></p>
 <p>每一行代表对某个函数的所有调用所花费的时间。第一列表明花费在这个函数上的时间占整个时间的百分比。第二列显示的是直到这一行并包括这一行的函数所花费的累计时间。第三列显示的是花费在这个函数上的时间，而第四列显示的是它被调用的次数<code>(递归调用不计算在内)</code>。在例子中，函数<code>sort_words</code>只被调用了一次，但就是这一次调用需要203.66秒，而函数<code>find_ele_rec</code>被调用了965027次<code>(递归调用不计算在内)</code>，总共需要4.85秒。函数<code>Strlen</code>通过调用库函数<code>strlen</code>来计算字符串的长度。<code>GPROF</code>的结果中通常不显示库函数调用。库函数耗费的时间通常计算在调用它们的函数内。通过创建这个包装函数<code>(wrapper function)Strlen</code>，我们可以可靠地跟踪对<code>strlen</code>的调用，表明它被调用了12511031次，但是一共只需要0.30秒。</p>
 <p>剖析报告的第二部分是函数的调用历史。下面是一个递归函数<code>find_ele_rec</code>的历史：</p>
-<p><img src="/table2.png"></p>
+<p><img src="/posts/opp-perf5/table2.png"></p>
 <p>这个历史既显示了调用<code>find_ele_rec</code>的函数，也显示了它调用的函数。头两行显示的是对这个函数的调用：被它自身递归地调用了158655725次，被函数<code>insert_string</code>调用了965027次<code>(它本身被调用了965027次)</code>。函数<code>find_ele_rec</code>也调用了另外两个函数<code>save_string</code>和<code>new_ele</code>，每个函数总共被调用了363039次。</p>
 <p>根据这个调用信息，我们通常可以推断出关于程序行为的有用信息。例如，函数<code>find_ele_rec</code>是一个递归过程，它扫描一个哈希桶<code>(hash bucket)</code>的链表，查找一个特殊的字符串。对于这个函数，比较递归调用的数量和顶层调用的数量，提供了关于遍历这些链表的长度的统计信息。这里递归与顶层调用的比率是164.4，我们可以推断出程序每次平均大约扫描164个元素。</p>
 <p><code>GPROF</code>有些属性值得注意：</p>
@@ -366,7 +366,7 @@
 </ul>
 <p>如图<code>5-38a</code>所示，最初的版本需要3.5分钟，大多数时间花在了排序上。这并不奇怪，因为插入排序有二次的运行时间，而程序对363039个值进行排序。</p>
 <p>在下一个版本中，我们用库函数<code>qsort</code>进行排序，这个函数是基于快速排序算法的，其预期运行时间为<code>O(nlogn)</code>。在图中这个版本称为<code>Quicksort</code>。更有效的排序算法使花在排序上的时间降低到可以忽略不计，而整个运行时间降低到大约5.4秒。图<code>5-38b</code>是剩下各个版本的时间，所用的比例能使我们看得更清楚。</p>
-<p><img src="/5-38.png"></p>
+<p><img src="/posts/opp-perf5/5-38.png"></p>
 <p>改进了排序，现在发现链表扫描变成了瓶颈。想想这个低效率是由于函数的递归结构引起的，我们用一个迭代的结构替换它，显示为<code>Iter first</code>。令人奇怪的是，运行时间增加到了大约7.5秒。根据更近一步的研究，我们发现两个链表函数之间有一个细微的差别。递归版本将新元素插入到链表尾部，而迭代版本把它们插到链表头部。为了使性能最大化，我们希望频率最高的<code>n-gram</code>出现在链表的开始处。这样一来，函数就能快速地定位常见的情况。假设<code>n-gram</code>在文档中是均匀分布的，我们期望频度高的单词的第一次出现在频度低的单词之前。通过将新的<code>n-gram</code>插入尾部，第一个函数倾向于按照频度的降序排序，而第二个函数则相反。因此我们创建第三个链表扫描函数，它使用迭代，但是将新元素插入到链表的尾部。使用这个版本，显示为<code>Iter last</code>，时间降到了大约5.3秒，<br>比递归版本稍微好一点。这些测量展示了对程序做实验作为优化工作一部分的重要性。开始时，我们假设将递归代码转换成迭代代码会改进程序的性能，而没有考虑添加元素到链表末尾和开头的差别。</p>
 <p>接下来，我们考虑哈希表的结构。最初的版本只有1021个桶<code>(通常会选择桶的个数为质数，以增强哈希函数将关键字均匀分布在桶中的能力)</code>。对于一个有363039个条目的表来说，这就意味着平均负载<code>(load)</code>是<code>363039/1021=355.6</code>。这就解释了为什么有那么多时间花在了执行链表操作上了——搜索包括测试大量的候选<code>n-gram</code>。它还解释了为什么性能对链表的排序这么敏感。然后，我们将桶的数量增加到了199999，平均负载降低到了1.8。不过，很奇怪的是，整体运行时间只下降到5.1秒，差距只有0.2秒。</p>
 <p>进一步观察，我们可以看到，表变大了但是性能提高很小，这是由于哈希函数选择的不好。简单地对字符串的字符编码求和不能产生一个大范围的值。特别是，一个字母最大的编码值是122，因而<code>n</code>个字符产生的和最多是<code>122n</code>。在文档中，最长的<code>bigram(honorificabilitudinitatibus thou)</code>的和也不过是3371，所以，我们哈希表中大多数桶都是不会被使用的。此外，可交换的哈希函数，例如加法，不能对一个字符串中不同的可能的字符顺序做出区分。例如，单词<code>rat</code>和<code>tar</code>会产生同样的和。</p>

@@ -27,26 +27,26 @@
 <meta property="og:site_name" content="Lu0k">
 <meta property="og:description" content="内容简介计算机执行机器代码，用字节序列编码低级的操作，包括处理数据、管理内存、读写存储设备上的数据，以及利用网络通信。编译器基于编程语言的规则、目标机器的指令集和操作系统遵循的惯例，经过一系列的阶段生成机器代码。GCC C语言编译器以汇编代码的形式产生输出，汇编代码是机器代码的文本表示，给出程序中的每一条指令。然后GCC调用汇编器和链接器，根据汇编代码生成可执行的机器代码。">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://lu0k.github.io/3-10.png">
-<meta property="og:image" content="https://lu0k.github.io/3-11.png">
-<meta property="og:image" content="https://lu0k.github.io/3-12.png">
-<meta property="og:image" content="https://lu0k.github.io/3-13.png">
-<meta property="og:image" content="https://lu0k.github.io/3-14.png">
-<meta property="og:image" content="https://lu0k.github.io/3-15.png">
-<meta property="og:image" content="https://lu0k.github.io/3-16.png">
-<meta property="og:image" content="https://lu0k.github.io/3-17.png">
-<meta property="og:image" content="https://lu0k.github.io/3-18.png">
-<meta property="og:image" content="https://lu0k.github.io/3-19.png">
-<meta property="og:image" content="https://lu0k.github.io/3-20.png">
-<meta property="og:image" content="https://lu0k.github.io/3-21.png">
-<meta property="og:image" content="https://lu0k.github.io/3-22.png">
-<meta property="og:image" content="https://lu0k.github.io/3-23.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/mlr-program2/3-10.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/mlr-program2/3-11.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/mlr-program2/3-12.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/mlr-program2/3-13.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/mlr-program2/3-14.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/mlr-program2/3-15.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/mlr-program2/3-16.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/mlr-program2/3-17.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/mlr-program2/3-18.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/mlr-program2/3-19.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/mlr-program2/3-20.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/mlr-program2/3-21.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/mlr-program2/3-22.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/mlr-program2/3-23.png">
 <meta property="article:published_time" content="2021-12-24T16:00:00.000Z">
 <meta property="article:modified_time" content="2022-01-08T10:17:19.138Z">
 <meta property="article:author" content="Lu0k">
 <meta property="article:tag" content="CSAPP">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://lu0k.github.io/3-10.png">
+<meta name="twitter:image" content="https://lu0k.github.io/posts/mlr-program2/3-10.png">
 
 
 <link rel="canonical" href="https://lu0k.github.io/posts/mlr-program2/">
@@ -288,7 +288,7 @@
 <span id="more"></span>
 
 <h1 id="算术和逻辑操作"><a href="#算术和逻辑操作" class="headerlink" title="算术和逻辑操作"></a>算术和逻辑操作</h1><p>图<code>3-10</code>列出了<code>x86-64</code>的一些整数和逻辑操作。大多数操作数都被分成了指令类，这些指令类有各种带不同大小操作数的变种<code>(只有leaq没有其他大小的变种)</code>。例如，指令类<code>ADD</code>由四条加法指令组成：<code>addb</code>、<code>addw</code>、<code>addl</code>和<code>addq</code>，分别是字节加法、字加法、双字加法和四字加法。事实上，给出的每个指令类都有对这四种不同大小数据的指令。这些操作被分为四组：加载有效地址、一元操作、二元操作和移位。</p>
-<p><img src="/3-10.png"></p>
+<p><img src="/posts/mlr-program2/3-10.png"></p>
 <h2 id="加载有效地址"><a href="#加载有效地址" class="headerlink" title="加载有效地址"></a>加载有效地址</h2><p>加载有效地址<code>(load effective address)</code>指令<code>leaq</code>实际上是<code>movq</code>指令的变形。它的指令形式是从内存读数据到寄存器，但实际上它根本就没有引用内存。它的第一个操作数看上去是一个内存引用，但该指令并不是从指定的位置读入数据，而是将有效地址写入到目的操作数。在图<code>3-10</code>中用C语言的地址操作符<code>&amp;</code>说明这种计算。这条指令可以为后面的内存引用产生指针。另外，它还可以简洁地描述普通的算术操作。例如，如果寄存器<code>%rdx</code>的值为<code>x</code>，那么指令<code>leaq 7(%rdx, %rdx, 4), %rax</code>将设置寄存器<code>%rax</code>的值为<code>5x+7</code>。编译器经常发现<code>leaq</code>的一些灵活用法，根本就与有效地址计算无关。目的操作数必须是一个寄存器。</p>
 <p>为了说明<code>leaq</code>在编译出的代码中的使用，示例C程序如下：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">long</span> <span class="title">scale</span><span class="params">(<span class="keyword">long</span> x, <span class="keyword">long</span> y, <span class="keyword">long</span> z)</span></span>&#123;</span><br><span class="line">    <span class="keyword">long</span> t = x + <span class="number">4</span> * y + <span class="number">12</span> * z;</span><br><span class="line">    <span class="keyword">return</span> t;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -302,9 +302,9 @@
 <h2 id="移位操作"><a href="#移位操作" class="headerlink" title="移位操作"></a>移位操作</h2><p>最后一组是移位操作，先给出移位量，然后第二项给出的是要移位的数。可以进行算术右移和逻辑右移。移位量可以是一个立即数，或者放在单字节寄存器<code>%cl</code>中<code>(只允许以这个特定的寄存器作为操作数)</code>。原则上来说，1个字节的移位量使得移位量的编码范围可以达到255。<code>x86-64</code>中，移位操作对<code>w</code>位长的数据值进行操作，移位量是由<code>%cl</code>寄存器的低<code>m</code>位决定的，这里2<sup>m</sup><code>=w</code>，高位会被忽略。所以，例如当寄存器<code>%cl</code>的十六进制值为<code>0xFF</code>时，指令<code>salb</code>会移7位，<code>salw</code>会移15位，<code>sall</code>会移31位，而<code>salq</code>会移63位。</p>
 <p>如图<code>3-10</code>所示，左移指令有两个名字：<code>SAL</code>和<code>SHL</code>。两者的效果是一样的，都是将右边填上0。右移指令不同，<code>SAR</code>执行算术移位<code>(填上符号位)</code>，而<code>SHR</code>执行逻辑移位<code>(填上0)</code>。移位操作的目的操作数可以是一个寄存器或是一个内存位置。</p>
 <h2 id="讨论"><a href="#讨论" class="headerlink" title="讨论"></a>讨论</h2><p>我们看到图<code>3-10</code>所示的大多数指令，既可以用于无符号运算，也可以用于补码运算。只有右移操作要求区分有符号和无符号数。这个特性使得补码运算成为实现有符号整数运算的一种比较好的方法的原因之一。图<code>3-11</code>给出了一个执行算术操作的函数示例，以及它的汇编代码。参数<code>x</code>、<code>y</code>和<code>z</code>初始时分别存放在内存<code>%rdi</code>、<code>%rsi</code>和<code>%rdx</code>中。汇编代码指令和C源代码行对应很紧密。第2行计算<code>x^y</code>的值。指令3和4用<code>leaq</code>和移位指令的组合来实现表达式<code>z*48</code>。第5行计算<code>t1</code>和<code>0x0F0F0F0F</code>的<code>AND</code>值。第6行计算最后的减法。由于减法的目的寄存器是<code>%rax</code>，函数会返回这个值。</p>
-<p><img src="/3-11.png"></p>
+<p><img src="/posts/mlr-program2/3-11.png"></p>
 <h2 id="特殊的算术操作"><a href="#特殊的算术操作" class="headerlink" title="特殊的算术操作"></a>特殊的算术操作</h2><p>两个64位的有符号或无符号数整数相乘得到的乘积需要128位来表示。<code>x86-64</code>指令集对128位<code>(16字节)</code>数的操作提供有限的支持。延续字<code>(2字节)</code>、双字<code>(4字节)</code>和四字<code>(8字节)</code>的命名惯例，<code>Intel</code>把16字节的数称为八字<code>(oct word)</code>。图<code>3-12</code>描述的是支持产生两个64位数字的全128位乘积以及整数除法的指令。</p>
-<p><img src="/3-12.png"></p>
+<p><img src="/posts/mlr-program2/3-12.png"></p>
 <p><code>imul</code>指令有两种不同的形式。其中一种如图<code>3-10</code>所示，是<code>IMUL</code>指令类中的一种。这种形式的<code>imulq</code>指令是一个双操作数乘法指令，它是从两个64位操作数产生一个64位乘积。此外，<code>x86-64</code>指令集还提供了两条不同的单操作数，以计算两个64位值的全128位乘积——一个是无符号数乘法<code>(mulq)</code>，而另一个是补码乘法<code>(imulq)</code>。这两个指令都要求一个参数必须在寄存器<code>%rax</code>中，而另一个作为指令的源操作数给出。然后乘积存放在寄存器<code>%rdx(高64位)</code>和<code>%rax(低64位)</code>中。虽然<code>imulq</code>这个名字可以用于两个不同的乘法操作，但是汇编器能够通过计算操作数的数目，分辨出想用哪条指令。</p>
 <p>下面的C代码是一个示例，说明了如何从两个无符号64位数字<code>x</code>和<code>y</code>生成128位的乘积：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;inttypes.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">unsigned</span> __int128 <span class="keyword">uint128_t</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">store_uprod</span><span class="params">(<span class="keyword">uint128_t</span> *dest, <span class="keyword">uint64_t</span> x, <span class="keyword">uint64_t</span> y)</span> </span>&#123;</span><br><span class="line">    *dest=x* (<span class="keyword">uint128_t</span>) y;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -336,7 +336,7 @@
 
 <p><code>leaq</code>指令不改变任何条件码，因为它是用来进行地址计算的。除此之外，图<code>3-10</code>中列出的所有指令都会设置条件码。对于逻辑操作，例如<code>XOR</code>，进位标志和溢出标志会设置为0。对于移位操作，进位标志将设置为最后一个被移出的位，而溢出标志设置为0。<code>INC</code>和<code>DEC</code>指令会设置溢出和零标志，但是不会改变进位标志。</p>
 <p>除了图<code>3-10</code>中的指令会设置条件码，还有两类指令<code>(有8、16、32和64位形式)</code>，它们只设置条件码而不改变任何其他寄存器；如图<code>3-13</code>所示。<code>CMP</code>指令根据两个操作数之差来设置条件码。除了只设置条件码而不更新目的寄存器之外，<code>CMP</code>指令与<code>SUB</code>指令的行为是一样的。在<code>ATT</code>格式中，列出操作数的顺序是相反的，这使代码有点难读。如果两个操作数相等，这些指令会将零标志设置为1，而其他的标志可以用来确定两个操作数之间的大小关系。<code>TEST</code>指令的行为与<code>AND</code>指令一样，除了只设置条件码而不改变目的寄存器的值。典型的用法是，两个操作数是一样的<code>(例如，testq %rax, %rax用来检查%rax是负数、零还是正数)</code>，或其中的一个操作数是一个掩码，用来指示哪些位应该被测试。</p>
-<p><img src="/3-13.png"></p>
+<p><img src="/posts/mlr-program2/3-13.png"></p>
 <h2 id="访问条件码"><a href="#访问条件码" class="headerlink" title="访问条件码"></a>访问条件码</h2><p>条件码通常不会直接读取，常用的使用方法有三种：</p>
 <ul>
 <li>根据条件码的某种组合，将一个字节设置为0或者1</li>
@@ -344,7 +344,7 @@
 <li>有条件地传送数据</li>
 </ul>
 <p>对于第一种情况，图<code>3-14</code>中描述的指令根据条件码的某种组合，将一个字节设置为0或者1。我们将这一整类指令称为<code>SET</code>指令；它们之间的区别就在于它们考虑的条件码的组合是什么，这些指令名字的不同后缀指明了它们所考虑的条件码的组合。这些指令的后缀表示不同的条件而不是操作数大小，了解这一点很重要。例如，指令<code>setl</code>和<code>setb</code>表示<code>小于时设置(set less)</code>和<code>低于时设置(set below)</code>，而不是<code>设置长字(set long word)</code>和<code>设置字节(set byte)</code>。</p>
-<p><img src="/3-14.png"></p>
+<p><img src="/posts/mlr-program2/3-14.png"></p>
 <p>一条<code>SET</code>指令的目的操作数是低位单字节寄存器元素<code>(图3-2)</code>之一，或是一个字节的内存位置，指令会将这个字节设置成0或者1。为了得到一个32位或64位结果，必须对高位清零。一个计算C语言表达式<code>a &lt; b</code>的典型指令序列如下所示，这里<code>a</code>和<code>b</code>都是<code>long</code>类型：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">; int comp(data_t a, data_t b)</span><br><span class="line">; a in %rdi, b in %rsi</span><br><span class="line">comp:</span><br><span class="line">    cmpq %rsi, %rdi     ; Compare a:b</span><br><span class="line">    setl %al            ; Set low-order byte of %eax to 0 or 1</span><br><span class="line">    movzbl %al, %eax    ; Clear rest of %eax (and rest of %rax)</span><br><span class="line">    ret</span><br></pre></td></tr></table></figure>
 
@@ -357,7 +357,7 @@
 
 <p>指令<code>jmp .L1</code>会导致程序跳过<code>movq</code>指令，而从<code>popq</code>指令开始继续执行。在产生目标代码文件时，汇编器会确定所有带标号指令的地址，并将跳转目标<code>(目的指令的地址)</code>编码为跳转指令的一部分。</p>
 <p>图<code>3-15</code>列举了不同的跳转指令。<code>jmp</code>指令是无条件跳转。它可以是直接跳转，即跳转目标是作为指令的一部分编码的；也可以是间接跳转，即跳转目标是从寄存器或内存位置中读出的。汇编语言中，直接跳转是给出一个标号作为跳转目标的，例如上面所示代码中的标号<code>.L1</code>。间接跳转的写法是<code>*</code>后面跟一个操作数指示符，使用图<code>3-3</code>中描述的内存操作数格式中的一种。举个例子，指令<code>jmp *%rax</code>用寄存器<code>%rax</code>中的值作为跳转目标，而指令<code>jmp *(%rax)</code>以<code>%rax</code>中的值作为读地址，从内存中读出跳转目标。</p>
-<p><img src="/3-15.png"></p>
+<p><img src="/posts/mlr-program2/3-15.png"></p>
 <p>表中所示的其他跳指令都是有条件的——它们根据条件码的某种组合，或者跳转、或者继续执行代码序列中下一条指令。这些指令的名字和跳转条件与<code>SET</code>指令的名字和设置条件是相匹配的<code>(见图3-14)</code>。同<code>SET</code>指令一样，一些底层的机器指令有多个名字。条件跳转只能是直接跳转。</p>
 <h2 id="跳转指令的编码"><a href="#跳转指令的编码" class="headerlink" title="跳转指令的编码"></a>跳转指令的编码</h2><p>在汇编代码中，跳转目标用符号标号书写。汇编器以及后来的链接器，会产生跳转目标的适当编码。跳转指令有几种不同的编码，但是最常用的都是<code>PC</code>相对的<code>(PC-relative)</code>。也就是说，他们会将目标指令的地址与紧跟在跳转指令后面那条指令的地址之间的差作为编码。这些地址偏移量可以编码为1、2或4个字节。第二种编码方法是出<code>绝对</code>地址，用4个字节直接指定目标。汇编器和链接器会选择适当的跳转目的编码。</p>
 <p>下面是一个<code>PC</code>相对寻址的例子，它包含两个跳转：第2行的<code>jmp</code>指令前向跳转到更高的地址，而第7行的<code>jg</code>指令后向跳转到较低的地址：</p>
@@ -372,7 +372,7 @@
 
 <p>这些指令被重定位到不同的地址，但是第2行和第5行中跳转目标的编码并没有变。通过使用与<code>PC</code>相对的跳转目标编码，指令编码很简洁<code>(只需要2个字节)</code>，而且目标代码可以不做改变就转移到内存中不同的位置。</p>
 <h2 id="用条件控制来实现条件分支"><a href="#用条件控制来实现条件分支" class="headerlink" title="用条件控制来实现条件分支"></a>用条件控制来实现条件分支</h2><p>将条件表达式和语句从C语言翻译成机器代码，最常用的方式是结合有条件和无条件跳转。例如，图<code>3-16a</code>给出了一个计算两数之差绝对值的函数的C代码。这个函数有一个副作用，会增加两个计数器，编码为全局变量<code>lt_cnt</code>和<code>ge_cnt</code>之一。<code>GCC</code>产生的汇编代码如图<code>3-16c</code>所示。把这个机器代码再转换成C语言，我们称之为函数 <code>gotodiff_se(图3-16b)</code>。它使用了C语言中的<code>goto</code>语句，这个语句类似于汇编代码中的无条件跳转。使用<code>goto</code>语句通常被认为是一种不好的编程风格，因为它会使代码非常难以阅读和调试。本文中使用<code>goto</code>语句，是为了构造描述汇编代码程序控制流的C程序。我们称这样的编程风格为<code>goto</code>代码。</p>
-<p><img src="/3-16.png"></p>
+<p><img src="/posts/mlr-program2/3-16.png"></p>
 <p>在<code>goto</code>代码中<code>(图3-16b)</code>，第5行中的<code>goto x_ge_y</code>语句会导致跳转到第9行中的标号<code>x_ge_y</code>处<code>(当x&gt;=y时会进行跳转)</code>。从这一点继续执行，完成函数<code>absdiff_se</code>的<code>else</code>部分并返回。另一方面，如果测试<code>x&gt;=y</code>失败，程序会计算<code>absdiff_se</code>的<code>if</code>部分指定的步骤并返回。</p>
 <p>汇编代码的实现<code>(图3-16c)</code>首先比较了两个操作数<code>(第2行)</code>，设置条件码。如果比较的结果表明<code>x</code>大于或者等于<code>y</code>，那么它就会跳转到第8行，增加全局变量<code>ge_cnt</code>，计算<code>x-y</code>作为返回值并返回。由此我们可以看到<code>absdiff_se</code>对应汇编代码的控制流非常类似于<code>gotodiff_se</code>的<code>goto</code>代码。</p>
 <p>C语言中的<code>if-else</code>语句的通用形式模板如下：</p>
@@ -385,13 +385,13 @@
 <h2 id="用条件传送来实现条件分支"><a href="#用条件传送来实现条件分支" class="headerlink" title="用条件传送来实现条件分支"></a>用条件传送来实现条件分支</h2><p>实现条件操作的传统方法是通过使用控制的条件转移。当条件满足时，程序沿着一条执行路径执行，而当条件不满足时，就走另一条路径。这种机制简单而通用，但是在现代处理器上，它可能会非常低效。</p>
 <p>一种替代的策略是使用数据的条件转移。这种方法计算一个条件操作的两种结果，然后再根据条件是否满足从中选取一个。只有在一些受限制的情况中，这种策略才可行，但是如果可行，就可以用一条简单的条件传送指令来实现它，条件传送指令更符合现代处理器的性能特性。我们将介绍这一策略，以及它在<code>x86-64</code>上的实现。</p>
 <p>图<code>3-17a</code>给出了一个可以用条件传送编译的示例代码。这个函数计算参数<code>x</code>和<code>y</code>差的绝对值，和前面的例子一样<code>(图3-16)</code>。不过前面的例子中，分支里有副作用，会修改<code>lt_cnt</code>或<code>ge_cnt</code>的值，而这个版本只是简单地计算函数要返回的值。</p>
-<p><img src="/3-17.png"></p>
+<p><img src="/posts/mlr-program2/3-17.png"></p>
 <p><code>GCC</code>为该函数产生的汇编代码如图<code>3-17c</code>所示，它与图<code>3-17b</code>中所示的C函数<code>cmovdiff</code>有相似的形式。研究这个C版本，我们可以看到它既计算了<code>y-x</code>，也计算了<code>x-y</code>，分别命名为<code>rval</code>和<code>eval</code>。然后它再测试<code>x</code>是否大于等于<code>y</code>，如果是，就在函数返回<code>rval</code>前，将<code>eval</code>复制到<code>rval</code>中。图<code>3-17c</code>中的汇编代码有相同的逻辑。关键就在于汇编代码的那条<code>cmovge</code>指令<code>(第7行)</code>实现了<code>cmovdiff</code>的条件赋值<code>(第8行)</code>。只有当第6行的<code>cmpq</code>指令表明一个值大于等于另一个值<code>(正如后缀ge表明的那样)</code>时，才会把数据源寄存器传送到目的。</p>
 <p>为了理解为什么基于条件数据传送的代码会比基于条件控制转移的代码<code>(如图3-16中那样)</code>性能要好，我们必须了解一些关于现代处理器如何运行的知识。正如我们将在第4章和第5章中看到的，处理器通过使用流水线<code>(pipelining)</code>来获得高性能，在流水线中，一条指令的处理要经过一系列的阶段，每个阶段执行所需操作的一小部分<code>(例如，从内存取指令、确定指令类型、从内存读数据、执行算术运算、向内存写数据、以及更新程序计数器)</code>。这种方法通过重叠连续指令的步骤来获得高性能，例如，在取一条指令的同时，执行它前面一条指令的算术运算。要做到这一点，要求能够事先确定要执行的指令序列，这样才能保持流水线中充满了待执行的指令。当机器遇到条件跳转<code>(也称为分支)</code>时，只有当分支条件求值完成之后，才能决定分支往哪边走。处理器采用非常精密的分支预测逻辑来猜测每条跳转指令是否会执行。只要它的猜测还比较可靠<code>(现代微处理器设计试图达到90%以上的成功率)</code>，指令流水线中就会充满着指令。另一方面，错误预测一个跳转，要求处理器丢掉它为该跳转指令后所有指令已做的工作，然后再开始用从正确位置处起始的指令去填充流水线。正如我们会看到的，这样一个错误预测会招致很严重的惩罚，浪费大约15~30个时钟周期，导致程序性能严重下降。</p>
 <p>作为一个示例，我们在<code>Intel Haswell</code>处理器上运行<code>absdiff</code>函数，用两种方法来实现条件操作。在一个典型的应用中，<code>x&lt;y</code>的结果非常地不可预测，因此即使是最精密的分支预测硬件也只能有大约50%的概率猜对。此外，两个代码序列中的计算执行都只需要一个时钟周期。因此，分支预测错误处罚主导着这个函数的性能。对于包含条件跳转的<code>x86-64</code>代码，我们发现当分支行为模式很容易预测时，每次调用函数需要大约8个时钟周期；而分支行为模式是随机的时候，每次调用需要大约17.50个时钟周期。由此我们可以推断出分支预测错误的处罚是大约19个时钟周期。这就意味着函数需要的时间范围大约在8到27个周期之间，这依赖于分支预测是否正确。</p>
 <p>另一方面，无论测试的数据是什么，编译出来使用条件传送的代码所需的时间都是大约8个时钟周期。控制流不依赖于数据，这使得处理器更容易保持流水线是满的。</p>
 <p>图<code>3-18</code>列举了<code>x86-64</code>上一些可用的条件传送指令。每条指令都有两个操作数：源寄器或者内存地址<code>S</code>，和目的寄存器<code>R</code>。与各种<code>SET</code>和跳转指令一样，这些指令的结果取决于条件码的值。源值可以从内存或者源寄存器中读取，但是只有在指定的条件满足时，才会被复制到目的寄存器中。</p>
-<p><img src="/3-18.png"></p>
+<p><img src="/posts/mlr-program2/3-18.png"></p>
 <p>源和目的的值可以是16位、32位或64位长。不支持单字节的条件传送。无条件指令的操作数的长度显式地编码在指令名中<code>(例如movww和movl)</code>，汇编器可以从目标寄存器的名字推断出条件传送指令的操作数长度，所以对所有的操作数长度，都可以使用同一个的指令名字。</p>
 <p>同条件跳转不同，处理器无需预测测试的结果就可以执行条件传送。处理器只是读源值<code>(可能是从内存中)</code>，检查条件码，然后要么更新目的寄存器，要么保持不变。我们会在第4章中探讨条件传送的实现。为了理解如何通过条件数据传输来实现条件操作，考虑下面的条件表达式和赋值的通用形式：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">v = test-expr ? then-expr : <span class="keyword">else</span>-expr;</span><br></pre></td></tr></table></figure>
@@ -421,7 +421,7 @@
 
 <p>也就是说，每次循环，程序会执行循环体里的语句，然后执行测试表达式。如果测试为真，就回去再执行一次循环。</p>
 <p>看一个示例，图<code>3-19a</code>给出了一个函数的实现，用<code>do-while</code>循环来计算函数参数的阶乘，写作<code>n!</code>。这个函数只计算<code>n&gt;0</code>时<code>n</code>的阶乘的值。</p>
-<p><img src="/3-19.png"></p>
+<p><img src="/posts/mlr-program2/3-19.png"></p>
 <p>图<code>3-19b</code>所示的<code>goto</code>代码展示了如何把循环变成低级的测试和条件跳转的组合。<code>result</code>初始化之后，程序开始循环。首先执行循环体，包括更新变量<code>result</code>和<code>n</code>。然后测试<code>n&gt;1</code>，如果是真，跳转到循环开始处。图<code>3-19c</code>所示的汇编代码就是<code>goto</code>代码的原型。条件跳转指令<code>(第7行)</code>是实现循环的关键指令，它决定了是需要继续重复还是退出循环。</p>
 <p>逆向工程像图<code>3-19c</code>中那样的汇编代码，需要确定哪个寄存器对应的是哪个程序值。本例中，这个对应关系很容易确定：我们知道<code>n</code>在寄存器<code>%rdi</code>中传递给函数。可以看到寄存器<code>%rax</code>初始化为1<code>(第2行)</code>。<code>(注意，虽然指令的目的寄存器是%eax，它实际上还会把%rax的高4字节设置为0。)</code>还可以看到这个寄存器还会在第4行被乘法改变值。此外，<code>%rax</code>用来返回函数值，所以通常会用来存放需要返回的程序值。因此我们断定<code>%rax</code>对应程序值<code>result</code>。</p>
 <h3 id="while循环"><a href="#while循环" class="headerlink" title="while循环"></a>while循环</h3><p>while语句的通用形式如下：</p>
@@ -432,7 +432,7 @@
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">    <span class="keyword">goto</span> test;</span><br><span class="line">loop:</span><br><span class="line">    body-statement</span><br><span class="line">test:</span><br><span class="line">    t = test-expr;</span><br><span class="line">    <span class="keyword">if</span> (t)</span><br><span class="line">        <span class="keyword">goto</span> loop;</span><br></pre></td></tr></table></figure>
 
 <p>作为一个示例，图<code>3-20a</code>给出了使用<code>while</code>循环的阶乘函数的实现。这个函数能够正确地计算<code>0!=1</code>。它旁边的函数<code>fact_while_jm_goto(图3-20b)</code>是<code>GCC</code>带优化命令行选项<code>-Og</code>时产生的汇编代码的C语言翻译。比较 <code>fact_while(图3-20b)</code>和<code>fact_do(图3-19b)</code>的代码，可以看到它们非常相似，区别仅在于循环前的<code>goto test</code>语句使得程序在修改<code>result</code>或<code>n</code>的值之前，先执行对<code>n</code>的测试。图的最下面<code>(图3-20c)</code>给出的是实际产生的汇编代码。</p>
-<p><img src="/3-20.png"></p>
+<p><img src="/posts/mlr-program2/3-20.png"></p>
 <p>第二种翻译方法，我们称之为<code>guarded-do</code>，首先用条件分支，如果初始条件不成立就跳过循环，把代码变换为<code>do-while</code>循环。当使用较高优化等级编译时，例如使用命令行选项<code>-O1</code>，<code>GCC</code>会采用这种策略。可以用如下模板来表达这种方法，把通用的<code>while</code>循环格式翻译成<code>do_while</code>循环：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">t = test-expr;</span><br><span class="line"><span class="keyword">if</span> (!t)</span><br><span class="line">        <span class="keyword">goto</span> done;</span><br><span class="line"><span class="keyword">do</span></span><br><span class="line">    body-<span class="function">statement</span></span><br><span class="line"><span class="function">    <span class="title">while</span> <span class="params">(test-expr)</span></span>;</span><br><span class="line">done:</span><br></pre></td></tr></table></figure>
 
@@ -441,7 +441,7 @@
 
 <p>利用这种实现策略，编译器常常可以优化初始的测试，例如认为测试条件总是满足。</p>
 <p>再来看个例子，图<code>3-21</code>给出了图<code>3-20</code>所示阶乘函数同样的C代码，不过给出的是<code>GCC</code>使用命令行选项<code>-O1</code>时的编译。图<code>3-21c</code>给出实际生成的汇编代码，图<code>3-21b</code>是这个汇编代码更易读的C语言表示。根据<code>goto</code>代码，可以看到如果对于<code>n</code>的初始值有<code>n&lt;=1</code>，那么将跳过该循环。该循环本身的基本结构与该函数<code>do-while</code>版本产生的结构<code>(图3-19)</code>一样。不过，一个有趣的特性是，循环测试<code>(汇编代码的第9行)</code>从原始C代码的<code>n&gt;1</code>变成了<code>n!=1</code>。编译器知道只有当<code>n&gt;1</code>时才会进入循环，所以将<code>n</code>减1意味着<code>n&gt;1</code>或者<code>n=1</code>。因此，测试<code>n!=1</code>就等价于测试<code>n&lt;=1</code>。</p>
-<p><img src="/3-21.png"></p>
+<p><img src="/posts/mlr-program2/3-21.png"></p>
 <h3 id="for循环"><a href="#for循环" class="headerlink" title="for循环"></a>for循环</h3><p><code>for</code>循环的通用形式如下：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (init-expr; test-expr; update-expr)</span><br><span class="line">    body-statement</span><br></pre></td></tr></table></figure>
 
@@ -473,9 +473,9 @@
 
 <h2 id="Switch语句"><a href="#Switch语句" class="headerlink" title="Switch语句"></a>Switch语句</h2><p><code>switch(开关)</code>语句可以根据一个整数索引值进行多重分支<code>(multiway branching)</code>。在处理具有多种可能结果的测试时，这种语句特别有用。它们不仅提高了C代码的可读性，而且通过使用跳转表<code>(jump table)</code>这种数据结构使得实现更加高效。跳转表是一个数组，表项<code>i</code>是一个代码段的地址，这个代码段实现当开关索引值等于<code>i</code>时程序应该采取的动作。程序代码用开关索引值来执行一个跳转表内的数组引用，确定转指令的目标。和使用一组很长的<code>if-else</code>语句相比，使用跳转表的优点是执行开关语句的时间与开关情况的数量无关。<code>GCC</code>根据开关情况的数量和开关情况值的稀疏程度来翻译开关语句。当开关情况数量比较多<code>(例如4个以上)</code>，并且值的范围跨度比较小时，就会使用跳转表。</p>
 <p>图<code>3-22a</code>是一个C语言<code>switch</code>语句的示例。这个例子有些非常有意思的特征，包括情况标号<code>(case label)</code>跨过一个不连续的区域<code>(对于情况101和105没有标号)</code>，有些情况有多个标号<code>(情况104和106)</code>，而有些情况则会落入其他情况之中<code>(情况102)</code>，因为对应该情况的代码段没有以<code>break</code>语句结尾。</p>
-<p><img src="/3-22.png"></p>
+<p><img src="/posts/mlr-program2/3-22.png"></p>
 <p>图<code>3-23</code>是编译<code>switch_eg</code>时产生的汇编代码。这段代码的行为用C语言来描述就是图<code>3-22b</code>中的过程<code>switch_eg_impl</code>。这段代码使用了<code>GCC</code>提供的对跳转表的支持，这是对C语言的扩展。数组<code>jt</code>包含7个表项，每个都是一个代码块的地址。这些位置由代码中的标号定义，在<code>jt</code>的表项中由代码指针指明，由标号加上<code>&amp;&amp;</code>前缀组成。<code>(运算符&amp;创建一个指向数据值的指针。在做这个扩展时，GCC的作者们创造了一个新的运算符&amp;&amp;, 这个运算符创建一个指向代码位置的指针。)</code></p>
-<p><img src="/3-23.png"></p>
+<p><img src="/posts/mlr-program2/3-23.png"></p>
 <p>原始的C代码有针对值<code>100</code>、<code>102-104</code>和<code>106</code>的情况，但是开关变量<code>n</code>可以是任意整数。编译器首先将<code>n</code>减去<code>100</code>，把取值范围移到0和6之间，创建一个新的程序变量，在我们的C版中称为<code>index</code>。补码表示的负数会映射成无符号表示的大正数，利用这一事实，将<code>index</code>看作无符号值，从而进一步简化了分支的可能性。因此可以通过测试<code>index</code>是否大于6来判定<code>index</code>是否在<code>0~6</code>的范围之外。在C和汇编代码中，根据<code>index</code>的值，有五个不同的跳转位置：<code>loc_A(在汇编代码中标识为.L3)</code>、<code>loc_B(.L5)</code>、<code>loc_C(.L6)</code>、<code>loc_D(.L7)</code>和<code>loc_def(.L8)</code>，最后一个是默认的目的地址。每个标号都标识一个实现某个情况分支的代码块。在C和汇编代码中，程序都是将<code>index</code>和6做比较，如果大于6就跳转到默认的代码处。</p>
 <p>执行<code>switch</code>语句的关键步骤是通过跳转表来访问代码位置。在C代码中是第16行，一条<code>goto</code>语句引用了跳转表<code>jt</code>。<code>GCC</code>支持计算<code>goto(computed goto)</code>，是对C语言的扩展。在我们的汇编代码版本中，类似的操作是在第5行，<code>jmp</code>指令的操作数有前缀<code>*</code>，表明这是一个间接跳转，操作数指定一个内存位置，索引由寄存器<code>%rsi</code>给出，这个寄存器保存着<code>index</code>的值。</p>
 <p>C代码将跳转表声明为一个有7个元素的数组，每个元素都是一个指向代码位置的指针。这些元素跨越<code>index</code>的值<code>0~6</code>，对应于<code>n</code>的值<code>100~106</code>。可以观察到，跳转表对重复情况的处理就是简单地对表项4和6用同样的代码标号<code>(loc_D)</code>，而对于缺失的情况的处理就是对表项1和5使用默认情况的标号<code>(loc_def)</code>。</p>

@@ -27,32 +27,32 @@
 <meta property="og:site_name" content="Lu0k">
 <meta property="og:description" content="内容简介写程序最主要的目标就是使它在所有可能的情况下都正确工作。一个运行得很快但是给出错误结果的程序没有任何用处。另一方面，在很多情况下，让程序运行得快也是一个重要的考虑因素。如果一个程序要实时地处理视频帧或者网络包，一个运行得很慢的程序就不能提供所需的功能。本章会探讨如何使用几种不同类型的程序优化技术，使程序运行得更快。">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://lu0k.github.io/5-16.png">
-<meta property="og:image" content="https://lu0k.github.io/5-17.png">
-<meta property="og:image" content="https://lu0k.github.io/5-18.png">
-<meta property="og:image" content="https://lu0k.github.io/5-19.png">
-<meta property="og:image" content="https://lu0k.github.io/5-20.png">
-<meta property="og:image" content="https://lu0k.github.io/formula1.png">
-<meta property="og:image" content="https://lu0k.github.io/formula2.png">
-<meta property="og:image" content="https://lu0k.github.io/5-21.png">
-<meta property="og:image" content="https://lu0k.github.io/table1.png">
-<meta property="og:image" content="https://lu0k.github.io/5-22.png">
-<meta property="og:image" content="https://lu0k.github.io/5-23.png">
-<meta property="og:image" content="https://lu0k.github.io/5-24.png">
-<meta property="og:image" content="https://lu0k.github.io/5-25.png">
-<meta property="og:image" content="https://lu0k.github.io/5-26.png">
-<meta property="og:image" content="https://lu0k.github.io/table2.png">
-<meta property="og:image" content="https://lu0k.github.io/5-27.png">
-<meta property="og:image" content="https://lu0k.github.io/5-28.png">
-<meta property="og:image" content="https://lu0k.github.io/5-29.png">
-<meta property="og:image" content="https://lu0k.github.io/5-30.png">
-<meta property="og:image" content="https://lu0k.github.io/table3.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/opp-perf3/5-16.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/opp-perf3/5-17.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/opp-perf3/5-18.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/opp-perf3/5-19.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/opp-perf3/5-20.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/opp-perf3/formula1.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/opp-perf3/formula2.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/opp-perf3/5-21.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/opp-perf3/table1.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/opp-perf3/5-22.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/opp-perf3/5-23.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/opp-perf3/5-24.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/opp-perf3/5-25.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/opp-perf3/5-26.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/opp-perf3/table2.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/opp-perf3/5-27.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/opp-perf3/5-28.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/opp-perf3/5-29.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/opp-perf3/5-30.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/opp-perf3/table3.png">
 <meta property="article:published_time" content="2022-01-22T16:00:00.000Z">
 <meta property="article:modified_time" content="2022-02-28T11:17:46.076Z">
 <meta property="article:author" content="Lu0k">
 <meta property="article:tag" content="CSAPP">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://lu0k.github.io/5-16.png">
+<meta name="twitter:image" content="https://lu0k.github.io/posts/opp-perf3/5-16.png">
 
 
 <link rel="canonical" href="https://lu0k.github.io/posts/opp-perf3/">
@@ -297,37 +297,37 @@
 <p>图<code>5-16</code>是合并代码的使用<code>2X1</code>循环展开的版本。第一个循环每次处理数组的两个元素。也就是每次迭代，循环索引<code>i</code>加2，在一次迭代中，对数组元素<code>i</code>和<code>i+1</code>使用合并运算。</p>
 <p>一般来说，向量长度不一定是2的倍数。想要使我们的代码对任意向量长度都能正确工作，可以从两个方面来解释这个需求。首先，要确保第一次循环不会超出数组的界限。对于长度为<code>n</code>的向量，我们将循环界限设为<code>n-1</code>。然后，保证只有当循环索引<code>i</code>满足<code>i&lt;n-1</code>时才会执行这个循环，因此最大数组索引<code>i+1</code>满足<code>i+1&lt;(n-1)+1=n</code>。</p>
 <p>把这个思想归纳为对一个循环按任意因子<code>k</code>进行展开，由此产生<code>kX1</code>循环展开。为此，上限设为<code>n-k+1</code>，在循环内对元素<code>i</code>到<code>i+k-1</code>应用合并运算。每次送代，循环索引<code>i</code>加<code>k</code>。那么最大循环索引<code>i+k-1</code>会小于<code>n</code>。要使用第二个循环，以每次处理一个元素的方式处理向量的最后几个元素。这个循环体将会执行<code>0~k-1</code>次。对于<code>k=2</code>，我们能用一个简单的条件语句，可选地增加最后一次迭代，如函数<code>psum2(图5-1)</code>所示。对于<code>k&gt;2</code>，最后的这些情况最好用一个循环来表示，所以对<code>k=2</code>的情况，我们同样也采用这个编程惯例。我们称这种变换为<code>kX1</code>循环展开，因为循环展开因子为<code>k</code>，而累积值只在单个变量<code>acc</code>中。</p>
-<p><img src="/5-16.png"></p>
+<p><img src="/posts/opp-perf3/5-16.png"></p>
 <p>我们看到对于整数加法，<code>CPE</code>有所改进，得到的延迟界限为1.00。会有这样的结果是得益于减少了循环开销操作。相对于计算向量和所需要的加法数量，降低开销操作的数量，此时，整数加法的一个周期的延迟成为了限制性能的因素。另一方面，其他情况并没有性能提高——它们已经达到了其延迟界限。图<code>5-17</code>给出了当循环展开到大约10次时的<code>CPE</code>测量值。对于展开2次和3次时观察到的趋势还在继续——没有一个低于其延迟界限。</p>
-<p><img src="/5-17.png"></p>
+<p><img src="/posts/opp-perf3/5-17.png"></p>
 <p>要理解为什么<code>kX1</code>循环展开不能将性能改进到超过延迟界限，让我们来查看一下<code>k=2</code>时，<code>combine5</code>内循环的机器级代码。当类型<code>data_t</code>为<code>double</code>，操作为乘法时，生成如下代码：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Inner loop of combine5. data_t = double, OP = *</span><br><span class="line">i in %rdx, data %rax, limit in %rbx, acc in %xmm0</span><br><span class="line">.L35:                                   loop:</span><br><span class="line">    vmulsd (%rax,%rdx,8), %xmm0, %xmm0      Multiply acc by data[i]</span><br><span class="line">    vmulsd 8(%rax,%rdx,8), %xmm0, %xmm0     Multiply acc by data[i+1]</span><br><span class="line">    addq $2, %rdx                           Increment i by 2</span><br><span class="line">    cmpq %rdx, %rbp                         Compare to limit:i</span><br><span class="line">    jg .L35                                 If &gt;, goto loop</span><br></pre></td></tr></table></figure>
 
-<p><img src="/5-18.png"></p>
+<p><img src="/posts/opp-perf3/5-18.png"></p>
 <p>我们可以看到，相比<code>combine4</code>生成的基于指针的代码，<code>GCC</code>使用了C代码中数组引用的更加直接的转换。循环索引<code>i</code>在寄存器<code>%rdx</code>中，<code>data</code>的地址在寄存器<code>%rax</code>中。和前面一样，累积值<code>acc</code>在向量寄存器<code>%xmm0</code>中。循环展开会导致两条<code>vmulsd</code>指令——一条将<code>data[i]</code>乘到<code>acc</code>上，第二条将<code>data[i+1]</code>乘到<code>acc</code>上。图<code>5-18</code>给出了这段代码的图形化表示。每条<code>vmulsd</code>指令被翻译成两个操作：一个操作是从内存中加载一个数组元素，另一个是把这个值乘以已有的累积值。这里我们看到，循环的每次执行中，对寄存器<code>%xmm0</code>读和写两次。可以重新排列、简化和抽象这张图，按照图<code>5-19a</code>所示的过程得到图<code>5-19b</code>所示的模板。然后，把这个模板复制<code>n/2</code>次，给出一个长度为<code>n</code>的向量的计算，得到如图<code>5-20</code>所示的数据流表示。在此我们看到，这张图中关键路径还是<code>n</code>个<code>mul</code>操<br>作——迭代次数减半了，但是每次迭代中还是有两个顺序的乘法操作。这个关键路径是循环没有展开代码的性能制约因素，而它仍然是<code>kX1</code>循环展开代码的性能制约因素。</p>
-<p><img src="/5-19.png"></p>
-<p><img src="/5-20.png"></p>
+<p><img src="/posts/opp-perf3/5-19.png"></p>
+<p><img src="/posts/opp-perf3/5-20.png"></p>
 <h1 id="提高并行性"><a href="#提高并行性" class="headerlink" title="提高并行性"></a>提高并行性</h1><p>在此，程序的性能是受运算单元的延迟限制的。不过，正如我们表明的，执行加法和乘法的功能单元是完全流水线化的，这意味着它们可以每个时钟周期开始一个新操作，并且有些操作可以被多个功能单元执行。硬件具有以更高速率执行乘法和加法的潜力，但是代码不能利用这种能力，即使是使用循环展开也不能，这是因为我们将累积值放在一个单独的变量<code>acc</code>中。在前面的计算完成之前，都不能计算<code>acc</code>的新值。虽然计算<code>acc</code>新值的功能单元能够每个时钟周期开始一个新的操作，但是它只会每<code>L</code>个周期开始一条新操作，这里<code>L</code>是合并操作的延迟。现在我们要考察打破这种顺序相关，得到比延迟界限更好性能的方法。</p>
 <h2 id="多个累积变量"><a href="#多个累积变量" class="headerlink" title="多个累积变量"></a>多个累积变量</h2><p>对于一个可结合和可交换的合并运算来说，比如说整数加法或乘法，我们可以通过将一组合并运算分割成两个或更多的部分，并在最后合并结果来提高性能。例如，P<sub>n</sub>表示元素a<sub>0</sub>, a<sub>1</sub>, ···, a<sub>n-1</sub>的乘积：</p>
-<p><img src="/formula1.png"></p>
+<p><img src="/posts/opp-perf3/formula1.png"></p>
 <p>假设<code>n</code>为偶数，我们还可以把它写成P<sub>n</sub>&#x3D;PE<sub>n</sub>XPO<sub>n</sub>，这里PE<sub>n</sub>是索引值为偶数的元素的乘积，而PO<sub>n</sub>是索引值为奇数的元素的乘积：</p>
-<p><img src="/formula2.png"></p>
+<p><img src="/posts/opp-perf3/formula2.png"></p>
 <p>图<code>5-21</code>展示的是使用这种方法的代码。它既使用了两次循环展开，以使每次迭代合并更多的元素，也使用了两路并行，将索引值为偶数的元素累积在变量<code>acc0</code>中，而索引值为奇数的元素累积在变量<code>acc1</code>中。因此，我们将其称为<code>2X2</code>循环展开。同前面一样，我们还包括了第二个循环，对于向量长度不为2的倍数时，这个循环要累积所有剩下的数组元素。然后，我们对<code>acc0</code>和<code>acc1</code>应用合并运算，计算最终的结果。</p>
-<p><img src="/5-21.png"></p>
+<p><img src="/posts/opp-perf3/5-21.png"></p>
 <p>比较只做循环展开和既做循环展开同时也使用两路并行这两种方法，我们得到下面的性能：</p>
-<p><img src="/table1.png"></p>
+<p><img src="/posts/opp-perf3/table1.png"></p>
 <p>我们看到所有情况都得到了改进，整数乘、浮点加、浮点乘改进了约2倍，而整数加也有所改进。最棒的是，我们打破了由延迟界限设下的限制。处理器不再需要延迟一个加法或乘法操作以待前一个操作完成。</p>
-<p><img src="/5-22.png"></p>
+<p><img src="/posts/opp-perf3/5-22.png"></p>
 <p>要理解<code>combine6</code>的性能，我们从图<code>5-22</code>所示的代码和操作序列开始。通过图<code>5-23</code>所示的过程，可以推导出一个模板，给出迭代之间的数据相关。同<code>combine5</code>一样，这个内循环包括两个<code>vmulsd</code>运算，但是这些指令被翻译成读写不同寄存器的<code>mul</code>操作，它们之间没有数据相关<code>(图5-23b)</code>。然后，把这个模板复制<code>n/2</code>次<code>(图5-24)</code>，就是在一个长度为<code>n</code>的向量上执行这个函数的模型。可以看到，现在有两条关键路径，一条对应于计算索引为偶数的元素的乘积<code>(程序值acc0)</code>，另一条对应于计算索引为奇数的元素的乘积<code>(程序值acc1)</code>。每条关键路径只包含<code>n/2</code>个操作，因此导致<code>CPE</code>大约为<code>5.00/2=2.50</code>。相似的分析可以解释我们观察到的对于不同的数据类型和合并运算的组合，延迟为<code>L</code>的操作的<code>CPE</code>等于<code>L/2</code>。实际上，程序正在利用功能单元的流水线能力，将利用率提高到2倍。唯一的例外是整数加。我们已经将<code>CPE</code>降低到1.0以下，但是还是有太多的循环开销，而无法达到理论界限0.50。</p>
-<p><img src="/5-23.png"></p>
-<p><img src="/5-24.png"></p>
+<p><img src="/posts/opp-perf3/5-23.png"></p>
+<p><img src="/posts/opp-perf3/5-24.png"></p>
 <p>我们可以将多个累积变量变换归纳为将循环展开<code>k</code>次，以及并行累积<code>k</code>个值，得到<code>kXk</code>循环展开。图<code>5-25</code>显示了当数值达到<code>k=10</code>时，应用这种变换的效果。可以看到，当<code>k</code>值足够大时，程序在所有情况下几乎都能达到吞吐量界限。整数加在<code>k=7</code>时达到的<code>CPE</code>为0.54，接近由两个加载单元导致的吞吐量界限0.50。整数乘和浮点加在<code>k≥3</code>时达到的<code>CPE</code>为1.01，接近由它们的功能单元设置的吞吐量界限1.00。浮点乘在<code>k≥10</code>时达到的<code>CPE</code>为0.51，接近由两个浮点乘法器和两个加载单元设置的吞吐量界限0.50。值得注意的是，即使乘法是更加复杂的操作，我们的代码在浮点乘上达到的吞吐量几乎是浮点加可以达到的两倍。</p>
-<p><img src="/5-25.png"></p>
+<p><img src="/posts/opp-perf3/5-25.png"></p>
 <p>通常，只有保持能够执行该操作的所有功能单元的流水线都是满的，程序才能达到这个操作的吞吐量界限。对延迟为<code>L</code>，容量为<code>C</code>的操作而言，这就要求循环展开因子<code>k≥C·L</code>。比如，浮点乘有<code>C=2</code>，<code>L=5</code>，循环展开因子就必须为<code>k≥10</code>。浮点加有<code>C=1</code>，<code>L=3</code>，则在<code>k≥3</code>时达到最大吞吐量。</p>
 <p>在执行<code>kXk</code>循环展开变换时，我们必须考虑是否要保留原始函数的功能。在第2章已经看到，补码运算是可交换和可结合的，甚至是当溢出时也是如此。因此，对于整数数据类型，在所有可能的情况下，<code>combine6</code>计算出的结果都和<code>combine5</code>计算出的相同。因此，优化编译器潜在地能够将<code>combine4</code>中所示的代码首先转换成<code>combine5</code>的二路循环展开的版本，然后再通过引入并行性，将之转换成<code>combine6</code>的版本。有些编译器可以做这种或与之类似的变换来提高整数数据的性能。</p>
 <p>另一方面，浮点乘法和加法不是可结合的。因此，由于四舍五入或溢出，<code>combine5</code>和<code>combine6</code>可能产生不同的结果。例如，假想这样一种情况，所有索引值为偶数的元素都是绝对值非常大的数，而索引值为奇数的元素都非常接近于0.0。那么，即使最终的乘积P<sub>n</sub>不会溢出，乘积PE<sub>n</sub>也可能上溢，或者PO<sub>n</sub>也可能下溢。不过在大多数现实的程序中，不大可能出现这样的情况。因为大多数物理现象是连续的，所以数值数据也趋向于相当平滑，不会出什么问题。即使有不连续的时候，它们通常也不会导致前面描述的条件那样的周期性模式。按照严格顺序对元素求积的准确性不太可能从根本上比<code>分成两组独立求积，然后再将这两个积相乘</code>更好。对大多数应用程序来说，使性能翻倍要比冒对奇怪的数据模式产生不同的结果的风险更重要。但是，程序开发人员应该与潜在的用户协商，看看是否有特殊的条件，可能会导致修改后的算法不能接受。大多数编译器并不会尝试对浮点数代码进行这种变换，因为它们没有办法判断引入这种会改变程序行为的转换所带来的风险，不论这种改变是多么小。</p>
 <h2 id="重新结合变换"><a href="#重新结合变换" class="headerlink" title="重新结合变换"></a>重新结合变换</h2><p>现在来探讨另一种打破顺序相关从而使性能提高到延迟界限之外的方法。我们看到过做<code>kX1</code>循环展开的<code>combine5</code>没有改变合并向量元素形成和或者乘积中执行的操作。不过，对代码做很小的改动，我们可以从根本上改变合并执行的方式，也极大地提高程序的性能。</p>
-<p><img src="/5-26.png"></p>
+<p><img src="/posts/opp-perf3/5-26.png"></p>
 <p>图<code>5-26</code>给出了一个函数<code>combine7</code>，它与<code>combine5</code>的展开代码<code>(图5-16)</code>的唯一区别在于内循环中元素合并的方式。在<code>combine5</code>中，合并是以下面这条语句来实现的：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">acc = (acc OP data[i]) OP data[i+<span class="number">1</span>];</span><br></pre></td></tr></table></figure>
 
@@ -336,18 +336,18 @@
 
 <p>差别仅在于两个括号是如何放置的。我们称之为重新结合变换<code>(reassociation transformation)</code>，因为括号改变了向量元素与累积值<code>acc</code>的合并顺序，产生了我们称为<code>2X1a</code>的<br>循环展开形式。</p>
 <p>对于未经训练的人来说，这两个语句可能看上去本质上是一样的，但是当我们测量<code>CPE</code>的时候，得到令人吃惊的结果：</p>
-<p><img src="/table2.png"></p>
+<p><img src="/posts/opp-perf3/table2.png"></p>
 <p>整数加的性能几乎与使用<code>kX1</code>展开的版本<code>(combine5)</code>的性能相同，而其他三种情况则与使用并行累积变量的版本<code>(combine6)</code>相同，是<code>kX1</code>扩展的性能的两倍。这些情况已经突破了延迟界限造成的限制。</p>
-<p><img src="/5-27.png"></p>
+<p><img src="/posts/opp-perf3/5-27.png"></p>
 <p>图<code>5-27</code>说明了<code>combine7</code>内循环的代码<code>(对于合并操作为乘法，数据类型为double的情况)</code>是如何被译码成操作，以及由此得到的数据相关。我们看到，来自于<code>vmovsd</code>和第一个<code>vmulsd</code>指令的<code>load</code>操作从内存中加载向量元素<code>i</code>和<code>i+1</code>，第一个<code>mul</code>操作把它们乘起来。然后，第二个<code>mul</code>操作把这个结果乘以累积值<code>acc</code>。图<code>5-28a</code>给出了我们如何对图<code>5-27</code>的操作进行重新排列、优化和抽象，得到表示一次迭代中数据相关的模板<code>(图5-28b)</code>。对于<code>combine5</code>和<code>combine7</code>的模板，有两个<code>load</code>和两个<code>mul</code>操作，但是只有一个<code>mul</code>操作形成了循环寄存器间的数据相关链。然后，把这个模板复制<code>n/2</code>次，给出了<code>n</code>个向量元素相乘所执行的计算<code>(图5-29)</code>，我们可以看到关键路径上只有<code>n/2</code>个操作。每次迭代内的第一个乘法都不需要等待前一次迭代的累积值就可以执行。因此，最小可能的<code>CPE</code>减少了2倍。</p>
-<p><img src="/5-28.png"></p>
-<p><img src="/5-29.png"></p>
+<p><img src="/posts/opp-perf3/5-28.png"></p>
+<p><img src="/posts/opp-perf3/5-29.png"></p>
 <p>图<code>5-30</code>展示了当数值达到<code>k=10</code>时，实现<code>kX1a</code>循环展开并重新结合变换的效果。可以看到，这种变换带来的性能结果与<code>kXk</code>循环展开中保持<code>k</code>个累积变量的结果相似。对所有的情况来说，我们都接近了由功能单元造成的吞吐量界限。</p>
-<p><img src="/5-30.png"></p>
+<p><img src="/posts/opp-perf3/5-30.png"></p>
 <p>在执行重新结合变换时，我们又一次改变向量元素合并的顺序。对于整数加法和乘法，这些运算是可结合的，这表示这种重新变换顺序对结果没有影响。对于浮点数情况，必须再次评估这种重新结合是否有可能严重影响结果。我们会说对大多数应用来说，这种差别不重要。</p>
 <p>总的来说，重新结合变换能够减少计算中关键路径上操作的数量，通过更好地利用功能单元的流水线能力得到更好的性能。大多数编详器不会尝试对浮点运算做重新结合，因为这些运算不保证是可结合的。当前的<code>GCC</code>版本会对整数运算执行重新结合，但不是总有好的效果。通常，我们发现循环展开和并行地累积在多个值中，是提高程序性能的更可靠的方法。</p>
 <h1 id="优化合并代码的结果小结"><a href="#优化合并代码的结果小结" class="headerlink" title="优化合并代码的结果小结"></a>优化合并代码的结果小结</h1><p>我们极大化对向量元素加或者乘的函数性能的努力获得了成功。下表总结了对于标量代码所获得的结果，没有使用<code>AVX</code>向量指令提供的向量并行性：</p>
-<p><img src="/table3.png"></p>
+<p><img src="/posts/opp-perf3/table3.png"></p>
 <p>使用多项优化技术，我们获得的<code>CPE</code>已经接近于0.50和1.00的吞吐量界限，只受限于功能单元的容量。与原始代码相比提升了<code>10~20</code>倍，且使用普通的C代码和标准编译器就获得了所有这些改进。重写代码利用较新的<code>SIMD</code>指令得到了将近4倍或8倍的性能提升。比如单精度乘法，<code>CPE</code>从初值11.14降到了0.06，整体性能提升超过180倍。这个例子说明现代处理器具有相当的计算能力，但是我们可能需要按非常程式化的方式来编写程序以便将这些能力诱发出来。</p>
 <h1 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h1><ul>
 <li><a target="_blank" rel="noopener" href="https://csapp.cs.cmu.edu/"><code>Computer Systems: A Programmer&#39;s Perspective, 3/E</code></a></li>
