@@ -27,11 +27,37 @@
 <meta property="og:site_name" content="Lu0k">
 <meta property="og:description" content="内容简介存储器系统(memory system)是一个具有不同容量、成本和访问时间的存储设备的层次结构。CPU寄存器保存着最常用的数据。靠近CPU的小的、快速的高速缓存存储器(cache memory)作为一部分存储在相对慢速的主存储器(main memory)中数据和指令的缓冲区域。主存缓存存储在容量较大的、慢速磁盘上的数据，而这些磁盘常常又作为存储在通过网络连接的其他机器的磁盘或磁带上的数据的">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://lu0k.github.io/posts/mem-hier2/6-21.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/mem-hier2/6-22.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/mem-hier2/6-23.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/mem-hier2/6-24.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/mem-hier2/6-25.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/mem-hier2/6-26.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/mem-hier2/6-27.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/mem-hier2/6-28.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/mem-hier2/6-29.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/mem-hier2/6-30.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/mem-hier2/t1.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/mem-hier2/t2.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/mem-hier2/t3.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/mem-hier2/t4.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/mem-hier2/t5.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/mem-hier2/t6.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/mem-hier2/t7.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/mem-hier2/6-32.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/mem-hier2/6-33.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/mem-hier2/6-34.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/mem-hier2/6-35.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/mem-hier2/6-36.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/mem-hier2/6-37.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/mem-hier2/6-38.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/mem-hier2/6-39.png">
 <meta property="article:published_time" content="2022-02-05T16:00:00.000Z">
-<meta property="article:modified_time" content="2022-02-06T12:13:53.164Z">
+<meta property="article:modified_time" content="2022-03-14T12:53:29.137Z">
 <meta property="article:author" content="Lu0k">
 <meta property="article:tag" content="CSAPP">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://lu0k.github.io/posts/mem-hier2/6-21.png">
 
 
 <link rel="canonical" href="https://lu0k.github.io/posts/mem-hier2/">
@@ -148,7 +174,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%86%85%E5%AE%B9%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">内容简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Reference"><span class="nav-number">2.</span> <span class="nav-text">Reference</span></a></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%86%85%E5%AE%B9%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">内容简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AD%98%E5%82%A8%E5%99%A8%E5%B1%82%E6%AC%A1%E7%BB%93%E6%9E%84"><span class="nav-number">2.</span> <span class="nav-text">存储器层次结构</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%98%E5%82%A8%E5%99%A8%E5%B1%82%E6%AC%A1%E7%BB%93%E6%9E%84%E4%B8%AD%E7%9A%84%E7%BC%93%E5%AD%98"><span class="nav-number">2.1.</span> <span class="nav-text">存储器层次结构中的缓存</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%93%E5%AD%98%E5%91%BD%E4%B8%AD"><span class="nav-number">2.1.1.</span> <span class="nav-text">缓存命中</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%93%E5%AD%98%E4%B8%8D%E5%91%BD%E4%B8%AD"><span class="nav-number">2.1.2.</span> <span class="nav-text">缓存不命中</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%93%E5%AD%98%E4%B8%8D%E5%91%BD%E4%B8%AD%E7%9A%84%E7%A7%8D%E7%B1%BB"><span class="nav-number">2.1.3.</span> <span class="nav-text">缓存不命中的种类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%93%E5%AD%98%E7%AE%A1%E7%90%86"><span class="nav-number">2.1.4.</span> <span class="nav-text">缓存管理</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%98%E5%82%A8%E5%99%A8%E5%B1%82%E6%AC%A1%E7%BB%93%E6%9E%84%E6%A6%82%E5%BF%B5%E5%B0%8F%E7%BB%93"><span class="nav-number">2.2.</span> <span class="nav-text">存储器层次结构概念小结</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%AB%98%E9%80%9F%E7%BC%93%E5%AD%98%E5%AD%98%E5%82%A8%E5%99%A8"><span class="nav-number">3.</span> <span class="nav-text">高速缓存存储器</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%80%9A%E7%94%A8%E7%9A%84%E9%AB%98%E9%80%9F%E7%BC%93%E5%AD%98%E5%AD%98%E5%82%A8%E5%99%A8%E7%BB%84%E7%BB%87%E7%BB%93%E6%9E%84"><span class="nav-number">3.1.</span> <span class="nav-text">通用的高速缓存存储器组织结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9B%B4%E6%8E%A5%E6%98%A0%E5%B0%84%E9%AB%98%E9%80%9F%E7%BC%93%E5%AD%98"><span class="nav-number">3.2.</span> <span class="nav-text">直接映射高速缓存</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%9B%B4%E6%8E%A5%E6%98%A0%E5%B0%84%E9%AB%98%E9%80%9F%E7%BC%93%E5%AD%98%E4%B8%AD%E7%9A%84%E7%BB%84%E9%80%89%E6%8B%A9"><span class="nav-number">3.2.1.</span> <span class="nav-text">直接映射高速缓存中的组选择</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%9B%B4%E6%8E%A5%E6%98%A0%E5%B0%84%E9%AB%98%E9%80%9F%E7%BC%93%E5%AD%98%E4%B8%AD%E7%9A%84%E8%A1%8C%E5%8C%B9%E9%85%8D"><span class="nav-number">3.2.2.</span> <span class="nav-text">直接映射高速缓存中的行匹配</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%9B%B4%E6%8E%A5%E6%98%A0%E5%B0%84%E9%AB%98%E9%80%9F%E7%BC%93%E5%AD%98%E4%B8%AD%E7%9A%84%E5%AD%97%E9%80%89%E6%8B%A9"><span class="nav-number">3.2.3.</span> <span class="nav-text">直接映射高速缓存中的字选择</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%9B%B4%E6%8E%A5%E6%98%A0%E5%B0%84%E9%AB%98%E9%80%9F%E7%BC%93%E5%AD%98%E4%B8%AD%E4%B8%8D%E5%91%BD%E4%B8%AD%E6%97%B6%E7%9A%84%E8%A1%8C%E6%9B%BF%E6%8D%A2"><span class="nav-number">3.2.4.</span> <span class="nav-text">直接映射高速缓存中不命中时的行替换</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%BC%E5%90%88%EF%BC%9A%E8%BF%90%E8%A1%8C%E4%B8%AD%E7%9A%84%E7%9B%B4%E6%8E%A5%E6%98%A0%E5%B0%84%E9%AB%98%E9%80%9F%E7%BC%93%E5%AD%98"><span class="nav-number">3.2.5.</span> <span class="nav-text">综合：运行中的直接映射高速缓存</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%9B%B4%E6%8E%A5%E6%98%A0%E5%B0%84%E9%AB%98%E9%80%9F%E7%BC%93%E5%AD%98%E4%B8%AD%E7%9A%84%E5%86%B2%E7%AA%81%E4%B8%8D%E5%91%BD%E4%B8%AD"><span class="nav-number">3.2.6.</span> <span class="nav-text">直接映射高速缓存中的冲突不命中</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%84%E7%9B%B8%E8%81%94%E9%AB%98%E9%80%9F%E7%BC%93%E5%AD%98"><span class="nav-number">3.3.</span> <span class="nav-text">组相联高速缓存</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%84%E7%9B%B8%E8%81%94%E9%AB%98%E9%80%9F%E7%BC%93%E5%AD%98%E4%B8%AD%E7%9A%84%E7%BB%84%E9%80%89%E6%8B%A9"><span class="nav-number">3.3.1.</span> <span class="nav-text">组相联高速缓存中的组选择</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%84%E7%9B%B8%E8%81%94%E9%AB%98%E9%80%9F%E7%BC%93%E5%AD%98%E4%B8%AD%E7%9A%84%E8%A1%8C%E5%8C%B9%E9%85%8D%E5%92%8C%E5%AD%97%E9%80%89%E6%8B%A9"><span class="nav-number">3.3.2.</span> <span class="nav-text">组相联高速缓存中的行匹配和字选择</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%84%E7%9B%B8%E8%81%94%E9%AB%98%E9%80%9F%E7%BC%93%E5%AD%98%E4%B8%AD%E4%B8%8D%E5%91%BD%E4%B8%AD%E6%97%B6%E7%9A%84%E8%A1%8C%E6%9B%BF%E6%8D%A2"><span class="nav-number">3.3.3.</span> <span class="nav-text">组相联高速缓存中不命中时的行替换</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%A8%E7%9B%B8%E8%81%94%E9%AB%98%E9%80%9F%E7%BC%93%E5%AD%98"><span class="nav-number">3.4.</span> <span class="nav-text">全相联高速缓存</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%A8%E7%9B%B8%E8%81%94%E9%AB%98%E9%80%9F%E7%BC%93%E5%AD%98%E4%B8%AD%E7%9A%84%E7%BB%84%E9%80%89%E6%8B%A9"><span class="nav-number">3.4.1.</span> <span class="nav-text">全相联高速缓存中的组选择</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%A8%E7%9B%B8%E8%81%94%E9%AB%98%E9%80%9F%E7%BC%93%E5%AD%98%E4%B8%AD%E7%9A%84%E8%A1%8C%E5%8C%B9%E9%85%8D%E5%92%8C%E5%AD%97%E9%80%89%E6%8B%A9"><span class="nav-number">3.4.2.</span> <span class="nav-text">全相联高速缓存中的行匹配和字选择</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%89%E5%85%B3%E5%86%99%E7%9A%84%E9%97%AE%E9%A2%98"><span class="nav-number">3.5.</span> <span class="nav-text">有关写的问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E4%B8%AA%E7%9C%9F%E5%AE%9E%E7%9A%84%E9%AB%98%E9%80%9F%E7%BC%93%E5%AD%98%E5%B1%82%E6%AC%A1%E7%BB%93%E6%9E%84%E7%9A%84%E8%A7%A3%E5%89%96"><span class="nav-number">3.6.</span> <span class="nav-text">一个真实的高速缓存层次结构的解剖</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%AB%98%E9%80%9F%E7%BC%93%E5%AD%98%E5%8F%82%E6%95%B0%E7%9A%84%E6%80%A7%E8%83%BD%E5%BD%B1%E5%93%8D"><span class="nav-number">3.7.</span> <span class="nav-text">高速缓存参数的性能影响</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%AB%98%E9%80%9F%E7%BC%93%E5%AD%98%E5%A4%A7%E5%B0%8F%E7%9A%84%E5%BD%B1%E5%93%8D"><span class="nav-number">3.7.1.</span> <span class="nav-text">高速缓存大小的影响</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9D%97%E5%A4%A7%E5%B0%8F%E7%9A%84%E5%BD%B1%E5%93%8D"><span class="nav-number">3.7.2.</span> <span class="nav-text">块大小的影响</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%9B%B8%E8%81%94%E5%BA%A6%E7%9A%84%E5%BD%B1%E5%93%8D"><span class="nav-number">3.7.3.</span> <span class="nav-text">相联度的影响</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%86%99%E7%AD%96%E7%95%A5%E7%9A%84%E5%BD%B1%E5%93%8D"><span class="nav-number">3.7.4.</span> <span class="nav-text">写策略的影响</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Reference"><span class="nav-number">4.</span> <span class="nav-text">Reference</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -272,6 +298,155 @@
         <h1 id="内容简介"><a href="#内容简介" class="headerlink" title="内容简介"></a>内容简介</h1><p>存储器系统<code>(memory system)</code>是一个具有不同容量、成本和访问时间的存储设备的层次结构。CPU寄存器保存着最常用的数据。靠近CPU的小的、快速的高速缓存存储器<code>(cache memory)</code>作为一部分存储在相对慢速的主存储器<code>(main memory)</code>中数据和指令的缓冲区域。主存缓存存储在容量较大的、慢速磁盘上的数据，而这些磁盘常常又作为存储在通过网络连接的其他机器的磁盘或磁带上的数据的缓冲区域。</p>
 <span id="more"></span>
 
+<h1 id="存储器层次结构"><a href="#存储器层次结构" class="headerlink" title="存储器层次结构"></a>存储器层次结构</h1><p><code>6.1</code>节和<code>6.2</code>节描述了存储技术和计算机软件的一些基本的和持久的属性：</p>
+<ul>
+<li><p>存储技术：不同存储技术的访问时间差异很大。速度较快的技术每字节的成本要比速度较慢的技术高，而且容量较小。<code>CPU</code>和主存之间的速度差距在增大</p>
+</li>
+<li><p>计算机软件：一个编写良好的程序倾向于展示出良好的局部性</p>
+</li>
+</ul>
+<p>计算中一个喜人的巧合是，硬件和软件的这些基本属性互相补充得很完美。它们这种相互补充的性质使人想到一种组织存储器系统的方法，称为存储器层次结构<code>(memory hierarchy)</code>，所有的现代计算机系统中都使用了这种方法。图<code>6-21</code>展示了一个典型的存储器层次结构。一般而言，从高层往底层走，存储设备变得更慢、更便宜和更大。在最高层<code>(L0)</code>，是少量快速的<code>CPU</code>寄存器，<code>CPU</code>可以在一个时钟周期内访问它们。接下来是一个或多个小型到中型的基于<code>SRAM</code>的高速缓存存储器，可以在几个<code>CPU</code>时钟周期内访问它们。然后是一个大的基于<code>DRAM</code>的主存，可以在几十到几百个时钟周期内访问它们。接下来是慢速但是容量很大的本地磁盘。最后，有些系统甚至包括了一层附加的远程服务器上的磁盘，要通过网络来访问它们。例如，像安德鲁文件系统<code>(Andrew File System,  AFS)</code>或者网络文件系统<code>(Network File System, NFS)</code>这样的分布式文件系统，允许程序访问存储在远程的网络服务器上的文件。类似地，万维网允许程序访问存储在世界上任何地方的<code>Web</code>服务器上的远程文件。</p>
+<p><img src="/posts/mem-hier2/6-21.png"></p>
+<h2 id="存储器层次结构中的缓存"><a href="#存储器层次结构中的缓存" class="headerlink" title="存储器层次结构中的缓存"></a>存储器层次结构中的缓存</h2><p>一般而言，高速缓存<code>(cache, 读作&quot;cash&quot;)</code>是一个小而快速的存储设备，它作为存储在更大、也更慢的设备中的数据对象的缓冲区域。使用高速缓存的过程称为缓存<code>(caching, 读作&quot;cashing&quot;)</code>。</p>
+<p>存储器层次结构的中心思想是，对于每个<code>k</code>，位于<code>k</code>层的更快更小的存储设备作为位于<code>k+1</code>层的更大更慢的存储设备的缓存。换句话说，层次结构中的每一层都缓存来自较低一层的数据对象。例如，本地磁盘作为通过网络从远程磁盘取出的文件<code>(例如Web页面)</code>的缓存，主存作为本地磁盘上数据的缓存，依此类推，直到最小的缓存——<code>CPU</code>寄存器组。</p>
+<p>图<code>6-22</code>展示了存储器层次结构中缓存的一般性概念。第<code>k+1</code>层的存储器被划分成连续的数据对象组块<code>(chunk)</code>，称为块<code>(block)</code>。每个块都有一个唯一的地址或名字，使之区别于其他的块。块可以是固定大小的<code>(通常是这样的)</code>，也可以是可变大小的<code>(例如存储在Web服务器上的远程HTML文件)</code>。例如，图<code>6-22</code>中第<code>k+1</code>层存储器被划分成16个大小固定的块，编号为<code>0~15</code>。</p>
+<p><img src="/posts/mem-hier2/6-22.png"></p>
+<p>类似地，第<code>k</code>层的存储器被划分成较少的块的集合，每个块的大小与<code>k+1</code>层的块的大小一样。在任何时刻，第<code>k</code>层的缓存包含第<code>k+1</code>层块的一个子集的副本。例如，在图<code>6-22</code>中，第<code>k</code>层的缓存有4个块的空间，当前包含块4、9、14、和3的副本。</p>
+<p>数据总是以块大小为传送单元<code>(transfer unit)</code>在第<code>k</code>层和第<code>k+1</code>层之间来回复制的。虽然在层次结构中任何一对相邻的层次之间块大小是固定的，但是其他的层次对之间可以有不同的块大小。例如，在图<code>6-21</code>中，<code>L1</code>和<code>L0</code>之间的传送通常使用的是1个字大小的块。<code>L2</code>和<code>L1</code>之间<code>(以及L3和L2之间、L4和L3之间)</code>的传送通常使用的是几十个字节的块。而<code>L5</code>和<code>L4</code>之间的传送用的是大小为几百或几千字节的块。一般而言，层次结构中较低层<code>(离CPU较远)</code>的设备的访问时间较长，因此为了补偿这些较长的访问时间，倾向于使用较大的块。</p>
+<h3 id="缓存命中"><a href="#缓存命中" class="headerlink" title="缓存命中"></a>缓存命中</h3><p>当程序需要第<code>k+1</code>层的某个数据对象<code>d</code>时，它首先在当前存储在第<code>k</code>层的一个块中查找<code>d</code>。如果<code>d</code>刚好缓存在第<code>k</code>层中，那么就是我们所说的缓存命中<code>(cache hit)</code>。该程序直接从第<code>k</code>层读取<code>d</code>，根据存储器层次结构的性质，这要比从第<code>k+1</code>层读取<code>d</code>更快。例如，一个有良好时间局部性的程序可以从块14中读出一个数据对象，得到一个对第<code>k</code>层的缓存命中。</p>
+<h3 id="缓存不命中"><a href="#缓存不命中" class="headerlink" title="缓存不命中"></a>缓存不命中</h3><p>另一方面，如果第<code>k</code>层中没有缓存数据对象<code>d</code>，那么就是我们所说的缓存不命中<code>(cache miss)</code>。当发生缓存不命中时，第<code>k</code>层的缓存从第<code>k+1</code>层缓存中取出包含<code>d</code>的那个块，如果第<code>k</code>层的缓存已经满了，可能就会覆盖现存的一个块。</p>
+<p>覆盖一个现存的块的过程称为替换<code>(replacing)</code>或驱逐<code>(evicting)</code>这个块。被驱逐的这个块有时也称为牺牲块<code>(victim block)</code>。决定该替换哪个块是由缓存的替换策略<code>(replacement policy)</code>来控制的。例如，一个具有随机替换策略的缓存会随机选择一个牺牲块。一个具有最近最少被使用<code>(LRU)</code>替换策略的缓存会选择那个最后被访问的时间距现在最远的块。</p>
+<p>在第<code>k</code>层缓存从第<code>k+1</code>层取出那个块之后，程序就能像前面一样从第<code>k</code>层读出<code>d</code>了。例如，在图<code>6-22</code>中，在第<code>k</code>层中读块12中的一个数据对象，会导致一个缓存不命中，因为块12当前不在第<code>k</code>层缓存中。一旦把块12从第<code>k+1</code>层复制到第<code>k</code>层之后，它就会保持在那里，等待稍后的访问。</p>
+<h3 id="缓存不命中的种类"><a href="#缓存不命中的种类" class="headerlink" title="缓存不命中的种类"></a>缓存不命中的种类</h3><p>区分不同种类的缓存不命中有时候是很有帮助的。如果第<code>k</code>层的缓存是空的，那么对任何数据对象的访问都会不命中。一个空的缓存有时被称为冷缓存<code>(cold cache)</code>，此类不命中称为强制性不命中<code>(compulsory miss)</code>或冷不命中<code>(cold miss)</code>。冷不命中很重要，因为它们通常是短暂的事件，不会在反复访问存储器使得缓存暖身<code>(warmed up)</code>之后的稳定状态中出现。</p>
+<p>只要发生了不命中，第<code>k</code>层的缓存就必须执行某个放置策略<code>(placement policy)</code>，确定把它从第<code>k+1</code>层中取出的块放在哪里。最灵活的替换策略是允许来自第<code>k+1</code>层的任何块放在第<code>k</code>层的任何块中。对于存储器层次结构中高层的缓存<code>(靠近CPU)</code>，它们是用硬件来实现的，而且速度是最优的，这个策略实现起来通常很昂贵，因为随机地放置块，定位起来代价很高。</p>
+<p>因此，硬件缓存通常使用的是更严格的放置策略，这个策略将第<code>k+1</code>层的某个块限制放置在第<code>k</code>层块的一个小的子集中<code>(有时只是一个块)</code>。例如，在图<code>6-22</code>中，我们可以确定第<code>k+1</code>层的块<code>i</code>必须放置在第<code>k</code>层的块<code>(i mod4)</code>中。例如，第<code>k+1</code>层的块0、4、8和12会映射到第<code>k</code>层的块0；块1、5、9和13会映射到块1；依此类推。注意，图<code>6-22</code>中的示例缓存使用的就是这个策略。</p>
+<p>这种限制性的放置策略会引起一种不命中，称为冲突不命中<code>(conflict miss)</code>，在这种情况中，缓存足够大，能够保存被引用的数据对象，但是因为这些对象会映射到同一个缓存块，缓存会一直不命中。例如，在图<code>6-22</code>中，如果程序请求块0，然后块8，然后块0，然后块8，依此类推，在第<code>k</code>层的缓存中，对这两个块的每次引用都会不命中，即使这个缓存总共可以容纳4个块。</p>
+<p>程序通常是按照一系列阶段<code>(如循环)</code>来运行的，每个阶段访问缓存块的某个相对稳定不变的集合。例如，一个嵌套的循环可能会反复地访问同一个数组的元素。这个块的集合称为这个阶段的工作集<code>(working set)</code>。当工作集的大小超过缓存的大小时，缓存会经历容量不命中<code>(capacity miss)</code>。换句话说就是，缓存太小了，不能处理这个工作集。</p>
+<h3 id="缓存管理"><a href="#缓存管理" class="headerlink" title="缓存管理"></a>缓存管理</h3><p>正如我们提到过的，存储器层次结构的本质是，每一层存储设备都是较低一层的缓存。在每一层上，某种形式的逻辑必须管理缓存。这里，我们的意思是指某个东西要将缓存划分成块，在不同的层之间传送块，判定是命中还是不命中，并处理它们。管理缓存的逻辑可以是硬件、软件，或是两者的结合。</p>
+<p>例如，编译器管理寄存器文件，缓存层次结构的最高层。它决定当发生不命中时何时发射加载，以及确定哪个寄存器来存放数据。<code>L1</code>、<code>L2</code>和<code>L3</code>层的缓存完全是由内置在缓存中的硬件逻辑来管理的。在一个有虚拟内存的系统中，<code>DRAM</code>主存作为存储在磁盘上的数据块的缓存，是由操作系统软件和<code>CPU</code>上的地址翻译硬件共同管理的。对于一个具有像<code>AFS</code>这样的分布式文件系统的机器来说，本地磁盘作为缓存，它是由运行在本地机器上的<code>AFS</code>客户端进程管理的。在大多数时候，缓存都是自动运行的，不需要程序采取特殊的或显式的行动。</p>
+<h2 id="存储器层次结构概念小结"><a href="#存储器层次结构概念小结" class="headerlink" title="存储器层次结构概念小结"></a>存储器层次结构概念小结</h2><p>概括来说，基于缓存的存储器层次结构行之有效，是因为较慢的存储设备比较快的存储设备更便宜，还因为程序倾向于展示局部性：</p>
+<ul>
+<li><p>利用时间局部性：由于时间局部性，同一数据对象可能会被多次使用。一旦一个数据对象在第一次不命中时被复制到缓存中，我们就会期望后面对该目标有一系列的访问命中。因为缓存比低一层的存储设备更快，对后面的命中的服务会比最开始的不命中快很多</p>
+</li>
+<li><p>利用空间局部性：块通常包含有多个数据对象。由于空间局部性，我们会期望后面对该块中其他对象的访问能够补偿不命中后复制该块的花费</p>
+</li>
+</ul>
+<p>现代系统中到处都使用了缓存。正如从图<code>6-23</code>中能够看到的那样，<code>CPU</code>芯片、操作系统、分布式文件系统中和万维网上都使用了缓存。各种各样硬件和软件的组合构成和管理着缓存。注意，图<code>6-23</code>中有大量我们还未涉及的术语和缩写。在此我们包括这些术语和缩写是为了说明缓存是多么的普遍。</p>
+<p><img src="/posts/mem-hier2/6-23.png"></p>
+<h1 id="高速缓存存储器"><a href="#高速缓存存储器" class="headerlink" title="高速缓存存储器"></a>高速缓存存储器</h1><p>早期计算机系统的存储器层次结构只有三层：<code>CPU</code>寄存器、<code>DRAM</code>主存储器和磁盘存储。不过，由于<code>CPU</code>和主存之间逐渐增大的差距，系统设计者被迫在<code>CPU</code>寄存器文件和主存之间插入了一个小的<code>SRAM</code>高速缓存存储器，称为<code>L1</code>高速缓存<code>(一级缓存)</code>，如图<code>6-24</code>所示。<code>L1</code>高速缓存的访问速度几乎和寄存器一样快，典型地是大约4个时钟周期。</p>
+<p><img src="/posts/mem-hier2/6-24.png"></p>
+<p>随着<code>CPU</code>和主存之间的性能差距不断增大，系统设计者在<code>L1</code>高速缓存和主存之间又插入了一个更大的高速缓存，称为<code>L2</code>高速缓存，可以在大约10个时钟周期内访问到它。有些现代系统还包括有一个更大的高速缓存，称为<code>L3</code>高速缓存，在存储器层次结构中，它位于<code>L2</code>高速缓存和主存之间，可以在大约50个周期内访问到它。虽然安排上有相当多的变化，但是通用原则是一样的。对于下一节中的讨论，我们会假设一个简单的存储器层次结构，<code>CPU</code>和主存之间只有一个<code>L1</code>高速缓存。</p>
+<h2 id="通用的高速缓存存储器组织结构"><a href="#通用的高速缓存存储器组织结构" class="headerlink" title="通用的高速缓存存储器组织结构"></a>通用的高速缓存存储器组织结构</h2><p>考虑一个计算机系统，其中每个存储器地址有<code>m</code>位，形成M&#x3D;2<sup>m</sup>个不同的地址。如图<code>6-25a</code>所示，这样一个机器的高速缓存被组织成一个有S&#x3D;2<sup>s</sup>个高速缓存组<code>(cache set)</code>的数组。每个组包含<code>E</code>个高速缓存行<code>(cache line)</code>。每个行是由一个B&#x3D;2<sup>b</sup>字节的数据块<code>(block)</code>组成的，一个有效位<code>(valid bit)</code>指明这个行是否包含有意义的信息，还有<code>t=m-(b+s)</code>个标记位<code>(tag bit)(是当前块的内存地址的位的一个子集)</code>，它们唯一地标识存储在这个高速缓存行中的块。</p>
+<p><img src="/posts/mem-hier2/6-25.png"></p>
+<p>一般而言，高速缓存的结构可以用元组<code>(S,E,B,m)</code>来描述。高速缓存的大小<code>(或容量)C</code>指的是所有块的大小的和。标记位和有效位不包括在内。因此，<code>C=SXEXB</code>。</p>
+<p>当一条加载指令指示<code>CPU</code>从主存地址<code>A</code>中读一个字时，它将地址<code>A</code>发送到高速缓存。如果高速缓存正保存着地址<code>A</code>处那个字的副本，它就立即将那个字发回给<code>CPU</code>。那么高速缓存如何知道它是否包含地址<code>A</code>处那个字的副本的呢？高速缓存的结构使得它能通过简单地检查地址位，找到所请求的字，类似于使用极其简单的哈希函数的哈希表。下面介绍它是如何工作的：</p>
+<p>参数<code>S</code>和<code>B</code>将<code>m</code>个地址位分为了三个字段，如图<code>6-25b</code>所示。<code>A</code>中<code>s</code>个组索引位是一个到<code>S</code>个组的数组的索引。第一个组是组0，第二个组是组1，依此类推。组索引位被解释为一个无符号整数，它告诉我们这个字必须存储在哪个组中。一旦我们知道了这个字必须放在哪个组中，<code>A</code>中的<code>t</code>个标记位就告诉我们这个组中的哪一行包含这个字<code>(如果有的话)</code>。当且仅当设置了有效位并且该行的标记位与地址<code>A</code>中的标记位相匹配时，组中的这一行才包含这个字。一旦我们在由组索引标识的组中定位了由标号所标识的行，那么<code>b</code>个块偏移位给出了在<code>B</code>个字节的数据块中的字偏移。</p>
+<p>你可能已经注意到了，对高速缓存的描述使用了很多符号。图<code>6-26</code>对这些符号做了个小结，供你参考。</p>
+<p><img src="/posts/mem-hier2/6-26.png"></p>
+<h2 id="直接映射高速缓存"><a href="#直接映射高速缓存" class="headerlink" title="直接映射高速缓存"></a>直接映射高速缓存</h2><p>根据每个组的高速缓存行数<code>E</code>，高速缓存被分为不同的类。每个组只有一行<code>(E=1)</code>的高速缓存称为直接映射高速缓存<code>(direct-mapped cache)(见图6-27)</code>。直接映射高速缓存是最容易实现和理解的，所以我们会以它为例来说明一些高速缓存工作方式的通用概念。</p>
+<p><img src="/posts/mem-hier2/6-27.png"></p>
+<p>假设我们有这样一个系统，它有一个<code>CPU</code>、一个寄存器文件、一个<code>L1</code>高速缓存和一个主存。当<code>CPU</code>执行一条读内存字<code>ω</code>的指令，它向<code>L1</code>高速缓存请求这个字。如果<code>L1</code>高速缓存有<code>ω</code>的一个缓存的副本，那么就得到<code>L1</code>高速缓存命中，高速缓存会很快抽取出<code>ω</code>，并将它返回给<code>CPU</code>。否则就是缓存不命中，当<code>L1</code>高速缓存向主存请求包含<code>ω</code>的块的一个副本时，<code>CPU</code>必须等待。当被请求的块最终从内存到达时，<code>L1</code>高速缓存将这个块存放在它的一个高速缓存行里，从被存储的块中抽取出字<code>ω</code>，然后将它返回给<code>CPU</code>。高速缓存确定一个请求是否命中，然后抽取出被请求的字的过程，分为三步：</p>
+<ul>
+<li><p>组选择</p>
+</li>
+<li><p>行匹配</p>
+</li>
+<li><p>字抽取</p>
+</li>
+</ul>
+<h3 id="直接映射高速缓存中的组选择"><a href="#直接映射高速缓存中的组选择" class="headerlink" title="直接映射高速缓存中的组选择"></a>直接映射高速缓存中的组选择</h3><p>在这一步中，高速缓存从<code>ω</code>的地址中间抽取出<code>s</code>个组索引位。这些位被解释成一个对应于一个组号的无符号整数。换句话来说，如果我们把高速缓存看成是一个关于组的一维数组，那么这些组索引位就是一个到这个数组的索引。图<code>6-28</code>展示了直接映射高速缓存的组选择是如何工作的。在这个例子中，组索引位<code>00001</code><sub>2</sub>被解释为一个选择组1的整数索引。</p>
+<p><img src="/posts/mem-hier2/6-28.png"></p>
+<h3 id="直接映射高速缓存中的行匹配"><a href="#直接映射高速缓存中的行匹配" class="headerlink" title="直接映射高速缓存中的行匹配"></a>直接映射高速缓存中的行匹配</h3><p>在上一步中我们已经选择了某个组<code>i</code>，接下来的一步就要确定是否有字<code>ω</code>的一个副本存储在组<code>i</code>包含的一个高速缓存行中。在直接映射高速缓存中这很容易，而且很快，这是因为每个组只有一行。当且仅当设置了有效位，而且高速缓存行中的标记与<code>ω</code>的地址中的标记相匹配时，这一行中包含<code>ω</code>的一个副本。</p>
+<p>图<code>6-29</code>展示了直接映射高速缓存中行匹配是如何工作的。在这个例子中，选中的组中只有一个高速缓存行。这个行的有效位设置了，所以我们知道标记和块中的位是有意义的。因为这个高速缓存行中的标记位与地址中的标记位相匹配，所以我们知道我们想要的那个字的一个副本确实存储在这个行中。换句话说，我们得到一个缓存命中。另一方面，如果有效位没有设置，或者标记不相匹配，那么我们就得到一个缓存不命中。</p>
+<p><img src="/posts/mem-hier2/6-29.png"></p>
+<h3 id="直接映射高速缓存中的字选择"><a href="#直接映射高速缓存中的字选择" class="headerlink" title="直接映射高速缓存中的字选择"></a>直接映射高速缓存中的字选择</h3><p>一旦命中，我们知道<code>ω</code>就在这个块中的某个地方。最后一步确定所需要的字在块中是从哪里开始的。如图<code>6-29</code>所示，块偏移位提供了所需要的字的第一个字节的偏移。就像我们把高速缓存看成一个行的数组一样，我们把块看成一个字节的数组，而字节偏移是到这个数组的一个索引。在这个示例中，块偏移位是<code>100</code><sub>2</sub>，它表明<code>ω</code>的副本是从块中的字书4开始的<code>(我们假设字长为4字节)</code>。</p>
+<h3 id="直接映射高速缓存中不命中时的行替换"><a href="#直接映射高速缓存中不命中时的行替换" class="headerlink" title="直接映射高速缓存中不命中时的行替换"></a>直接映射高速缓存中不命中时的行替换</h3><p>如果缓存不命中，那么它需要从存储器层次结构中的下一层取出被请求的块，然后将新的块存储在组索引位指示的组中的一个高速缓存行中。一般而言，如果组中都是有效高速缓存行了，那么必须要驱逐出一个现存的行。对于直接映射高速缓存来说，每个组只包含有一行，替换策略非常简单：用新取出的行替换当前的行。</p>
+<h3 id="综合：运行中的直接映射高速缓存"><a href="#综合：运行中的直接映射高速缓存" class="headerlink" title="综合：运行中的直接映射高速缓存"></a>综合：运行中的直接映射高速缓存</h3><p>高速缓存用来选择组和标识行的机制极其简单，因为硬件必须在几个纳秒的时间内完成这些工作。不过，用这种方式来处理位是很令人困惑的。一个具体的例子能帮助解释清楚这个过程。假设我们有一个直接映射高速缓存，描述如下：<code>(S,E,B,m)=(4,1,2,4)</code></p>
+<p>换句话说，高速缓存有4个组，每个组一行，每个块2个字节，而地址是4位的。我们还假设每个字都是单字节的。当然，这样一些假设完全是不现实的，但是它们能使示例保持简单。</p>
+<p>当你初学高速缓存时，列举出整个地址空间并划分好位是很有帮助的，就像我们在图<code>6-30</code>对4位的示例所做的那样。关于这个列举出的空间，有一些有趣的事情值得注意：</p>
+<ul>
+<li><p>标记位和索引位连起来唯一地标识了内存中的每个块。例如，块0是由地址0和1组成的，块1是由地址2和3组成的，块2是由地址4和5组成的，依此类推</p>
+</li>
+<li><p>因为有8个内存块，但是只有4个高速缓存组，所以多个块会映射到同一个高速缓存组<code>(即它们有相同的组索引)</code>。例如，块0和4都映射到组0，块1和5都映射到组1，等等</p>
+</li>
+<li><p>映射到同一个高速缓存组的块由标记位唯一地标识。例如，块0的标记位为0，而块4的标记位为1，块1的标记位为0，而块5的标记位为1，以此类推</p>
+</li>
+</ul>
+<p><img src="/posts/mem-hier2/6-30.png"></p>
+<p>让我们来模拟一下当<code>CPU</code>执行一系列读的时候，高速缓存的执行情况。记住对于这个示例，我们假设<code>CPU</code>读1字节的字。虽然这种手工的模拟很乏味，你可能想要跳过它，但是根据我们的经验，在学生们做过几个这样的练习之前，他们是不能真正理解高速缓存是如何工作的。</p>
+<p>初始时，高速缓存是空的<code>(即每个有效位都是0)</code>：</p>
+<p><img src="/posts/mem-hier2/t1.png"></p>
+<p>表中的每一行都代表一个高速缓存行。第一列表明该行所属的组，但是请记住提供这个位只是为了方便，实际上它并不真是高速缓存的一部分。后面四列代表每个高速缓存行的实际的位。现在，让我们来看看当<code>CPU</code>执行一系列读时，都发生了什么：</p>
+<ul>
+<li>读地址0的字。因为组0的有效位是0，是缓存不命中。高速缓存从内存<code>(或低一层的高速缓存)</code>取出块0，并把这个块存储在组0中。然后，高速缓存返回新取出的高速缓存行的块<code>[0]</code>的<code>m[0](内存位置0的内容)</code></li>
+</ul>
+<p><img src="/posts/mem-hier2/t2.png"></p>
+<ul>
+<li>读地址1的字。这次会是高速缓存命中。高速缓存立即从高速缓存行的块<code>[1]</code>中返回<code>m[1]</code>。高速缓存的状态没有变化</li>
+<li>读地址13的字。由于组2中的高速缓存行不是有效的，所以有缓存不命中。高速缓存把块6加载到组2中，然后从新的高速缓存行的块<code>[1]</code>中返回<code>m[13]</code></li>
+</ul>
+<p><img src="/posts/mem-hier2/t3.png"></p>
+<ul>
+<li>读地址8的字。这会发生缓存不命中。组0中的高速缓存行确实是有效的，但是标记不匹配。高速缓存将块4加载到组0中<code>(替换读地址0时读入的那一行)</code>，然后从新的高速缓存行的块<code>[0]</code>中返回<code>m[8]</code></li>
+</ul>
+<p><img src="/posts/mem-hier2/t4.png"></p>
+<ul>
+<li>读地址0的字。又会发生缓存不命中，因为在前面引用地址8时，我们刚好替换了块0。这就是冲突不命中的一个例子，也就是我们有足够的高速缓存空间，但是却交替地引用映射到同一个组的块</li>
+</ul>
+<p><img src="/posts/mem-hier2/t5.png"></p>
+<h3 id="直接映射高速缓存中的冲突不命中"><a href="#直接映射高速缓存中的冲突不命中" class="headerlink" title="直接映射高速缓存中的冲突不命中"></a>直接映射高速缓存中的冲突不命中</h3><p>冲突不命中在真实的程序中很常见，会导致令人困惑的性能问题。当程序访问大小为2的幂的数组时，直接映射高速缓存中通常会发生冲突不命中。例如，考虑一个计算两个向量点积的函数：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">float</span> <span class="title">dotprod</span><span class="params">(<span class="keyword">float</span> x[<span class="number">8</span>], <span class="keyword">float</span> y[<span class="number">8</span>])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">float</span> sum = <span class="number">0.0</span>;</span><br><span class="line">    <span class="keyword">int</span> i;</span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; <span class="number">8</span>; i++)</span><br><span class="line">        sum += x[i] * y[i];</span><br><span class="line">    <span class="keyword">return</span> sum;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>对于<code>x</code>和<code>y</code>来说，这个函数有良好的空间局部性，因此我们期望它的命中率会比较高。不幸的是，并不总是如此。</p>
+<p>假设浮点数是4个字节，<code>x</code>被加载到从地址0开始的32字节连续内存中，而<code>y</code>紧跟在<code>x</code>之后，从地址32开始。为了简便，假设一个块是16个字节<code>(足够容纳4个浮点数)</code>，高速缓存由两个组组成，高速缓存的整个大小为32字节。我们会假设变量<code>sum</code>实际上存放在一个<code>CPU</code>寄存器中，因此不需要内存引用。根据这些假设每个<code>x[i]</code>和<code>y[i]</code>会映射到相同的高速缓存组：</p>
+<p><img src="/posts/mem-hier2/t6.png"></p>
+<p>在运行时，循环的第一次迭代引用<code>x[0]</code>，缓存不命中会导致包含<code>x[0]~x[3]</code>的块被加载到组0。接下来是对<code>y[0]</code>的引用，又一次缓存不命中，导致包含<code>y[0]~y[3]</code>的块被复制到组0，覆盖前一次引用复制进来的<code>x</code>的值。在下一次迭代中，对<code>x[1]</code>的引用不命中，导致<code>x[0]~x[3]</code>的块被加载回组0，覆盖掉<code>y[0]~y[3]</code>的块。因而现在我们就有了一个冲突不命中，而且实际上后面每次对<code>x</code>和<code>y</code>的引用都会导致冲突不命中，因为我们在<code>x</code>和<code>y</code>的块之间抖动<code>(thrash)</code>。术语<code>抖动</code>描述的是这样一种情况，即高速缓存反复地加载和驱逐相同的高速缓存块的组。</p>
+<p>简要来说就是，即使程序有良好的空间局部性，而且我们的高速缓存中也有足够的空间来存放<code>x[i]</code>和<code>y[i]</code>的块，每次引用还是会导致冲突不命中，这是因为这些块被映射到了同一个高速缓存组。这种抖动导致速度下降2或3倍并不稀奇。另外，还要注意虽然我们的示例极其简单，但是对于更大、更现实的直接映射高速缓存来说，这个问题也是很真实的。</p>
+<p>幸运的是，一旦程序员意识到了正在发生什么，就很容易修正抖动问题。一个很简单的方法是在每个数组的结尾放<code>B</code>字节的填充。例如，不是将<code>x</code>定义为<code>float x[8]</code>，而是定义成<code>float x[12]</code>。假设在内存中<code>y</code>紧跟在<code>x</code>后面，我们有下面这样的从数组元素到组的映射：</p>
+<p><img src="/posts/mem-hier2/t7.png"></p>
+<p>在<code>x</code>结尾加了填充，<code>x[i]</code>和<code>y[i]</code>现在就映射到了不同的组，消除了抖动冲突不命中。</p>
+<h2 id="组相联高速缓存"><a href="#组相联高速缓存" class="headerlink" title="组相联高速缓存"></a>组相联高速缓存</h2><p>直接映射高速缓存中冲突不命中造成的问题源于每个组只有一行<code>(或者，按照我们的术语来描述就是E=1)</code>这个限制。组相联高速缓存<code>(set associative cache)</code>放松了这条限制，所以每个组都保存有多于一个的高速缓存行。一个<code>1&lt;E&lt;C/B</code>的高速缓存通常称为<code>E</code>路组相联高速缓存。在下一节中，我们会讨论<code>E=C/B</code>这种特殊情况。图<code>6-32</code>展示了一个2路组相联高速缓存的结构。</p>
+<p><img src="/posts/mem-hier2/6-32.png"></p>
+<h3 id="组相联高速缓存中的组选择"><a href="#组相联高速缓存中的组选择" class="headerlink" title="组相联高速缓存中的组选择"></a>组相联高速缓存中的组选择</h3><p>它的组选择与直接映射高速缓存的组选择一样，组索引位标识组。图<code>6-33</code>总结了这个原理。</p>
+<h3 id="组相联高速缓存中的行匹配和字选择"><a href="#组相联高速缓存中的行匹配和字选择" class="headerlink" title="组相联高速缓存中的行匹配和字选择"></a>组相联高速缓存中的行匹配和字选择</h3><p>组相联高速缓存中的行匹配比直接映射高速缓存中的更复杂，因为它必须检查多个行的标记位和有效位，以确定所请求的字是否在集合中。传统的内存是一个值的数组，以地址作为输入，并返回存储在那个地址的值。另一方面，相联存储器是一个<code>(key,value)</code>对的数组，以<code>key</code>为输入，返回与输入的<code>key</code>相匹配的<code>(key,value)</code>对中的<code>value</code>值。因此，我们可以把组相联高速缓存中的每个组都看成一个小的相联存储器，<code>key</code>是标记和有效位，而<code>value</code>就是块的内容。</p>
+<p><img src="/posts/mem-hier2/6-33.png"></p>
+<p>图<code>6-34</code>展示了相联高速缓存中行匹配的基本思想。这里的一个重要思想就是组中的任何一行都可以包含任何映射到这个组的内存块。所以高速缓存必须搜索组中的每一行，寻找一个有效的行，其标记与地址中的标记相匹配。如果高速缓存找到了这样一行，那么我们就命中，块偏移从这个块中选择一个字，和前面一样。</p>
+<p><img src="/posts/mem-hier2/6-34.png"></p>
+<h3 id="组相联高速缓存中不命中时的行替换"><a href="#组相联高速缓存中不命中时的行替换" class="headerlink" title="组相联高速缓存中不命中时的行替换"></a>组相联高速缓存中不命中时的行替换</h3><p>如果<code>CPU</code>请求的字不在组的任何一行中，那么就是缓存不命中，高速缓存必须从内存中取出包含这个字的块。不过，一旦高速缓存取出了这个块，该替换哪个行呢？当然，如果有一个空行，那它就是个很好的候选。但是如果该组中没有空行，那么我们必须从中选择一个非空的行，希望<code>CPU</code>不会很快引用这个被替换的行。</p>
+<p>程序员很难在代码中利用高速缓存替换策略，所以在此我们不会过多地讲述其细节。最简单的替换策略是随机选择要替换的行。其他更复杂的策略利用了局部性原理，以使在比较近的将来引用被替换的行的概率最小。例如，最不常使用<code>(Least-Frequently-Used, LFU)</code>策略会替换在过去某个时间窗口内引用次数最少的那一行。最近最少使用<code>(Least Recently-Used, LRU)</code>策略会替换最后一次访问时间最久远的那一行。所有这些策略都需要额外的时间和硬件。但是，越往存储器层次结构下面走，远离<code>CPU</code>，一次不命中的开销就会更加昂贵，用更好的替换策略使得不命中最少也变得更加值得了。</p>
+<h2 id="全相联高速缓存"><a href="#全相联高速缓存" class="headerlink" title="全相联高速缓存"></a>全相联高速缓存</h2><p>全相联高速缓存<code>(fully asociative cache)</code>是由一个包含所有高速缓存行的组<code>(即E=C/B)</code>组成的。图<code>6-35</code>给出了基本结构。</p>
+<p><img src="/posts/mem-hier2/6-35.png"></p>
+<h3 id="全相联高速缓存中的组选择"><a href="#全相联高速缓存中的组选择" class="headerlink" title="全相联高速缓存中的组选择"></a>全相联高速缓存中的组选择</h3><p>全相联高速缓存中的组选择非常简单，因为只有一个组，图<code>6-36</code>做了个小结。注意地址中没有组索引位，地址只被划分成了一个标记和一个块偏移。</p>
+<p><img src="/posts/mem-hier2/6-36.png"></p>
+<h3 id="全相联高速缓存中的行匹配和字选择"><a href="#全相联高速缓存中的行匹配和字选择" class="headerlink" title="全相联高速缓存中的行匹配和字选择"></a>全相联高速缓存中的行匹配和字选择</h3><p>全相联高速缓存中的行匹配和字选择与组相联高速缓存中的是一样的，如图<code>6-37</code>所示。它们之间的区别主要是规模大小的问题。</p>
+<p><img src="/posts/mem-hier2/6-37.png"></p>
+<p>因为高速缓存电路必须并行地搜索许多相匹配的标记，构造一个又大又快的相联高速缓存很困难，而且很昂贵。因此，全相联高速缓存只适合做小的高速缓存，例如虚拟内存系统中的翻译备用缓冲器<code>(TLB)</code>，它缓存页表项<code>(见9.6.2节)</code>。</p>
+<h2 id="有关写的问题"><a href="#有关写的问题" class="headerlink" title="有关写的问题"></a>有关写的问题</h2><p>正如我们看到的，高速缓存关于读的操作非常简单。首先，在高速缓存中查找所需字<code>ω</code>的副本。如果命中，立即返回字<code>ω</code>给<code>CPU</code>。如果不命中，从存储器层次结构中较低层中取出包含字<code>ω</code>的块，将这个块存储到某个高速缓存行中<code>(可能会驱逐一个有效的行)</code>，然后返回字<code>ω</code>。</p>
+<p>写的情况就要复杂一些了。假设我们要写一个已经缓存了的字<code>ω(写命中，write hit)</code>。在高速缓存更新了它的<code>ω</code>的副本之后，怎么更新<code>ω</code>在层次结构中紧接着低一层中的副本呢？最简单的方法，称为直写<code>(write-through)</code>，就是立即将<code>ω</code>的高速缓存块写回到紧接着的低一层中。虽然简单，但是直写的缺点是每次写都会引起总线流量。另一种方法，称为写回<code>(write-back)</code>，尽可能地推迟更新，只有当替换算法要驱逐这个更新过的块时，才把它写到紧接着的低一层中。由于局部性，写回能显著地减少总线流量，但是它的缺点是增加了复杂性。高速缓存必须为每个高速缓存行维护一个额外的修改位<code>(dirty bit)</code>，表明这个高速缓存块是否被修改过。</p>
+<p>另一个问题是如何处理写不命中。一种方法，称为写分配<code>(write-allocate)</code>，加载相应的低一层中的块到高速缓存中，然后更新这个高速缓存块。写分配试图利用写的空间局部性，但是缺点是每次不命中都会导致一个块从低一层传送到高速缓存。另一种方法，称为非写分配<code>(not-write-allocate)</code>，避开高速缓存，直接把这个字写到低一层中。直写高速缓存通常是非写分配的。写回高速缓存通常是写分配的。</p>
+<p>为写操作优化高速缓存是一个细致而困难的题，在此我们只略讲皮毛。细节随系统的不同而不同，而且通常是私有的，文档记录不详细。对于试图编写高速缓存比较友好的程序的程序员来说，我们建议在心里采用一个使用写回和写分配的高速缓存的模型。这样建议有几个原因。通常，由于较长的传送时间，存储器层次结构中较低层的缓存更可能使用写回，而不是直写。例如，虚拟内存系统<code>(用主存作为存储在磁盘上的块的缓存)</code>只使用写回。但是由于逻辑电路密度的提高，写回的高复杂性也越来越不成为阻碍了，我们在现代系统的所有层次上都能看到写回缓存。所以这种假设符合当前的趋势。假设使用写回写分配方法的另一个原因是，它与处理读的方式相对称，因为写回写分配试图利用局部性。因此，我们可以在高层次上开发我们的程序，展示良好的空间和时间局部性，而不是试图为某一个存储器系统进行优化。</p>
+<h2 id="一个真实的高速缓存层次结构的解剖"><a href="#一个真实的高速缓存层次结构的解剖" class="headerlink" title="一个真实的高速缓存层次结构的解剖"></a>一个真实的高速缓存层次结构的解剖</h2><p>到目前为止，我们一直假设高速缓存只保存程序数据。不过，实际上，高速缓存既保存数据，也保存指令。只保存指令的高速缓存称为<code>i-cache</code>。只保存程序数据的高速缓存称为<code>d-cache</code>。既保存指令又包括数据的高速缓存称为统一的高速缓存<code>(unified cache)</code>。现代处理器包括独立的<code>i-cache</code>和<code>d-cache</code>。这样做有很多原因。有两个独立的高速缓存，处理器能够同时读一个指令字和一个数据字。<code>i-cache</code>通常是只读的，因此比较简单。通常会针对不同的访问模式来优化这两个高速缓存，它们可以有不同的块大小，相联度和容量。使用不同的高速缓存也确保了数据访问不会与指令访问形成冲突不命中，反过来也是一样，代价就是可能会引起容量不命中增加。</p>
+<p>图<code>6-38</code>给出了<code>Intel Core i7</code>处理器的高速缓存层次结构。每个<code>CPU</code>芯片有四个核。每个核有自己私有的<code>L1 i-cache</code>、<code>L1 d-cache</code>和<code>L2</code>统一的高速缓存。所有的核共享片上<code>L3</code>统一的高速缓存。这个层次结构的一个有趣的特性是所有的<code>SRAM</code>高速缓存存储器都在<code>CPU</code>芯片上。</p>
+<p><img src="/posts/mem-hier2/6-38.png"></p>
+<p>图<code>6-39</code>总结了<code>Core i7</code>高速缓存的基本特性。</p>
+<p><img src="/posts/mem-hier2/6-39.png"></p>
+<h2 id="高速缓存参数的性能影响"><a href="#高速缓存参数的性能影响" class="headerlink" title="高速缓存参数的性能影响"></a>高速缓存参数的性能影响</h2><p>有许多指标来衡量高速缓存的性能：</p>
+<ul>
+<li><p>不命中率<code>(miss rate)</code>。在一个程序执行或程序的一部分执行期间，内存引用不命中的比率。它是这样计算的：不命中数量<code>/</code>引用数量</p>
+</li>
+<li><p>命中率<code>(hit rate)</code>。命中的内存引用比率。它等于<code>1-不命中率</code></p>
+</li>
+<li><p>命中时间<code>(hit time)</code>。从高速缓存传送一个字到<code>CPU</code>所需的时间，包括组选择、行确认和字选择的时间。对于<code>L1</code>高速缓存来说，命中时间的数量级是几个时钟周期</p>
+</li>
+<li><p>不命中处罚<code>(miss penalty)</code>。由于不命中所需要的额外的时间。<code>L1</code>不命中需要从<code>L2</code>得到服务的处罚，通常是数10个周期；从<code>L3</code>得到服务的处罚，50个周期；从主存得到的服务的处罚，200个周期</p>
+</li>
+</ul>
+<p>优化高速缓存的成本和性能的折中是一项很精细的工作，它需要在现实的基准程序代码上进行大量的模拟，因此超出了我们讨论的范围。不过，还是可以认识一些定性的折中考量的。</p>
+<h3 id="高速缓存大小的影响"><a href="#高速缓存大小的影响" class="headerlink" title="高速缓存大小的影响"></a>高速缓存大小的影响</h3><p>一方面，较大的高速缓存可能会提高命中率。另一方面，使大存储器运行得更快总是要难一些的。结果，较大的高速缓存可能会增加命中时间。这解释了为什么<code>L1</code>高速缓存比<code>L2</code>高速缓存小，以及为什么<code>L2</code>高速缓存比<code>L3</code>高速缓存小。</p>
+<h3 id="块大小的影响"><a href="#块大小的影响" class="headerlink" title="块大小的影响"></a>块大小的影响</h3><p>大的块有利有弊。一方面，较大的块能利用程序中可能存在的空间局部性，帮助提高命中率。不过，对于给定的高速缓存大小，块越大就意味着高速缓存行数越少，这会损害时间局部性比空间局部性更好的程序中的命中率。较大的块对不命中处罚也有负面影响，因为块越大，传送时间就越长。现代系统<code>(如Corei7)</code>会折中使高速缓存块包含64个字节。</p>
+<h3 id="相联度的影响"><a href="#相联度的影响" class="headerlink" title="相联度的影响"></a>相联度的影响</h3><p>这里的问题是参数<code>E</code>选择的影响，<code>E</code>是每个组中高速缓存行数。较高的相联度<code>(也就是E的值较大)</code>的优点是降低了高速缓存由于冲突不命中出现抖动的可能性。不过，较高的相联度会造成较高的成本。较高的相联度实现起来很昂贵，而且很难使之速度变快。每一行需要更多的标记位，每一行需要额外的<code>LRU</code>状态位和额外的控制逻辑。较高的相联度会增加命中时间，因为复杂性增加了，另外，还会增加不命中处罚，因为选择牺牲行的复杂性也增加了。</p>
+<p>相联度的选择最终变成了命中时间和不命中处罚之间的折中。传统上，努力争取时钟频率的高性能系统会为<code>L1</code>高速缓存选择较低的相联度<code>(这里的不命中处罚只是几个周期)</code>，而在不命中处罚比较高的较低层上使用比较大的相联度。例如，<code>Intel Core i7</code>系统中，<code>L1</code>和<code>L2</code>高速缓存是8路组相联的，而<code>L3</code>高速缓存是16路组相联的。</p>
+<h3 id="写策略的影响"><a href="#写策略的影响" class="headerlink" title="写策略的影响"></a>写策略的影响</h3><p>直写高速缓存比较容易实现，而且能使用独立于高速缓存的写缓冲区<code>(write buffer)</code>，用来更新内存。此外，读不命中开销没这么大，因为它们不会触发内存写。另一方面，写回高速缓存引起的传送比较少，它允许更多的到内存的带宽用于执行<code>DMA</code>的<code>I/O</code>设备。此外，越往层次结构下面走，传送时间增加，减少传送的数量就变得更加重要。一般而言，高速缓存越往下层，越可能使用写回而不是直写。</p>
 <h1 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h1><ul>
 <li><a target="_blank" rel="noopener" href="https://csapp.cs.cmu.edu/"><code>Computer Systems: A Programmer&#39;s Perspective, 3/E</code></a></li>
 </ul>
