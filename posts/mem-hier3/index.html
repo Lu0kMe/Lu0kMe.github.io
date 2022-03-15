@@ -27,11 +27,24 @@
 <meta property="og:site_name" content="Lu0k">
 <meta property="og:description" content="内容简介存储器系统(memory system)是一个具有不同容量、成本和访问时间的存储设备的层次结构。CPU寄存器保存着最常用的数据。靠近CPU的小的、快速的高速缓存存储器(cache memory)作为一部分存储在相对慢速的主存储器(main memory)中数据和指令的缓冲区域。主存缓存存储在容量较大的、慢速磁盘上的数据，而这些磁盘常常又作为存储在通过网络连接的其他机器的磁盘或磁带上的数据的">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://lu0k.github.io/posts/mem-hier3/t1.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/mem-hier3/t2.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/mem-hier3/t3.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/mem-hier3/6-40.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/mem-hier3/6-41.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/mem-hier3/6-42.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/mem-hier3/6-43.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/mem-hier3/formula1.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/mem-hier3/formula2.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/mem-hier3/6-44.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/mem-hier3/6-45.png">
+<meta property="og:image" content="https://lu0k.github.io/posts/mem-hier3/6-46.png">
 <meta property="article:published_time" content="2022-02-11T16:00:00.000Z">
-<meta property="article:modified_time" content="2022-02-12T14:48:06.124Z">
+<meta property="article:modified_time" content="2022-03-15T06:15:26.134Z">
 <meta property="article:author" content="Lu0k">
 <meta property="article:tag" content="CSAPP">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://lu0k.github.io/posts/mem-hier3/t1.png">
 
 
 <link rel="canonical" href="https://lu0k.github.io/posts/mem-hier3/">
@@ -148,7 +161,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%86%85%E5%AE%B9%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">内容简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Reference"><span class="nav-number">2.</span> <span class="nav-text">Reference</span></a></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%86%85%E5%AE%B9%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">内容简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BC%96%E5%86%99%E9%AB%98%E9%80%9F%E7%BC%93%E5%AD%98%E5%8F%8B%E5%A5%BD%E7%9A%84%E4%BB%A3%E7%A0%81"><span class="nav-number">2.</span> <span class="nav-text">编写高速缓存友好的代码</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BB%BC%E5%90%88%EF%BC%9A%E9%AB%98%E9%80%9F%E7%BC%93%E5%AD%98%E5%AF%B9%E7%A8%8B%E5%BA%8F%E6%80%A7%E8%83%BD%E7%9A%84%E5%BD%B1%E5%93%8D"><span class="nav-number">3.</span> <span class="nav-text">综合：高速缓存对程序性能的影响</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%98%E5%82%A8%E5%99%A8%E5%B1%B1"><span class="nav-number">3.1.</span> <span class="nav-text">存储器山</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%87%8D%E6%96%B0%E6%8E%92%E5%88%97%E5%BE%AA%E7%8E%AF%E4%BB%A5%E6%8F%90%E9%AB%98%E7%A9%BA%E9%97%B4%E5%B1%80%E9%83%A8%E6%80%A7"><span class="nav-number">3.2.</span> <span class="nav-text">重新排列循环以提高空间局部性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9C%A8%E7%A8%8B%E5%BA%8F%E4%B8%AD%E5%88%A9%E7%94%A8%E5%B1%80%E9%83%A8%E6%80%A7"><span class="nav-number">3.3.</span> <span class="nav-text">在程序中利用局部性</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%B0%8F%E7%BB%93"><span class="nav-number">4.</span> <span class="nav-text">小结</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Reference"><span class="nav-number">5.</span> <span class="nav-text">Reference</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -272,6 +285,105 @@
         <h1 id="内容简介"><a href="#内容简介" class="headerlink" title="内容简介"></a>内容简介</h1><p>存储器系统<code>(memory system)</code>是一个具有不同容量、成本和访问时间的存储设备的层次结构。CPU寄存器保存着最常用的数据。靠近CPU的小的、快速的高速缓存存储器<code>(cache memory)</code>作为一部分存储在相对慢速的主存储器<code>(main memory)</code>中数据和指令的缓冲区域。主存缓存存储在容量较大的、慢速磁盘上的数据，而这些磁盘常常又作为存储在通过网络连接的其他机器的磁盘或磁带上的数据的缓冲区域。</p>
 <span id="more"></span>
 
+<h1 id="编写高速缓存友好的代码"><a href="#编写高速缓存友好的代码" class="headerlink" title="编写高速缓存友好的代码"></a>编写高速缓存友好的代码</h1><p>在<code>6.2</code>节中，我们介绍了局部性的思想，而且定性地谈了一下什么会具有良好的局部性。明白了高速缓存存储器是如何工作的，我们就能更加准确一些了。局部性比较好的程序更容易有较低的不命中率，而不命中率较低的程序往往比不命中率较高的程序运行得更快。因此，从具有良好局部性的意义上来说，好的程序员总是应该试着去编写高速缓存友好<code>(cache friendly)</code>的代码。下面就是我们用来确保代码高速缓存友好的基本方法。</p>
+<ul>
+<li><p>让最常见的情况运行得快。程序通常把大部分时间都花在少量的核心函数上，而这些函数通常把大部分时间都花在了少量循环上。所以要把注意力集中在核心函数里的循环上，而忽略其他部分</p>
+</li>
+<li><p>尽量减小每个循环内部的缓存不命中数量。在其他条件<code>(例如加载和存储的总次数)</code>相同的情况下，不命中率较低的循环运行得更快</p>
+</li>
+</ul>
+<p>为了看看实际上这是怎么工作的，考虑<code>6.2</code>节中的函数<code>sumvec</code>：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">sumvec</span><span class="params">(<span class="keyword">int</span> v[N])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> i, sum = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; N; i++)</span><br><span class="line">        sum += v[i];</span><br><span class="line">    <span class="keyword">return</span> sum;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个函数高速缓存友好吗？首先，注意对于局部变量<code>i</code>和<code>sum</code>，循环体有良好的时间局部性。实际上，因为它们都是局部变量，任何合理的优化编译器都会把它们缓存在寄存器文件中，也就是存储器层次结构的最高层中。现在考虑一下对向量<code>v</code>的步长为1的引用。一般而言，如果一个高速缓存的块大小为<code>B</code>字节，那么一个步长为<code>k</code>的引用模式<code>(这里k是以字为单位的)</code>平均每次循环迭代会有<code>min(1,(wordsizexk)/B)</code>次缓存不命中。当<code>k=1</code>时，它取最小值，所以对<code>v</code>的步长为1的引用确实是高速缓存友好的。例如，假设<code>v</code>是块对齐的，字为4个字节，高速缓存块为4个字，而高速缓存初始为空<code>(冷高速缓存)</code>。然后，无论是什么样的高速缓存结构，对<code>v</code>的引用都会得到下面的命中和不命中模式：</p>
+<p><img src="/posts/mem-hier3/t1.png"></p>
+<p>在这个例子中，对<code>v[0]</code>的引用会不命中，而相应的包含<code>v[0]~v[3]</code>的块会被从内存加载到高速缓存中。因此，接下来三个引用都会命中。对<code>v[4]</code>的引用会导致不命中，而一个新的块被加载到高速缓存中，接下来的三个引用都命中，依此类推。总的来说，四个引用中，三个会命中，在这种冷缓存的情况下，这是我们所能做到的最好的情况了。</p>
+<p>总之，简单的<code>sumvec</code>示例说明了两个关于编写高速缓存友好的代码的重要问题：</p>
+<ul>
+<li><p>对局部变量的反复引用是好的，因为编译器能够将它们缓存在寄存器文件中<code>(时间局部性)</code></p>
+</li>
+<li><p>步长为1的引用模式是好的，因为存储器层次结构中所有层次上的缓存都是将数据存储为连续的块<code>(空间局部性)</code></p>
+</li>
+</ul>
+<p>在对多维数组进行操作的程序中，空间局部性尤其重要。例如，考虑<code>6.2</code>节中的<code>sumarrayrows</code>函数，它按照行优先顺序对一个二维数组的元素求和：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">sumarrayrows</span><span class="params">(<span class="keyword">int</span> a[M][N])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> i, j, sum = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; M; i++)</span><br><span class="line">    <span class="keyword">for</span> (j = <span class="number">0</span>; j &lt; N; j++)</span><br><span class="line">        sum += a[i][j];</span><br><span class="line">    <span class="keyword">return</span> sum;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>由于C语言以行优先顺序存储数组，所以这个函数中的内循环有与<code>sumvec</code>一样好的步长为1的访问模式。例如，假设我们对这个高速缓存做与对<code>sumvec</code>一样的假设。那么对数组<code>a</code>的引用会得到下面的命中和不命中模式：</p>
+<p><img src="/posts/mem-hier3/t2.png"></p>
+<p>但是如果我们做一个看似无伤大雅的改变——交换循环的次序，看看会发生什么：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">sumarraycols</span><span class="params">(<span class="keyword">int</span> a[M][N])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> i, j, sum = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (j = <span class="number">0</span>; j &lt; N; j++)</span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; M; i++)</span><br><span class="line">        sum += a[i][j];</span><br><span class="line">    <span class="keyword">return</span> sum;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这种情况中，我们是一列一列而不是一行一行地扫描数组的。如果我们够幸运，整个数组都在高速缓存中，那么我们也会有相同的不命中率1&#x2F;4。不过，如果数组比高速缓存要大<code>(更可能出现这种情况)</code>，那么每次对<code>a[i][j]</code>的访问都会不命中！</p>
+<p><img src="/posts/mem-hier3/t3.png"></p>
+<p>较高的不命中率对运行时间可以有显著的影响。例如，在桌面机器上，<code>sumarrayrows</code>运行速度比<code>sumarraycols</code>快25倍。总之，程序员应该注意他们程序中的局部性，试着编写利用局部性的程序。</p>
+<h1 id="综合：高速缓存对程序性能的影响"><a href="#综合：高速缓存对程序性能的影响" class="headerlink" title="综合：高速缓存对程序性能的影响"></a>综合：高速缓存对程序性能的影响</h1><p>本节通过研究高速缓存对运行在实际机器上的程序的性能影响，综合了我们对存储器层次结构的讨论。</p>
+<h2 id="存储器山"><a href="#存储器山" class="headerlink" title="存储器山"></a>存储器山</h2><p>一个程序从存储系统中读数据的速率称为读吞吐量<code>(read throughput)</code>，或者有时称为读带宽<code>(read bandwidth)</code>。如果一个程序在<code>s</code>秒的时间段内读<code>n</code>个字节，那么这段时间内的读吞吐量就等于<code>n/s</code>，通常以兆字节每秒<code>(MB/s)</code>为单位。</p>
+<p>如果我们要编写一个程序，它从一个紧密程序循环<code>(tight program loop)</code>中发出一系列读请求，那么测量出的读吞吐量能让我们看到对于这个读序列来说的存储系统的性能。图<code>6-40</code>给出了一对测量某个读序列读吞吐量的函数。</p>
+<p><img src="/posts/mem-hier3/6-40.png"></p>
+<p><code>test</code>函数通过以步长<code>stride</code>扫描一个数组的头<code>elems</code>个元素来产生读序列。为了提高内循环中可用的并行性，使用了<code>4x4</code>展开<code>(见5.9节)</code>。<code>run</code>函数是一个包装函数，调用<code>test</code>函数，并返回测量出的读吞吐量。第37行对<code>test</code>函数的调用会对高速缓存做腰身。第38行的<code>fcyc2</code>函数以参数<code>eIems</code>调用<code>test</code>函数，并估计<code>test</code>函数的运行时间，以<code>CPU</code>周期为单位。注意，<code>run</code>函数的参数<code>size</code>是以字节为单位的，而<code>test</code>函数对应的参数<code>elems</code>是以数组元素为单位的。另外，注意第39行将<code>MB/s</code>计算为10<sup>6</sup>字节<code>/</code>秒，而不是2<sup>20</sup>字节<code>/</code>秒。</p>
+<p><code>run</code>函数的参数<code>size</code>和<code>stride</code>允许我们控制产生出的读序列的时间和空间局部性程度。<code>size</code>的值越小，得到的工作集越小，因此时间局部性越好。<code>stride</code>的值越小，得到的空间局部性越好。如果我们反复以不同的<code>size</code>和<code>stride</code>值调用<code>run</code>函数，那么我们就能得到一个读带宽的时间和空间局部性的二维函数，称为存储器山<code>(memory mountain)</code>。</p>
+<p>每个计算机都有表明它存储器系统的能力特色的唯一的存储器山。例如，图<code>6-41</code>展示了<code>Intel Core i7</code>系统的存储器山。在这个例子中，<code>size</code>从16KB变到128MB，<code>stride</code>从1变到12个元素，每个元素是一个8个字节的<code>long int</code>。</p>
+<p><img src="/posts/mem-hier3/6-41.png"></p>
+<p>这座<code>Core i7</code>山的地形地势展现了一个很丰富的结构。垂直于大小轴的是四条山脊，分别对应于工作集完全在<code>L1</code>高速缓存、<code>L2</code>高速缓存、<code>L3</code>高速缓存和主存内的时间局部性区域。注意，<code>L1</code>山脊的最高点<code>(那里CPU读速率为14GB/s)</code>与主存山脊的最低点<code>(那里CPU读速率为900MB/s)</code>之间的差别有一个数量级。</p>
+<p>在<code>L2</code>、<code>L3</code>和主存山脊上，随着步长的增加，有一个空间局部性的斜坡，空间局部性下降。注意，即使当工作集太大，不能全都装进任何一个高速缓存时，主存山脊的最高点也比它的最低点高8倍。因此，即使是当程序的时间局部性很差时，空间局部性仍然能补救，并且是非常重要的。</p>
+<p>有一条特别有趣的平坦的山脊线，对于步长1垂直于步长轴，此时读吞吐量相对保持不变，为12GB&#x2F;s，即使工作集超出了<code>L1</code>和<code>L2</code>的大小。这然是由于<code>Core i7</code>存储器硬件预取<code>(prefetching)</code>机制，它会自动地识别顺序的、步长为1的引用模式，试图在一些块被访问之前，将它们取到高速缓存中。虽然文档里没有记录这种预取算法的细节，但是从存储器山可以明显地看到这个算法对小步长效果最好——这也是代码中要使用步长为1的顺序访问的另一个理由。</p>
+<p>如果我们从这座山中取出一个片段，保持步长为常数，如图<code>6-42</code>所示，我们就能很清楚地看到高速缓存的大小和时间局部性对性能的影响了。大小最大为32KB的工作集完全能放进<code>L1 d-cache</code>中，因此，读都是由<code>L1</code>来服务的，吞吐量保持在峰值12GB&#x2F;s处。大小最大为256KB的工作集完全能放进统一的<code>L2</code>高速缓存中，对于大小最大为8M，工作集完全能放进统一的<code>L3</code>高速缓存中。更大的工作集大小主要由主存来服务。</p>
+<p><img src="/posts/mem-hier3/6-42.png"></p>
+<p><code>L2</code>和<code>L3</code>高速缓存区域最左边的边缘上读吞吐量的下降很有趣，此时工作集大小为256KB和8MB，等于对应的高速缓存的大小。为什么会出现这样的下降，还不是完全清楚。要确认的唯一方法就是执行一个详细的高速缓存模拟，但是这些下降很有可能是与其他数据和代码行的冲突造成的。</p>
+<p>以相反的方向横切这座山，保持工作集大小不变，我们从中能看到空间局部性对读吞吐量的影响。例如，图<code>6-43</code>展示了工作集大小固定为4MB时的片段。这个片段是沿着图<code>6-41</code>中的<code>L3</code>山脊切的，这里，工作集完全能够放到<code>L3</code>高速缓存中，但是对<code>L2</code>高速缓存来说太大了。</p>
+<p>注意随着步长从1个字增长到8个字，读吞吐量是如何平稳地下降的。在山的这个区域中，<code>L2</code>中的读不命中会导致一个块从<code>L3</code>传送到<code>L2</code>。后面在<code>L2</code>中这个块上会有一定数量的命中，这是取决于步长的。随着步长的增加，<code>L2</code>不命中与<code>L2</code>命中的比值也增加了。因为服务不命中要比命中更慢，所以读吞吐量也下降了。一旦步长达到了8个字，在这个系统上就等于块的大小64个字节了，每个读请求在<code>L2</code>中都会不命中，必须从<code>L3</code>服务。因此，对于至少为8个字的步长来说，读吞吐量是一个常数速率，是由从<code>L3</code>传送高速缓存块到<code>L2</code>的速率决定的。</p>
+<p><img src="/posts/mem-hier3/6-43.png"></p>
+<p>总结一下我们对存储器山的讨论，存储器系统的性能不是一个数字就能描述的。相反，它是一座时间和空间局部性的山，这座山的上升高度差别可以超过一个数量级。明智的程序员会试图构造他们的程序，使得程序运行在山峰而不是低谷。目标就是利用时间局部性，使得频繁使用的字从<code>L1</code>中取出，还要利用空间局部性，使得尽可能多的字从一个<code>L1</code>高速缓存行中访问到。</p>
+<h2 id="重新排列循环以提高空间局部性"><a href="#重新排列循环以提高空间局部性" class="headerlink" title="重新排列循环以提高空间局部性"></a>重新排列循环以提高空间局部性</h2><p>考虑一对<code>nxn</code>矩阵相乘的问题：<code>C=AB</code>。例如，如果<code>n=2</code>，那么</p>
+<p><img src="/posts/mem-hier3/formula1.png"></p>
+<p>其中，</p>
+<p><img src="/posts/mem-hier3/formula2.png"></p>
+<p>矩阵乘法函数通常是用3个嵌套的循环来实现的，分别用索引<code>i</code>、<code>j</code>和<code>k</code>来标识。如果改变循环的次序，对代码进行一些其他的小改动，我们就能得到矩阵乘法的6个在功能上等价的版本，如图<code>6-44</code>所示。每个版本都以它循环的顺序来唯一地标识。</p>
+<p><img src="/posts/mem-hier3/6-44.png"></p>
+<p>在高层次来看，这6个版本是非常相似的。如果加法是可结合的，那么每个版本计算出的结果完全一样。每个版本总共都执行O(n<sup>3</sup>)个操作，而加法和乘法的数量相同。<code>A</code>和<code>B</code>的n<sup>2</sup>个元素中的每一个都要读<code>n</code>次。计算<code>C</code>的n<sup>2</sup>个元素中的每一个都要对<code>n</code>个值求和。不过，如果分析最里层循环迭代的行为，我们发现在访问数量和局部性上还是有区别的。为了分析，我们做了如下假设：</p>
+<ul>
+<li><p>每个数组都是一个<code>double</code>类型的<code>nxn</code>的数组，<code>sizeof(double)==8</code></p>
+</li>
+<li><p>只有一个高速缓存，其块大小为32字节<code>(B=32)</code></p>
+</li>
+<li><p>数组大小<code>n</code>很大，以至于矩阵的一行都不能完全装进<code>L1</code>高速缓存中</p>
+</li>
+<li><p>编译器将局部变量存储到寄存器中，因此循环内对局部变量的引用不需要任何加载或存储指令</p>
+</li>
+</ul>
+<p>图<code>6-45</code>总结了我们对内循环的分析结果。注意6个版本成对地形成了3个等价类，用内循环中访问的矩阵对来表示每个类。例如，版本<code>ijk</code>和<code>jik</code>是类<code>AB</code>的成员，因为它们在最内层的循环中引用的是矩阵<code>A</code>和<code>B(而不是C)</code>。对于每个类，我们统计了每个内循环迭代中加载<code>(读)</code>和存储<code>(写)</code>的数量，每次循环迭代中对<code>A</code>、<code>B</code>和<code>C</code>的引用在高速缓存中不命中的数量，以及每次迭代缓存不命中的总数。</p>
+<p>类<code>AB</code>例程的内循环<code>(图6-44a和图6-44b)</code>以步长1扫描数组<code>A</code>的一行。因为每个高速缓存块保存四个8字节的字，<code>A</code>的不命中率是每次迭代不命中0.25次。另一方面，内循环以步长<code>n</code>扫描数组<code>B</code>的一列。因为<code>n</code>很大，每次对数组<code>B</code>的访向都会不命中，所以每次送代总共会有1.25次不命中。</p>
+<p><img src="/posts/mem-hier3/6-45.png"></p>
+<p>类<code>AC</code>例程的内循环<code>(图6-44c和图6-44d)</code>有一些问题。每次迭代执行两个加载和一个存储<code>(相对于类AB例程，它们执行2个加载而没有存储)</code>。内循环以步长<code>n</code>扫描<code>A</code>和<code>C</code>的列。结果是每次加载都会不命中，所以每次迭代总共有两个不命中。注意，与类<code>AB</code>例程相比，交换循环降低了空间局部性。</p>
+<p><code>BC</code>例程<code>(图6-44e和图6-44f)</code>展示了一个很有趣的折中：使用了两个加载和一个存储，它们比<code>AB</code>例程多需要一个内存操作。另一方面，因为内循环以步长为1的访问模式按行扫描<code>B</code>和<code>C</code>，每次迭代每个数组上的不命中率只有0.25次不命中，所以每次迭代总共有0.50个不命中。</p>
+<p>图<code>6-46</code>小结了一个<code>Core i7</code>系统上矩阵乘法各个版本的性能。这个图画出了测量出的每次内循环迭代所需的<code>CPU</code>周期数作为数组大小<code>(n)</code>的函数。</p>
+<p><img src="/posts/mem-hier3/6-46.png"></p>
+<p>对于这幅图有很多有意思的地方值得注意：</p>
+<ul>
+<li><p>对于大的<code>n</code>值，即使每个版本都执行相同数量的浮点算术操作，最快的版本比最慢的版本运行得快几乎40倍</p>
+</li>
+<li><p>每次迭代内存引用和不命中数量都相同的一对版本，有大致相同的测量性能</p>
+</li>
+<li><p>内存行为最糟糕的两个版本，就每次迭代的访问数量和不命中数量而言，明显地比其他4个版本运行得慢，其他4个版本有较少的不命中次数或者较少的访问次数，或者兼而有之</p>
+</li>
+<li><p>在这个情况中，与内存访问总数相比，不命中率是一个更好的性能预测指标。例如，即使类<code>BC</code>例程<code>(2个加载和1个存储)</code>在内循环中比类<code>AB</code>例程<code>(2个加载)</code>执行更多的内存引用，类<code>BC</code>例程<code>(每次送代有0.5个不命中)</code>比类<code>AB</code>例程<code>(每次迭代有1.25个不命中)</code>性能还是要好很多</p>
+</li>
+<li><p>对于大的<code>n</code>值，最快的一对版本<code>(kij和ikj)</code>的性能保持不变。虽然这个数组远大于任何<code>SRAM</code>高速缓存存储器，但预取硬件足够聪明，能够认出步长为1的访问模式，而且速度足够快能够跟上内循环中的内存访问。这是设计这个内存系统的<code>Intel</code>的工程师所做的一项极好成就，向程序员提供了甚至更多的鼓励，鼓励他们开发出具有良好空间局部性的程序</p>
+</li>
+</ul>
+<h2 id="在程序中利用局部性"><a href="#在程序中利用局部性" class="headerlink" title="在程序中利用局部性"></a>在程序中利用局部性</h2><p>正如我们看到的，存储系统被组织成一个存储设备的层次结构，较小、较快的设备靠近顶部，较大、较慢的设备靠近底部。由于采用了这种层次结构，程序访问存储位置的实际速率不是一个数字能描述的。相反，它是一个变化很大的程序局部性的函数<code>(我们称之为存储器山)</code>，变化可以有几个数量级。有良好局部性的程序从快速的高速缓存存储器中访问它的大部分数据。局部性差的程序从相对慢速的<code>DRAM</code>主存中访问它的大部分数据。</p>
+<p>理解存储器层次结构本质的程序员能够利用这些知识编写出更有效的程序，无论具体的存储系统结构是怎样的。特别地，我们推荐下列技术：</p>
+<ul>
+<li><p>将你的注意力集中在内循环上，大部分计算和内存访问都发生在这里</p>
+</li>
+<li><p>通过按照数据对象存储在内存中的顺序、以步长为1的来读数据，从而使得你程序中的空间局部性最大</p>
+</li>
+<li><p>一旦从存储器中读入了一个数据对象，就尽可能多地使用它，从而使得程序中的时间局部性最大</p>
+</li>
+</ul>
+<h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><p>基本存储技术包括随机存储器<code>(RAM)</code>、非易失性存储器<code>(ROM)</code>和磁盘。<code>RAM</code>有两种基本类型。静态<code>RAM(SRAM)</code>快一些，但是也贵一些，它既可以用做<code>CPU</code>芯片上的高速缓存，也可以用做芯片下的高速缓存。动态<code>RAM(DRAM)</code>慢一点，也便宜一些，用做主存和图形帧缓冲区。即使是在关电的时候，<code>ROM</code>也能保持它们的信息，可以用来存储固件。旋转磁盘是机械的非易失性存储设备，以每个位很低的成本保存大量的数据，但是其访问时间比<code>DRAM</code>长得多。固态硬盘<code>(SSD)</code>基于非易失性的闪存，对某些应用来说，越来越成为旋转磁盘的具有吸引力的替代产品。</p>
+<p>一般而言，较快的存储技术每个位会更贵，而且容量更小。这些技术的价格和性能属性正在以显著不同的速度变化着。特别地，<code>DRAM</code>和磁盘访问时间远远大于<code>CPU</code>周期时间。系统通过将存储器组织<br>成存储设备的层次结构来弥补这些差异，在这个层次结构中，较小、较快的设备在顶部，较大、较慢的设备在底部。因为编写良好的程序有好的局部性，大多数数据都可以从较高层得到服务，结果就是存储系统能以较高层的速度运行，但却有较低层的成本和容量。</p>
+<p>程序员可以通过编写有良好空间和时间局部性的程序来显著地改进程序的运行时间。利用基于<code>SRAM</code>的高速缓存存储器特别重要。主要从高速缓存取数据的程序能比主要从内存取数据的程序运行得快得多。</p>
 <h1 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h1><ul>
 <li><a target="_blank" rel="noopener" href="https://csapp.cs.cmu.edu/"><code>Computer Systems: A Programmer&#39;s Perspective, 3/E</code></a></li>
 </ul>
