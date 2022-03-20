@@ -20,28 +20,28 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"lu0k.github.io","root":"/","images":"/images","scheme":"Gemini","version":"8.7.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
-<meta name="description" content="Here&#39;s something encrypted, password is required to continue reading.">
+<meta name="description" content="内容简介为了更加有效地管理内存并且少出错，现代系统提供了一种对主存的抽象概念，叫做虚拟内存(VM)。虚拟内存是硬件异常、硬件地址翻译、主存、磁盘文件和内核软件的完美交互，它为每个进程提供了一个大的、一致的和私有的地址空间。虚拟内存是计算机系统最重要的概念之一。它是沉默地、自动地工作的，不需要应用程序员的任何干涉。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="HTB Money Flowz">
-<meta property="og:url" content="https://lu0k.github.io/posts/htb-moneyflowz/index.html">
+<meta property="og:title" content="虚拟内存(四)">
+<meta property="og:url" content="https://lu0k.github.io/posts/vir-mem4/index.html">
 <meta property="og:site_name" content="Lu0k">
-<meta property="og:description" content="Here&#39;s something encrypted, password is required to continue reading.">
+<meta property="og:description" content="内容简介为了更加有效地管理内存并且少出错，现代系统提供了一种对主存的抽象概念，叫做虚拟内存(VM)。虚拟内存是硬件异常、硬件地址翻译、主存、磁盘文件和内核软件的完美交互，它为每个进程提供了一个大的、一致的和私有的地址空间。虚拟内存是计算机系统最重要的概念之一。它是沉默地、自动地工作的，不需要应用程序员的任何干涉。">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2022-01-03T16:00:00.000Z">
-<meta property="article:modified_time" content="2022-03-16T11:00:17.766Z">
+<meta property="article:published_time" content="2022-03-19T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-03-20T11:01:32.543Z">
 <meta property="article:author" content="Lu0k">
-<meta property="article:tag" content="OSINT">
+<meta property="article:tag" content="CSAPP">
 <meta name="twitter:card" content="summary">
 
 
-<link rel="canonical" href="https://lu0k.github.io/posts/htb-moneyflowz/">
+<link rel="canonical" href="https://lu0k.github.io/posts/vir-mem4/">
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://lu0k.github.io/posts/htb-moneyflowz/","path":"posts/htb-moneyflowz/","title":"HTB Money Flowz"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://lu0k.github.io/posts/vir-mem4/","path":"posts/vir-mem4/","title":"虚拟内存(四)"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>HTB Money Flowz | Lu0k</title>
+<title>虚拟内存(四) | Lu0k</title>
   
 
 
@@ -135,7 +135,7 @@
 
   <aside class="sidebar">
 
-    <div class="sidebar-inner sidebar-overview-active">
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
       <ul class="sidebar-nav">
         <li class="sidebar-nav-toc">
           文章目录
@@ -148,6 +148,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%86%85%E5%AE%B9%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">内容简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Reference"><span class="nav-number">2.</span> <span class="nav-text">Reference</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -222,7 +223,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://lu0k.github.io/posts/htb-moneyflowz/">
+    <link itemprop="mainEntityOfPage" href="https://lu0k.github.io/posts/vir-mem4/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">
@@ -235,7 +236,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          HTB Money Flowz
+          虚拟内存(四)
         </h1>
 
         <div class="post-meta-container">
@@ -246,7 +247,7 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2022-01-04 00:00:00" itemprop="dateCreated datePublished" datetime="2022-01-04T00:00:00+08:00">2022-01-04</time>
+      <time title="创建时间：2022-03-20 00:00:00" itemprop="dateCreated datePublished" datetime="2022-03-20T00:00:00+08:00">2022-03-20</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -254,7 +255,7 @@
       </span>
       <span class="post-meta-item-text">分类于</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/HTB-Challenges/" itemprop="url" rel="index"><span itemprop="name">HTB Challenges</span></a>
+          <a href="/categories/Read-Notes/" itemprop="url" rel="index"><span itemprop="name">Read Notes</span></a>
         </span>
     </span>
 
@@ -268,22 +269,13 @@
     
     
     <div class="post-body" itemprop="articleBody">
-        <div class="hbe hbe-container" id="hexo-blog-encrypt" data-wpm="Oh, this is an invalid password. Check and try again, please." data-whm="OOPS, these decrypted content may changed, but you can still have a look.">
-  <script id="hbeData" type="hbeData" data-hmacdigest="70292bffaa5d15bc92d3e216242513c67375e6d337459cacacec4ab1d926de52">894407e12e5223380169518ac3b8c32db51d04494177e7e50a6267555ee962b1a5870d0c1f16c240a354a655c19419699e49332275f4d0a9c35ebb2acfa810eaf19c4fac0cdf83ab507ce74fd1ed41094360e9424c502d6e0acfd82a7f8cf0429a32e1d410a4ec8dd3a4ce91648ea59cc78be1100e1da5bc82d11cf9fa9000a2145933c4d9ae865520565526bd7b0333e254c5df6347298e3b47e45f7ad4e2ce55213f3e4429111cdb7562a5ce28e50028f9691d47c0331d084f4356a26d756bfda506618cec76b6d3d7de696161bb6f63f0f21e5ced27efc8d40f605dbecbb32253071250aa6ad878aac2e4d0965796e340cfa87ab1e40fecb95947a869cae15ce37f9bf735adc4dd2234d4575db3e8806887b8eaf0d8c1d49def08b8e0f0bac8f9ce554eb560c2b4e258eb8f2aafb6bd5c9ddc2f14fc66776069ca724f3101d49562c81cacb2483538f7ec687f25ea75cb7362df118c6243ef021433243e0c0bbefc568da40c7a3f53f466c8ea5c2b935005b4d44742a6f51bfefba37cfe891a5477a813e540baa248981f8b2bca29aa471cbca2605d1fcf15286f5ef9210b77a3a0a080e5100379641d610e97d64a475c8ed9ca15a848e08136d5c5a119122464689b36ea6e6b84aa6269ed3adef96f6aa14b780518f526970f40106eef5b3044004daa8678af7fd6c3f1527a2ccf9c93dbae29b31fcffbd638a53f578cfd8b7a1ff8e736a733eb6f7bce188e9f06885c436ed4e1ba928cd019fb9b0236ce041093bed3ecdc4b6ff95d3cc624b614e4581fc1592517a3f6506aa42e699dcdfd84897e56f1c10a8ec4f8964d0ff2bb98c07440d69692c4b9f5a2d9e1b2299abdb3bd231e16e2178d8d8787a1911e60f1b6cdba6052a2364e0e1b34aa543beff5147559ab3914bd2f982456ad3309a99002bd4d1ae5a94ce8354d77aa51b089fa578cc9620ba08b3c8604f7d227ce6dc403ae5759ea82b396db5b0557f2f25b262b94b9bc14646d50740e3292a4b3b8430fd0a5f9d5008304b83ee417d51862816746caae4b609660b953892c098eda552a42edc30f7aa7085f93951dc5b7b1f771184836ab95a090d856a37c63a31ea5d907bca5e9c4ff823ba020a1cd9269d8d0e72156ee5fa724fa1e011b2113757987b9838fafb4b37ffb5dae044bfb60869233747261f5b2b11763d3f40579050ab7cf0efa28eaadf20b078c06c24c30e8cd1fd57921563ec5014141a384507db7ef1887de48bff5d70afeacacf5d403974d1cb992ac72f1655d61ce4f7cb3d305d74c088a5c7c43b01e3049adf27d89f68522e8d9bc0e9bfb17c24d720f28fb2fbcc43a7c4d0d13505b8b3fa57aad4d33d90e0295f2fcbc86d63ebf15049cd37d6f6765c1c4d2251804967ea7ee7f7a9cca0b7dcbdf5ca4cb30703d0a516cf71b10642bba7f5c925ca16a8d71b09acb979ad0baf36bcc43c8ed6af11ce4d5c3083bddacf45c44524b9081448cb5eb161d3e3d0358fe4e55358f3f4b23efb56fb95c1fc8fbdbd9a6cdf8b9dacea9b872ed08cb6784d29f63ab518ae7dcc36acc4716ed2742ab5c4aedfe2a8235e715ec3ea4df4fe629ba1bc47f80afd82c299ee555286e56f0a2a9df80a993068d9cdcd4b3ac8bdd5a18abf67ae6a44a029026d77030d0922253e4ea52b7e5787edb4cd66492af8dde66697ada2c3ee25ea91cd47d408b83558a6d37d190e3f7ccc3455fc8b3eb00648fd85385f8fe472b688bf90e9047109023a0985edb99a6ffe7d29c7882c0cbeaf54721d1c90256e913fbddcb7da010a002cf9fc09446c5ce888283f20df2cc131b1fe756c008db8f4f47918b5ec61c8c9e8686affc0d73b11834b51262e8f062c97efce1d458a855035522444754af73059396d606a1d362a617faa54c4c675042eb280b800584a336bfa1d107c27aa7d2567cd61070ece8a648908f946ca111e69b80bf5c651ce4cf11015c5f50346f87e2e67f21c02eb1fe72d2d898a283e6c8e5e29bd40414886f5b9a366de57abf2f689cea2d1a5056440b26094c43dcdb2ffbce70986f4eff2512031c6a3d1dd632d2340225d4c1a54a0838bf5c634b8b67cbad82774472946e38a68d28b1b7c38e9003b33744f59479b6d913aa714bd55bbd7717ab3cc103e5e7e7efd113ea3463569706670786e164962c3039390812732e4c81bf300c5b3de31899b21ea62a5ac0e31e653cb169074f4f31bad92d8251d680350d36e1661d750b76b157e3b8f387ed85549746c8a0f632bb94ba7efc6ed8444c5a299961c43bd651f48649fdaaff706c0c6d811bd30bfb2f7fc6914cbf88d03db819f8ee9964347c8bf37e510ec50b3e7967072a5f81cb57e8fc1f6d10bff5061ee04915221f0607d74ef2abb944d8d4dd42921035ad0648af1fe0f41c5f93907514f755416e1e9ae0c95d7e5327ebb0508170bc47a8827d7fee4dd54d3c73178e9f6d37f24db467b321d75625dd524667c7abdc7eb6353d2dd908cc2ddb10b03d75323125d85ef49ab92b35556dc7345c94fd60e5e9e7e8df67ce9faab4e28318bc493cc17b0ee56a795b37a0c566d2f7548e08cbf78a69fe4b6b7bb995809f12f76a64353651cca54ecc891b582d150fcaf750d312ff90c5c358a8d4df85fdaffd569585f05abd95118a3dc2f1df3c5432eb179d4d31634448109f3f854c2abd1ea20560a793882077cd4deeb34a778fe168297b00eb6a5712b3bf4e2a3ad16f36f5ac0db818e25a6e6c39af078c305e3c696e146bd828a732dcf9b59a3cb2dcd3494ad1e5c3dd073a46504ea4f7071288b2ecb41edebd2e415a95c1d06993ce186dc255915e5c93da08b89f4db66048f3d83f0a4751467e8a4eac587bd26861575921bc337f10c89edb8af048cfcd03de8a2444bdb5d8961bdadd112900a0cd5cc63a8f0617d710433134f37ddd2f2785e739920bd57e11300af78f45e2c4d2b57f2a0ee80ef278c1d86afb269f312ea289829a7ebdd627f3739db773d21ba048ce62765a28250571f800e2a44103762cb49d45c649e7df1f511528d84d58c04cebf6fe4adfb5a9872d35736dedd9b9c6e7ee513661581797bbe25e7b978f5116abfa196af7e13411c42b1ab925840fa6cd550ebe24194dde82b40ba51cfc828857b5696ca41cbd160975866d6f5ed0ef7a8d88772d177cd54b591ff43bd32ecaa9ef00d2ce9a98b211484080a73798558a1e9fae05b91175ed0dc9a147111767080e3f50866f9db6b81df9f5b7ad4e04acc66514ade355440f2f66e1e8a26da3440cdec60c6093932e96e237746c97902cec18fb654d5be1ebd5e210926132d57f001a00445af072593e35196ac82a1512a65e15ead49d6e4a5b81cff28a5a35f668bce5c0bc3547487262f3a8720fef77972a7d759aafd54cb9a0d6db0fca2e2b84e8d39e88e1a13818fe1b4257eca76ebe49a9274c94d9c42dacc82897d76f931e3479a76fe38cd6a79dab7b39f98fb0e73e3e52c7ad5f8c79037427226d04941c5051d736fd688e1411fd3305d30b92d5cc4443c45b7ff12178e89943a3e7d758416b11fcb1e9e80210a7c54b02ad78b64df9a373b7e7395fb8b2ed86d9f7b2f37321af0729332e0efb80529d4ae716f02542b68ef15719d6a0159267d6368ea0e03575f579257b8f5876613c5b4ee2a4b848d4fa5272b92f0570e353f8bc4518eaba6d978d813b52d4d371a51cb25606d15ae9420324e20470cb32e0f806e683f782c740386a2d82dcf03b48d53b70083430496b1486e73dd5366ca891a0559ed95485efa2f85a871079f384200c2cabd05d19ae0d8f4dfccecbfa785a532156f92aec3899a5b84c2f4116f026dd5af79d62fd0bcd73227c87b8e9ba21018c440363b411505c9428175da26454379e19a3ce70ee9dafd5ef95d8b986065dac07bad4c9548837dc52be0fe089a1beda742097411bb20eb7f8b3024834833e25de8f961aa0ac16390f77a5fd2e05b8fcc8c5c8f4fdad80dc4eec06a0e1c4979fe3e21f68da598baa843604aa6c045a84c871f10d0b3216ce0a36c28b652db5fb6b2144915563a11c40f33bf5bd7c8416440ecac2acd50015f4aa82a1bf3666af8295a949431da7f9e976a2e8140d7f235a9ec25ef03ae8d88bb09727cc15de412211a21bae191946ad5952849a70e562c38017ce71aaebf0d4e33a68035ed42278bfad445f139ac02c320e3839b245fa5023693995391eaad89984720d582930529adcb8350f6cfc810bb89fe91d58672adb2a1febf74972c1d509c46ffde1e2bfe8d509ddb923104e36617065eb1f45c699bd8f1516cac1bc73278c76d77139fa4340edc9e9b1f60d06edd4aa017f0c39a40a66165ec1d8d85add582efcdc54204daf23bce0c45d2a7cead3d6c039183b66444ef2741cce2c7684d1db306a65d9fe2ec62411c218fdd858eb675c03a546362a35184e823b7435e79a5ccb62d02508d3be042bf8cfd3fcf13851040a8d9811f62f1f7e5dec0b3c328af673bb6d38a732cd193608dc3eb9e20520e49623e5b41b07eaa2aedcbe3464ae435d407427d06bdd508cfdac98d820dea21a3db4acf33d58395cb7b3402ea3f4f62af11dd46c62</script>
-  <div class="hbe hbe-content">
-    <div class="hbe hbe-input hbe-input-xray">
-      <input class="hbe hbe-input-field hbe-input-field-xray" type="password" id="hbePass">
-      <label class="hbe hbe-input-label hbe-input-label-xray" for="hbePass">
-        <span class="hbe hbe-input-label-content hbe-input-label-content-xray">Hey, password is required here.</span>
-      </label>
-      <svg class="hbe hbe-graphic hbe-graphic-xray" width="300%" height="100%" viewBox="0 0 1200 60" preserveAspectRatio="none">
-        <path d="M0,56.5c0,0,298.666,0,399.333,0C448.336,56.5,513.994,46,597,46c77.327,0,135,10.5,200.999,10.5c95.996,0,402.001,0,402.001,0"></path>
-        <path d="M0,2.5c0,0,298.666,0,399.333,0C448.336,2.5,513.994,13,597,13c77.327,0,135-10.5,200.999-10.5c95.996,0,402.001,0,402.001,0"></path>
-      </svg>
-    </div>
-  </div>
-</div>
-<script data-pjax src="/lib/hbe.js"></script><link href="/css/hbe.style.css" rel="stylesheet" type="text/css">
+        <h1 id="内容简介"><a href="#内容简介" class="headerlink" title="内容简介"></a>内容简介</h1><p>为了更加有效地管理内存并且少出错，现代系统提供了一种对主存的抽象概念，叫做虚拟内存<code>(VM)</code>。虚拟内存是硬件异常、硬件地址翻译、主存、磁盘文件和内核软件的完美交互，它为每个进程提供了一个大的、一致的和私有的地址空间。虚拟内存是计算机系统最重要的概念之一。它是沉默地、自动地工作的，不需要应用程序员的任何干涉。</p>
+<span id="more"></span>
+
+<h1 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h1><ul>
+<li><a target="_blank" rel="noopener" href="https://csapp.cs.cmu.edu/"><code>Computer Systems: A Programmer&#39;s Perspective, 3/E</code></a></li>
+</ul>
+
     </div>
 
     
@@ -292,21 +284,18 @@
 
     <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/OSINT/" rel="tag"><i class="fa fa-tag"></i> OSINT</a>
+              <a href="/tags/CSAPP/" rel="tag"><i class="fa fa-tag"></i> CSAPP</a>
           </div>
 
         
 
           <div class="post-nav">
             <div class="post-nav-item">
-                <a href="/posts/htb-easyphish/" rel="prev" title="HTB Easy Phish">
-                  <i class="fa fa-chevron-left"></i> HTB Easy Phish
+                <a href="/posts/vir-mem3/" rel="prev" title="虚拟内存(三)">
+                  <i class="fa fa-chevron-left"></i> 虚拟内存(三)
                 </a>
             </div>
             <div class="post-nav-item">
-                <a href="/posts/htb-idexposed/" rel="next" title="HTB ID Exposed">
-                  HTB ID Exposed <i class="fa fa-chevron-right"></i>
-                </a>
             </div>
           </div>
     </footer>
