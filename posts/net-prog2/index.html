@@ -20,28 +20,28 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"lu0k.github.io","root":"/","images":"/images","scheme":"Gemini","version":"8.7.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
-<meta name="description" content="Here&#39;s something encrypted, password is required to continue reading.">
+<meta name="description" content="内容简介网络应用随处可见。任何时候浏览Web、发送Email信息或是玩在线游戏，都在使用网络应用程序。有趣的是，所有的网络应用都是基于相同的基本编程模型，有着相似的整体逻辑结构，并且依赖相同的编程接口。网络应用依赖于很多在系统研究中已经学习过的概念，例如：进程、信号、字节顺序、内存映射以及动态内存分配。还依赖于一些新的概念。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="HTB Obscure">
-<meta property="og:url" content="https://lu0k.github.io/posts/htb-obscure/index.html">
+<meta property="og:title" content="网络编程(二)">
+<meta property="og:url" content="https://lu0k.github.io/posts/net-prog2/index.html">
 <meta property="og:site_name" content="Lu0k">
-<meta property="og:description" content="Here&#39;s something encrypted, password is required to continue reading.">
+<meta property="og:description" content="内容简介网络应用随处可见。任何时候浏览Web、发送Email信息或是玩在线游戏，都在使用网络应用程序。有趣的是，所有的网络应用都是基于相同的基本编程模型，有着相似的整体逻辑结构，并且依赖相同的编程接口。网络应用依赖于很多在系统研究中已经学习过的概念，例如：进程、信号、字节顺序、内存映射以及动态内存分配。还依赖于一些新的概念。">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2022-02-22T16:00:00.000Z">
-<meta property="article:modified_time" content="2022-03-16T11:00:17.767Z">
+<meta property="article:published_time" content="2022-04-09T16:00:00.000Z">
+<meta property="article:modified_time" content="2022-04-10T12:08:02.091Z">
 <meta property="article:author" content="Lu0k">
-<meta property="article:tag" content="Forensics">
+<meta property="article:tag" content="CSAPP">
 <meta name="twitter:card" content="summary">
 
 
-<link rel="canonical" href="https://lu0k.github.io/posts/htb-obscure/">
+<link rel="canonical" href="https://lu0k.github.io/posts/net-prog2/">
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://lu0k.github.io/posts/htb-obscure/","path":"posts/htb-obscure/","title":"HTB Obscure"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://lu0k.github.io/posts/net-prog2/","path":"posts/net-prog2/","title":"网络编程(二)"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>HTB Obscure | Lu0k</title>
+<title>网络编程(二) | Lu0k</title>
   
 
 
@@ -135,7 +135,7 @@
 
   <aside class="sidebar">
 
-    <div class="sidebar-inner sidebar-overview-active">
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
       <ul class="sidebar-nav">
         <li class="sidebar-nav-toc">
           文章目录
@@ -148,6 +148,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%86%85%E5%AE%B9%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">内容简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Reference"><span class="nav-number">2.</span> <span class="nav-text">Reference</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -222,7 +223,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://lu0k.github.io/posts/htb-obscure/">
+    <link itemprop="mainEntityOfPage" href="https://lu0k.github.io/posts/net-prog2/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">
@@ -235,7 +236,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          HTB Obscure
+          网络编程(二)
         </h1>
 
         <div class="post-meta-container">
@@ -246,7 +247,7 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2022-02-23 00:00:00" itemprop="dateCreated datePublished" datetime="2022-02-23T00:00:00+08:00">2022-02-23</time>
+      <time title="创建时间：2022-04-10 00:00:00" itemprop="dateCreated datePublished" datetime="2022-04-10T00:00:00+08:00">2022-04-10</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -254,7 +255,7 @@
       </span>
       <span class="post-meta-item-text">分类于</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/HTB-Challenges/" itemprop="url" rel="index"><span itemprop="name">HTB Challenges</span></a>
+          <a href="/categories/Read-Notes/" itemprop="url" rel="index"><span itemprop="name">Read Notes</span></a>
         </span>
     </span>
 
@@ -268,22 +269,13 @@
     
     
     <div class="post-body" itemprop="articleBody">
-        <div class="hbe hbe-container" id="hexo-blog-encrypt" data-wpm="Oh, this is an invalid password. Check and try again, please." data-whm="OOPS, these decrypted content may changed, but you can still have a look.">
-  <script id="hbeData" type="hbeData" data-hmacdigest="6f349dbc68b4c1974f53434e135e8b4e5ff0177a1050dd2cbf38c82947b9e974">426478eb48212ddfed3bbd1ecf8d7f3ed066042fc074039788defb93c5bdf4825da941885609cd6c21ddc4fb42bff172d391fd60592c9a4383ece041d2fdf817e1b787425c2391f6504d6cb4d0ce1f01b7a2428546d42793cfa7c0064b1f2ac364afdf4073309f966e76f0caa750de1c72af4d1e6597ef12cc52abae02c7d6c316a033f7cd77f195e409c041aace6bd1235bf555ccc7fa4d9cb25e3b34c54d968a4b661d03b98118f34e38655c4ccadaef13d17f22121b8b70d4d074cf2cff5a4e90bff7805922c4aed75b433715c6d440fab93ec48757d488766b2f3986069ba677c6d1dc0f65afbb45c8322449a1cfec4c913d6096ffa8d1fd32f1b208e22903107261a53bd32056bb33ff2a737044ed87bf9270046ecd70aeb652d8a11de10b16d751e660ff60d03fbe55e7c4a8af8b116adcb7de134120bbfa899bf85f5665acec6acc61615145dd8ab5761de5572ed06f20a3d804c5627609c5e283e0dc4ca8de0c38792f0ec9c538a50b3c0c6b5fb8342c1947b9d4aa93bc5efe754e4c0b19f25489f57f3bf68f4cc0a15816654f9b0c2c4fa0aa14ed50aeaa3a49feefd601b933bb18e41dad77c7fb01f920ef6b2c7240cb35499b0cbc26b87819b4406f8b2535aa31e04078cd3195a46e042cfb3d05820e84258c8284025bc3fca422aaee91f05534d73f1e18368fe0cc826c308875358f69973e0f41cccaede22509d32257fb1e69fea8a4acefc1a753730566d393443424c09c6614a60bdd141aab0f85a1b01b5edf95064385448bee0a6b8552da2d45387b8926a93cedd320a9c7de7fc64e209060ec83d990b08afa570256713d4e1bd0b18259a8b72d2b4b2dca51411e00b1469ae662ad2412ab3bc23d5824c750f360eb78650fb593430e69f639e3538e6194e048d2a93777cee313b320d6f5e3318f375d0d999d3aad6203f943b7bb1cc7fb18aeeea302a45b96e73c9ec489900e0f87cd37a3148ae9511ded5ab2683595b81d490cd538fcc869f3567704daf20619e8c13a7713c961112fd9</script>
-  <div class="hbe hbe-content">
-    <div class="hbe hbe-input hbe-input-xray">
-      <input class="hbe hbe-input-field hbe-input-field-xray" type="password" id="hbePass">
-      <label class="hbe hbe-input-label hbe-input-label-xray" for="hbePass">
-        <span class="hbe hbe-input-label-content hbe-input-label-content-xray">Hey, password is required here.</span>
-      </label>
-      <svg class="hbe hbe-graphic hbe-graphic-xray" width="300%" height="100%" viewBox="0 0 1200 60" preserveAspectRatio="none">
-        <path d="M0,56.5c0,0,298.666,0,399.333,0C448.336,56.5,513.994,46,597,46c77.327,0,135,10.5,200.999,10.5c95.996,0,402.001,0,402.001,0"></path>
-        <path d="M0,2.5c0,0,298.666,0,399.333,0C448.336,2.5,513.994,13,597,13c77.327,0,135-10.5,200.999-10.5c95.996,0,402.001,0,402.001,0"></path>
-      </svg>
-    </div>
-  </div>
-</div>
-<script data-pjax src="/lib/hbe.js"></script><link href="/css/hbe.style.css" rel="stylesheet" type="text/css">
+        <h1 id="内容简介"><a href="#内容简介" class="headerlink" title="内容简介"></a>内容简介</h1><p>网络应用随处可见。任何时候浏览<code>Web</code>、发送<code>Email</code>信息或是玩在线游戏，都在使用网络应用程序。有趣的是，所有的网络应用都是基于相同的基本编程模型，有着相似的整体逻辑结构，并且依赖相同的编程接口。网络应用依赖于很多在系统研究中已经学习过的概念，例如：进程、信号、字节顺序、内存映射以及动态内存分配。还依赖于一些新的概念。</p>
+<span id="more"></span>
+
+<h1 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h1><ul>
+<li><a target="_blank" rel="noopener" href="https://csapp.cs.cmu.edu/"><code>Computer Systems: A Programmer&#39;s Perspective, 3/E</code></a></li>
+</ul>
+
     </div>
 
     
@@ -292,21 +284,18 @@
 
     <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/Forensics/" rel="tag"><i class="fa fa-tag"></i> Forensics</a>
+              <a href="/tags/CSAPP/" rel="tag"><i class="fa fa-tag"></i> CSAPP</a>
           </div>
 
         
 
           <div class="post-nav">
             <div class="post-nav-item">
-                <a href="/posts/htb-redfailure/" rel="prev" title="HTB Red Failure">
-                  <i class="fa fa-chevron-left"></i> HTB Red Failure
+                <a href="/posts/net-prog1/" rel="prev" title="网络编程(一)">
+                  <i class="fa fa-chevron-left"></i> 网络编程(一)
                 </a>
             </div>
             <div class="post-nav-item">
-                <a href="/posts/htb-obfsc4t10n/" rel="next" title="HTB oBfsC4t10n">
-                  HTB oBfsC4t10n <i class="fa fa-chevron-right"></i>
-                </a>
             </div>
           </div>
     </footer>
