@@ -160,7 +160,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">168</span>
+          <span class="site-state-item-count">139</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -171,7 +171,7 @@
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">39</span>
+        <span class="site-state-item-count">38</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -218,7 +218,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://lu0k.github.io/posts/htb-m0rsarchive/">
+    <link itemprop="mainEntityOfPage" href="https://lu0k.github.io/posts/tcache-info/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">
@@ -231,7 +231,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/htb-m0rsarchive/" class="post-title-link" itemprop="url">HTB M0rsarchive</a>
+          <a href="/posts/tcache-info/" class="post-title-link" itemprop="url">TCache机制</a>
         </h2>
 
         <div class="post-meta-container">
@@ -242,87 +242,7 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2021-12-27 00:00:00" itemprop="dateCreated datePublished" datetime="2021-12-27T00:00:00+08:00">2021-12-27</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/HTB-Challenges/" itemprop="url" rel="index"><span itemprop="name">HTB Challenges</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          Here's something encrypted, password is required to continue reading.
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/posts/htb-m0rsarchive/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://lu0k.github.io/posts/mlr-program3/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.jpg">
-      <meta itemprop="name" content="Lu0k">
-      <meta itemprop="description" content="谦虚学习!">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Lu0k">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/mlr-program3/" class="post-title-link" itemprop="url">程序的机器级表示(三)</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2021-12-26 00:00:00" itemprop="dateCreated datePublished" datetime="2021-12-26T00:00:00+08:00">2021-12-26</time>
+      <time title="创建时间：2021-11-28 00:00:00" itemprop="dateCreated datePublished" datetime="2021-11-28T00:00:00+08:00">2021-11-28</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -344,10 +264,10 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <h1 id="内容简介"><a href="#内容简介" class="headerlink" title="内容简介"></a>内容简介</h1><p>计算机执行机器代码，用字节序列编码低级的操作，包括处理数据、管理内存、读写存储设备上的数据，以及利用网络通信。编译器基于编程语言的规则、目标机器的指令集和操作系统遵循的惯例，经过一系列的阶段生成机器代码。GCC C语言编译器以汇编代码的形式产生输出，汇编代码是机器代码的文本表示，给出程序中的每一条指令。然后GCC调用汇编器和链接器，根据汇编代码生成可执行的机器代码。</p>
+          <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>在<code>Glibc-2.26</code>版本内存分配器加入了<code>TCache</code>机制而有了较大的变化。<code>TCache</code>全名为<code>Thread Local Caching</code>，它为每个线程创建一个缓存，里面包含了一些小堆块，无须对<code>arena</code>上锁即可使用，这种无锁的分配算法能有不错的性能提升。虽然线程缓存在很多年前已经在另一种内存分配器<code>TCMalloc(Thread-Caching Malloc)</code>中实现，但直到2017年<code>ptmalloc2</code>才在<code>glibc-2.26</code>中将其正式加入，并默认开启。</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/posts/mlr-program3/#more" rel="contents">
+              <a class="btn" href="/posts/tcache-info/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -378,7 +298,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://lu0k.github.io/posts/mlr-program2/">
+    <link itemprop="mainEntityOfPage" href="https://lu0k.github.io/posts/heap-intro/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">
@@ -391,7 +311,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/mlr-program2/" class="post-title-link" itemprop="url">程序的机器级表示(二)</a>
+          <a href="/posts/heap-intro/" class="post-title-link" itemprop="url">堆简析</a>
         </h2>
 
         <div class="post-meta-container">
@@ -402,7 +322,7 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2021-12-25 00:00:00" itemprop="dateCreated datePublished" datetime="2021-12-25T00:00:00+08:00">2021-12-25</time>
+      <time title="创建时间：2021-11-27 00:00:00" itemprop="dateCreated datePublished" datetime="2021-11-27T00:00:00+08:00">2021-11-27</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -424,10 +344,10 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <h1 id="内容简介"><a href="#内容简介" class="headerlink" title="内容简介"></a>内容简介</h1><p>计算机执行机器代码，用字节序列编码低级的操作，包括处理数据、管理内存、读写存储设备上的数据，以及利用网络通信。编译器基于编程语言的规则、目标机器的指令集和操作系统遵循的惯例，经过一系列的阶段生成机器代码。GCC C语言编译器以汇编代码的形式产生输出，汇编代码是机器代码的文本表示，给出程序中的每一条指令。然后GCC调用汇编器和链接器，根据汇编代码生成可执行的机器代码。</p>
+          <h1 id="堆简介"><a href="#堆简介" class="headerlink" title="堆简介"></a>堆简介</h1><p>堆是程序虚拟内存中由低地址向高地址线性增长的线性区域。一般只有当用户像操作系统申请内存时，这片区域才会被内核分配出来，并且出于效率和页对齐的考虑，通常会分配相当大的连续内存。程序再次申请时便会从这片内存中分配，直到堆空间不能满足时才会再次增长。堆的位置一般在<code>BSS</code>段高地址处。</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/posts/mlr-program2/#more" rel="contents">
+              <a class="btn" href="/posts/heap-intro/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -458,7 +378,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://lu0k.github.io/posts/htb-exploitedstream/">
+    <link itemprop="mainEntityOfPage" href="https://lu0k.github.io/posts/htb-rookiemistake/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">
@@ -471,7 +391,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/htb-exploitedstream/" class="post-title-link" itemprop="url">HTB ExploitedStream</a>
+          <a href="/posts/htb-rookiemistake/" class="post-title-link" itemprop="url">HTB Rookie Mistake</a>
         </h2>
 
         <div class="post-meta-container">
@@ -482,7 +402,7 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2021-12-24 00:00:00" itemprop="dateCreated datePublished" datetime="2021-12-24T00:00:00+08:00">2021-12-24</time>
+      <time title="创建时间：2021-11-26 00:00:00" itemprop="dateCreated datePublished" datetime="2021-11-26T00:00:00+08:00">2021-11-26</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -507,7 +427,7 @@
           Here's something encrypted, password is required to continue reading.
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/posts/htb-exploitedstream/#more" rel="contents">
+              <a class="btn" href="/posts/htb-rookiemistake/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -538,7 +458,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://lu0k.github.io/posts/htb-microstorage/">
+    <link itemprop="mainEntityOfPage" href="https://lu0k.github.io/posts/htb-shibboleth/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">
@@ -551,7 +471,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/htb-microstorage/" class="post-title-link" itemprop="url">HTB Micro Storage</a>
+          <a href="/posts/htb-shibboleth/" class="post-title-link" itemprop="url">HTB Shibboleth</a>
         </h2>
 
         <div class="post-meta-container">
@@ -562,7 +482,87 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2021-12-23 00:00:00" itemprop="dateCreated datePublished" datetime="2021-12-23T00:00:00+08:00">2021-12-23</time>
+      <time title="创建时间：2021-11-25 00:00:00" itemprop="dateCreated datePublished" datetime="2021-11-25T00:00:00+08:00">2021-11-25</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/HTB-Machines/" itemprop="url" rel="index"><span itemprop="name">HTB Machines</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          Here's something encrypted, password is required to continue reading.
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/posts/htb-shibboleth/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://lu0k.github.io/posts/htb-fibopadcci/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Lu0k">
+      <meta itemprop="description" content="谦虚学习!">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Lu0k">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/posts/htb-fibopadcci/" class="post-title-link" itemprop="url">HTB Fibopadcci</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-11-24 00:00:00" itemprop="dateCreated datePublished" datetime="2021-11-24T00:00:00+08:00">2021-11-24</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -587,7 +587,7 @@
           Here's something encrypted, password is required to continue reading.
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/posts/htb-microstorage/#more" rel="contents">
+              <a class="btn" href="/posts/htb-fibopadcci/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -618,7 +618,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://lu0k.github.io/posts/htb-canvas/">
+    <link itemprop="mainEntityOfPage" href="https://lu0k.github.io/posts/htb-rsaiseasy/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">
@@ -631,7 +631,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/htb-canvas/" class="post-title-link" itemprop="url">HTB Canvas</a>
+          <a href="/posts/htb-rsaiseasy/" class="post-title-link" itemprop="url">HTB RSAisEasy</a>
         </h2>
 
         <div class="post-meta-container">
@@ -642,7 +642,7 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2021-12-22 00:00:00" itemprop="dateCreated datePublished" datetime="2021-12-22T00:00:00+08:00">2021-12-22</time>
+      <time title="创建时间：2021-11-23 00:00:00" itemprop="dateCreated datePublished" datetime="2021-11-23T00:00:00+08:00">2021-11-23</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -667,7 +667,7 @@
           Here's something encrypted, password is required to continue reading.
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/posts/htb-canvas/#more" rel="contents">
+              <a class="btn" href="/posts/htb-rsaiseasy/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -698,7 +698,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://lu0k.github.io/posts/htb-blackhole/">
+    <link itemprop="mainEntityOfPage" href="https://lu0k.github.io/posts/overflow-rop/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">
@@ -711,7 +711,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/htb-blackhole/" class="post-title-link" itemprop="url">HTB Blackhole</a>
+          <a href="/posts/overflow-rop/" class="post-title-link" itemprop="url">栈溢出与ROP</a>
         </h2>
 
         <div class="post-meta-container">
@@ -722,167 +722,7 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2021-12-21 00:00:00" itemprop="dateCreated datePublished" datetime="2021-12-21T00:00:00+08:00">2021-12-21</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/HTB-Challenges/" itemprop="url" rel="index"><span itemprop="name">HTB Challenges</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          Here's something encrypted, password is required to continue reading.
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/posts/htb-blackhole/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://lu0k.github.io/posts/htb-longbottom'slocker/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.jpg">
-      <meta itemprop="name" content="Lu0k">
-      <meta itemprop="description" content="谦虚学习!">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Lu0k">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/htb-longbottom'slocker/" class="post-title-link" itemprop="url">HTB Longbottom's Locker</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2021-12-20 00:00:00" itemprop="dateCreated datePublished" datetime="2021-12-20T00:00:00+08:00">2021-12-20</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/HTB-Challenges/" itemprop="url" rel="index"><span itemprop="name">HTB Challenges</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          Here's something encrypted, password is required to continue reading.
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/posts/htb-longbottom'slocker/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://lu0k.github.io/posts/mlr-program1/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.jpg">
-      <meta itemprop="name" content="Lu0k">
-      <meta itemprop="description" content="谦虚学习!">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Lu0k">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/mlr-program1/" class="post-title-link" itemprop="url">程序的机器级表示(一)</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2021-12-19 00:00:00" itemprop="dateCreated datePublished" datetime="2021-12-19T00:00:00+08:00">2021-12-19</time>
+      <time title="创建时间：2021-11-22 00:00:00" itemprop="dateCreated datePublished" datetime="2021-11-22T00:00:00+08:00">2021-11-22</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -904,10 +744,10 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <h1 id="内容简介"><a href="#内容简介" class="headerlink" title="内容简介"></a>内容简介</h1><p>计算机执行机器代码，用字节序列编码低级的操作，包括处理数据、管理内存、读写存储设备上的数据，以及利用网络通信。编译器基于编程语言的规则、目标机器的指令集和操作系统遵循的惯例，经过一系列的阶段生成机器代码。GCC C语言编译器以汇编代码的形式产生输出，汇编代码是机器代码的文本表示，给出程序中的每一条指令。然后GCC调用汇编器和链接器，根据汇编代码生成可执行的机器代码。</p>
+          <h1 id="栈溢出原理"><a href="#栈溢出原理" class="headerlink" title="栈溢出原理"></a>栈溢出原理</h1><p>由于C语言对于数组引用不做任何边界检查，从而导致缓冲区溢出<code>(buffer overflow)</code>成为一种很常见的漏洞。根据溢出发生的内存位置，通常可以分为栈溢出和堆溢出。其中，由于栈上保存着局部变量和一些状态信息<code>(寄存器值、返回地址等)</code>，一旦发生严重的溢出，攻击者就可以通过覆写返回地址来执行任意代码，利用方法包括<code>shellcode注入</code>、<code>ret2libc</code>、<code>ROP</code>等。同时，防守方也发展出多种利用缓解机制。</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/posts/mlr-program1/#more" rel="contents">
+              <a class="btn" href="/posts/overflow-rop/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -938,7 +778,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://lu0k.github.io/posts/ram-info2/">
+    <link itemprop="mainEntityOfPage" href="https://lu0k.github.io/posts/format-str/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">
@@ -951,7 +791,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/ram-info2/" class="post-title-link" itemprop="url">信息的表示和处理(下)</a>
+          <a href="/posts/format-str/" class="post-title-link" itemprop="url">格式化字符串</a>
         </h2>
 
         <div class="post-meta-container">
@@ -962,7 +802,7 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2021-12-18 00:00:00" itemprop="dateCreated datePublished" datetime="2021-12-18T00:00:00+08:00">2021-12-18</time>
+      <time title="创建时间：2021-11-21 00:00:00" itemprop="dateCreated datePublished" datetime="2021-11-21T00:00:00+08:00">2021-11-21</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -984,10 +824,170 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <h1 id="内容简介"><a href="#内容简介" class="headerlink" title="内容简介"></a>内容简介</h1><p>现代计算机存储和处理的信息以二值信号表示。这些微不足道的二进制数字，或者称为位<code>(bit)</code>，形成了数字革命的基础。对于有10个手指的人类来说，使用十进制表示法是很自然的事情，但是当构造存储和处理信息的处理器时，二进制值工作得更好。二值信号能够很容易地被表示、存储和传输，对二值信号进行存储和执行计算的电子电路非常简单和可靠。</p>
+          <h1 id="格式化输出"><a href="#格式化输出" class="headerlink" title="格式化输出"></a>格式化输出</h1><p>C语言中定义的变参函数<code>(variadic function)</code>就是参数数量可变的函数。这种函数由固定数量<code>(至少一个)</code>的强制参数<code>(mandatory argument)</code>和数量可变的可选参数<code>(optional argument)</code>组成，强制参数在前，可选参数在后<code>(用省略号表示)</code>。可选参数的类型可以变化，而数量由强制参数的值或者用来定义可选参数列表的特殊值决定。</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/posts/ram-info2/#more" rel="contents">
+              <a class="btn" href="/posts/format-str/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://lu0k.github.io/posts/int-sec/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Lu0k">
+      <meta itemprop="description" content="谦虚学习!">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Lu0k">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/posts/int-sec/" class="post-title-link" itemprop="url">整数安全</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-11-20 00:00:00" itemprop="dateCreated datePublished" datetime="2021-11-20T00:00:00+08:00">2021-11-20</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Read-Notes/" itemprop="url" rel="index"><span itemprop="name">Read Notes</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="整数溢出"><a href="#整数溢出" class="headerlink" title="整数溢出"></a>整数溢出</h1><p>计算机中的整数分为有符号整数和无符号整数两种，通常保存在一个固定长度的内存空间内，它能存储的最大值和最小值都是固定的。如果一个整数被用来计算一些敏感数值，如缓冲区大小或数值索引，就会产生潜在的危险。通常情况下，整数溢出并没有改写额外的内存，不会直接导致任意代码执行，但是它会导致栈溢出和堆溢出，从而导致任意代码执行。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/posts/int-sec/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://lu0k.github.io/posts/htb-lunacrypt/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Lu0k">
+      <meta itemprop="description" content="谦虚学习!">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Lu0k">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/posts/htb-lunacrypt/" class="post-title-link" itemprop="url">HTB LunaCrypt</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-11-19 00:00:00" itemprop="dateCreated datePublished" datetime="2021-11-19T00:00:00+08:00">2021-11-19</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/HTB-Challenges/" itemprop="url" rel="index"><span itemprop="name">HTB Challenges</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          Here's something encrypted, password is required to continue reading.
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/posts/htb-lunacrypt/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -1011,7 +1011,7 @@
 
 
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/8/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/8/">8</a><span class="page-number current">9</span><a class="page-number" href="/page/10/">10</a><span class="space">&hellip;</span><a class="page-number" href="/page/17/">17</a><a class="extend next" rel="next" href="/page/10/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/8/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/8/">8</a><span class="page-number current">9</span><a class="page-number" href="/page/10/">10</a><span class="space">&hellip;</span><a class="page-number" href="/page/14/">14</a><a class="extend next" rel="next" href="/page/10/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 </div>
@@ -1023,7 +1023,7 @@
 
 <div class="copyright">
   &copy; 
-  <span itemprop="copyrightYear">2022</span>
+  <span itemprop="copyrightYear">2023</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

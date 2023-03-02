@@ -160,7 +160,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">168</span>
+          <span class="site-state-item-count">139</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -171,7 +171,7 @@
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">39</span>
+        <span class="site-state-item-count">38</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -218,7 +218,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://lu0k.github.io/posts/conc-prog3/">
+    <link itemprop="mainEntityOfPage" href="https://lu0k.github.io/posts/cve-2021-4034/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">
@@ -231,7 +231,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/conc-prog3/" class="post-title-link" itemprop="url">并发编程(三)</a>
+          <a href="/posts/cve-2021-4034/" class="post-title-link" itemprop="url">CVE-2021-4034 分析及复现</a>
         </h2>
 
         <div class="post-meta-container">
@@ -242,7 +242,7 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2022-04-24 00:00:00" itemprop="dateCreated datePublished" datetime="2022-04-24T00:00:00+08:00">2022-04-24</time>
+      <time title="创建时间：2022-02-28 00:00:00" itemprop="dateCreated datePublished" datetime="2022-02-28T00:00:00+08:00">2022-02-28</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -250,7 +250,7 @@
       </span>
       <span class="post-meta-item-text">分类于</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/Read-Notes/" itemprop="url" rel="index"><span itemprop="name">Read Notes</span></a>
+          <a href="/categories/Vulns/" itemprop="url" rel="index"><span itemprop="name">Vulns</span></a>
         </span>
     </span>
 
@@ -264,10 +264,10 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <h1 id="内容简介"><a href="#内容简介" class="headerlink" title="内容简介"></a>内容简介</h1><p>如果逻辑控制流在时间上重叠，那么它们就是并发的<code>(concurrent)</code>。这种常见的现象称为并发<code>(concurrency)</code>，出现在计算机系统的许多不同层面上，例如硬件异常处理程序、进程和Linux信号处理程序。并发是一种操作系统内核用来运行多个应用程序的机制，但是并发不仅仅局限于内核，它也可以在应用程序中扮演重要角色。</p>
+          <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>CVE-2021-4034是一个本地权限提升漏洞，该漏洞存在于<code>Polkit</code>工具包中的<code>pkexec</code>中。<code>Polkit</code>是一个用于定义和处理授权的工具包，用于允许非特权进程与特权进程对话。用户可以使用其中的<code>pkexec</code>以提升的权限执行命令。<code>pkexec</code>是一个<code>SUID-root</code>程序，如果成功利用此漏洞，任何非特权用户均可以在易受攻击的主机上获得<code>root</code>权限。</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/posts/conc-prog3/#more" rel="contents">
+              <a class="btn" href="/posts/cve-2021-4034/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -298,7 +298,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://lu0k.github.io/posts/conc-prog2/">
+    <link itemprop="mainEntityOfPage" href="https://lu0k.github.io/posts/linking3/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">
@@ -311,7 +311,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/conc-prog2/" class="post-title-link" itemprop="url">并发编程(二)</a>
+          <a href="/posts/linking3/" class="post-title-link" itemprop="url">链接(三)</a>
         </h2>
 
         <div class="post-meta-container">
@@ -322,7 +322,7 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2022-04-23 00:00:00" itemprop="dateCreated datePublished" datetime="2022-04-23T00:00:00+08:00">2022-04-23</time>
+      <time title="创建时间：2022-02-20 00:00:00" itemprop="dateCreated datePublished" datetime="2022-02-20T00:00:00+08:00">2022-02-20</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -344,10 +344,10 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <h1 id="内容简介"><a href="#内容简介" class="headerlink" title="内容简介"></a>内容简介</h1><p>如果逻辑控制流在时间上重叠，那么它们就是并发的<code>(concurrent)</code>。这种常见的现象称为并发<code>(concurrency)</code>，出现在计算机系统的许多不同层面上，例如硬件异常处理程序、进程和Linux信号处理程序。并发是一种操作系统内核用来运行多个应用程序的机制，但是并发不仅仅局限于内核，它也可以在应用程序中扮演重要角色。</p>
+          <h1 id="内容简介"><a href="#内容简介" class="headerlink" title="内容简介"></a>内容简介</h1><p>链接<code>(linking)</code>是将各种代码和数据片段收集并组合成为一个单一文件的过程，这个文件可被加载<code>(复制)</code>到内存并执行。链接可以执行于编译时<code>(compile time)</code>，也就是在源代码被翻译成机器代码时；也可以执行于加载时<code>(load time)</code>，也就是在程序被加载器<code>(loader)</code>加载到内存并执行时；甚至执行于运行时<code>(run time)</code>，也就是由应用程序来执行。</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/posts/conc-prog2/#more" rel="contents">
+              <a class="btn" href="/posts/linking3/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -378,7 +378,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://lu0k.github.io/posts/conc-prog1/">
+    <link itemprop="mainEntityOfPage" href="https://lu0k.github.io/posts/linking2/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">
@@ -391,7 +391,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/conc-prog1/" class="post-title-link" itemprop="url">并发编程(一)</a>
+          <a href="/posts/linking2/" class="post-title-link" itemprop="url">链接(二)</a>
         </h2>
 
         <div class="post-meta-container">
@@ -402,7 +402,7 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2022-04-17 00:00:00" itemprop="dateCreated datePublished" datetime="2022-04-17T00:00:00+08:00">2022-04-17</time>
+      <time title="创建时间：2022-02-19 00:00:00" itemprop="dateCreated datePublished" datetime="2022-02-19T00:00:00+08:00">2022-02-19</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -424,10 +424,10 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <h1 id="内容简介"><a href="#内容简介" class="headerlink" title="内容简介"></a>内容简介</h1><p>如果逻辑控制流在时间上重叠，那么它们就是并发的<code>(concurrent)</code>。这种常见的现象称为并发<code>(concurrency)</code>，出现在计算机系统的许多不同层面上，例如硬件异常处理程序、进程和Linux信号处理程序。并发是一种操作系统内核用来运行多个应用程序的机制，但是并发不仅仅局限于内核，它也可以在应用程序中扮演重要角色。</p>
+          <h1 id="内容简介"><a href="#内容简介" class="headerlink" title="内容简介"></a>内容简介</h1><p>链接<code>(linking)</code>是将各种代码和数据片段收集并组合成为一个单一文件的过程，这个文件可被加载<code>(复制)</code>到内存并执行。链接可以执行于编译时<code>(compile time)</code>，也就是在源代码被翻译成机器代码时；也可以执行于加载时<code>(load time)</code>，也就是在程序被加载器<code>(loader)</code>加载到内存并执行时；甚至执行于运行时<code>(run time)</code>，也就是由应用程序来执行。</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/posts/conc-prog1/#more" rel="contents">
+              <a class="btn" href="/posts/linking2/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -458,7 +458,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://lu0k.github.io/posts/net-prog3/">
+    <link itemprop="mainEntityOfPage" href="https://lu0k.github.io/posts/linking1/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">
@@ -471,7 +471,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/net-prog3/" class="post-title-link" itemprop="url">网络编程(三)</a>
+          <a href="/posts/linking1/" class="post-title-link" itemprop="url">链接(一)</a>
         </h2>
 
         <div class="post-meta-container">
@@ -482,7 +482,7 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2022-04-16 00:00:00" itemprop="dateCreated datePublished" datetime="2022-04-16T00:00:00+08:00">2022-04-16</time>
+      <time title="创建时间：2022-02-13 00:00:00" itemprop="dateCreated datePublished" datetime="2022-02-13T00:00:00+08:00">2022-02-13</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -504,10 +504,10 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <h1 id="内容简介"><a href="#内容简介" class="headerlink" title="内容简介"></a>内容简介</h1><p>网络应用随处可见。任何时候浏览<code>Web</code>、发送<code>Email</code>信息或是玩在线游戏，都在使用网络应用程序。有趣的是，所有的网络应用都是基于相同的基本编程模型，有着相似的整体逻辑结构，并且依赖相同的编程接口。网络应用依赖于很多在系统研究中已经学习过的概念，例如：进程、信号、字节顺序、内存映射以及动态内存分配。还依赖于一些新的概念。</p>
+          <h1 id="内容简介"><a href="#内容简介" class="headerlink" title="内容简介"></a>内容简介</h1><p>链接<code>(linking)</code>是将各种代码和数据片段收集并组合成为一个单一文件的过程，这个文件可被加载<code>(复制)</code>到内存并执行。链接可以执行于编译时<code>(compile time)</code>，也就是在源代码被翻译成机器代码时；也可以执行于加载时<code>(load time)</code>，也就是在程序被加载器<code>(loader)</code>加载到内存并执行时；甚至执行于运行时<code>(run time)</code>，也就是由应用程序来执行。</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/posts/net-prog3/#more" rel="contents">
+              <a class="btn" href="/posts/linking1/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -538,7 +538,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://lu0k.github.io/posts/net-prog2/">
+    <link itemprop="mainEntityOfPage" href="https://lu0k.github.io/posts/mem-hier3/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">
@@ -551,7 +551,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/net-prog2/" class="post-title-link" itemprop="url">网络编程(二)</a>
+          <a href="/posts/mem-hier3/" class="post-title-link" itemprop="url">存储器层次结构(三)</a>
         </h2>
 
         <div class="post-meta-container">
@@ -562,7 +562,7 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2022-04-10 00:00:00" itemprop="dateCreated datePublished" datetime="2022-04-10T00:00:00+08:00">2022-04-10</time>
+      <time title="创建时间：2022-02-12 00:00:00" itemprop="dateCreated datePublished" datetime="2022-02-12T00:00:00+08:00">2022-02-12</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -584,10 +584,10 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <h1 id="内容简介"><a href="#内容简介" class="headerlink" title="内容简介"></a>内容简介</h1><p>网络应用随处可见。任何时候浏览<code>Web</code>、发送<code>Email</code>信息或是玩在线游戏，都在使用网络应用程序。有趣的是，所有的网络应用都是基于相同的基本编程模型，有着相似的整体逻辑结构，并且依赖相同的编程接口。网络应用依赖于很多在系统研究中已经学习过的概念，例如：进程、信号、字节顺序、内存映射以及动态内存分配。还依赖于一些新的概念。</p>
+          <h1 id="内容简介"><a href="#内容简介" class="headerlink" title="内容简介"></a>内容简介</h1><p>存储器系统<code>(memory system)</code>是一个具有不同容量、成本和访问时间的存储设备的层次结构。CPU寄存器保存着最常用的数据。靠近CPU的小的、快速的高速缓存存储器<code>(cache memory)</code>作为一部分存储在相对慢速的主存储器<code>(main memory)</code>中数据和指令的缓冲区域。主存缓存存储在容量较大的、慢速磁盘上的数据，而这些磁盘常常又作为存储在通过网络连接的其他机器的磁盘或磁带上的数据的缓冲区域。</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/posts/net-prog2/#more" rel="contents">
+              <a class="btn" href="/posts/mem-hier3/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -618,7 +618,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://lu0k.github.io/posts/net-prog1/">
+    <link itemprop="mainEntityOfPage" href="https://lu0k.github.io/posts/htb-rsactftool/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">
@@ -631,7 +631,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/net-prog1/" class="post-title-link" itemprop="url">网络编程(一)</a>
+          <a href="/posts/htb-rsactftool/" class="post-title-link" itemprop="url">HTB RsaCtfTool</a>
         </h2>
 
         <div class="post-meta-container">
@@ -642,7 +642,7 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2022-04-09 00:00:00" itemprop="dateCreated datePublished" datetime="2022-04-09T00:00:00+08:00">2022-04-09</time>
+      <time title="创建时间：2022-02-11 00:00:00" itemprop="dateCreated datePublished" datetime="2022-02-11T00:00:00+08:00">2022-02-11</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -650,7 +650,7 @@
       </span>
       <span class="post-meta-item-text">分类于</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/Read-Notes/" itemprop="url" rel="index"><span itemprop="name">Read Notes</span></a>
+          <a href="/categories/HTB-Challenges/" itemprop="url" rel="index"><span itemprop="name">HTB Challenges</span></a>
         </span>
     </span>
 
@@ -664,10 +664,10 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <h1 id="内容简介"><a href="#内容简介" class="headerlink" title="内容简介"></a>内容简介</h1><p>网络应用随处可见。任何时候浏览<code>Web</code>、发送<code>Email</code>信息或是玩在线游戏，都在使用网络应用程序。有趣的是，所有的网络应用都是基于相同的基本编程模型，有着相似的整体逻辑结构，并且依赖相同的编程接口。网络应用依赖于很多在系统研究中已经学习过的概念，例如：进程、信号、字节顺序、内存映射以及动态内存分配。还依赖于一些新的概念。</p>
+          Here's something encrypted, password is required to continue reading.
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/posts/net-prog1/#more" rel="contents">
+              <a class="btn" href="/posts/htb-rsactftool/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -698,7 +698,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://lu0k.github.io/posts/sysl-io2/">
+    <link itemprop="mainEntityOfPage" href="https://lu0k.github.io/posts/htb-lostkey/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">
@@ -711,7 +711,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/sysl-io2/" class="post-title-link" itemprop="url">系统级I/O(二)</a>
+          <a href="/posts/htb-lostkey/" class="post-title-link" itemprop="url">HTB LostKey</a>
         </h2>
 
         <div class="post-meta-container">
@@ -722,7 +722,7 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2022-04-03 00:00:00" itemprop="dateCreated datePublished" datetime="2022-04-03T00:00:00+08:00">2022-04-03</time>
+      <time title="创建时间：2022-02-10 00:00:00" itemprop="dateCreated datePublished" datetime="2022-02-10T00:00:00+08:00">2022-02-10</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -730,7 +730,7 @@
       </span>
       <span class="post-meta-item-text">分类于</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/Read-Notes/" itemprop="url" rel="index"><span itemprop="name">Read Notes</span></a>
+          <a href="/categories/HTB-Challenges/" itemprop="url" rel="index"><span itemprop="name">HTB Challenges</span></a>
         </span>
     </span>
 
@@ -744,10 +744,10 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <h1 id="内容简介"><a href="#内容简介" class="headerlink" title="内容简介"></a>内容简介</h1><p>输入<code>/</code>输出<code>(I/O)</code>是在主存和外部设备<code>(例如磁盘驱动器、终端和网络)</code>之间复制数据的过程。输入操作是从<code>I/O</code>设备复制数据到主存，而输出操作是从主存复制数据到<code>I/O</code>设备。所有语言的运行时系统都提供执行<code>I/O</code>的较高级别的工具。例如，ANSI C提供标准<code>I/O</code>库，包含像<code>printf</code>和<code>scanf</code>这样执行带缓冲区的<code>I/O</code>函数。C++语言用它的重载操作符<code>&lt;&lt;(输入)</code>和<code>&gt;&gt;(输出)</code>提供了类似的功能。</p>
+          Here's something encrypted, password is required to continue reading.
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/posts/sysl-io2/#more" rel="contents">
+              <a class="btn" href="/posts/htb-lostkey/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -778,7 +778,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://lu0k.github.io/posts/sysl-io1/">
+    <link itemprop="mainEntityOfPage" href="https://lu0k.github.io/posts/htb-optimusprime/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">
@@ -791,7 +791,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/sysl-io1/" class="post-title-link" itemprop="url">系统级I/O(一)</a>
+          <a href="/posts/htb-optimusprime/" class="post-title-link" itemprop="url">HTB Optimus Prime</a>
         </h2>
 
         <div class="post-meta-container">
@@ -802,7 +802,7 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2022-04-02 00:00:00" itemprop="dateCreated datePublished" datetime="2022-04-02T00:00:00+08:00">2022-04-02</time>
+      <time title="创建时间：2022-02-09 00:00:00" itemprop="dateCreated datePublished" datetime="2022-02-09T00:00:00+08:00">2022-02-09</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -810,7 +810,7 @@
       </span>
       <span class="post-meta-item-text">分类于</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/Read-Notes/" itemprop="url" rel="index"><span itemprop="name">Read Notes</span></a>
+          <a href="/categories/HTB-Challenges/" itemprop="url" rel="index"><span itemprop="name">HTB Challenges</span></a>
         </span>
     </span>
 
@@ -824,10 +824,10 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <h1 id="内容简介"><a href="#内容简介" class="headerlink" title="内容简介"></a>内容简介</h1><p>输入<code>/</code>输出<code>(I/O)</code>是在主存和外部设备<code>(例如磁盘驱动器、终端和网络)</code>之间复制数据的过程。输入操作是从<code>I/O</code>设备复制数据到主存，而输出操作是从主存复制数据到<code>I/O</code>设备。所有语言的运行时系统都提供执行<code>I/O</code>的较高级别的工具。例如，ANSI C提供标准<code>I/O</code>库，包含像<code>printf</code>和<code>scanf</code>这样执行带缓冲区的<code>I/O</code>函数。C++语言用它的重载操作符<code>&lt;&lt;(输入)</code>和<code>&gt;&gt;(输出)</code>提供了类似的功能。</p>
+          Here's something encrypted, password is required to continue reading.
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/posts/sysl-io1/#more" rel="contents">
+              <a class="btn" href="/posts/htb-optimusprime/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -858,7 +858,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://lu0k.github.io/posts/vir-mem6/">
+    <link itemprop="mainEntityOfPage" href="https://lu0k.github.io/posts/htb-epsilon/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">
@@ -871,7 +871,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/vir-mem6/" class="post-title-link" itemprop="url">虚拟内存(六)</a>
+          <a href="/posts/htb-epsilon/" class="post-title-link" itemprop="url">HTB Epsilon</a>
         </h2>
 
         <div class="post-meta-container">
@@ -882,7 +882,7 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2022-03-27 00:00:00" itemprop="dateCreated datePublished" datetime="2022-03-27T00:00:00+08:00">2022-03-27</time>
+      <time title="创建时间：2022-02-08 00:00:00" itemprop="dateCreated datePublished" datetime="2022-02-08T00:00:00+08:00">2022-02-08</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -890,7 +890,7 @@
       </span>
       <span class="post-meta-item-text">分类于</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/Read-Notes/" itemprop="url" rel="index"><span itemprop="name">Read Notes</span></a>
+          <a href="/categories/HTB-Machines/" itemprop="url" rel="index"><span itemprop="name">HTB Machines</span></a>
         </span>
     </span>
 
@@ -904,10 +904,10 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <h1 id="内容简介"><a href="#内容简介" class="headerlink" title="内容简介"></a>内容简介</h1><p>为了更加有效地管理内存并且少出错，现代系统提供了一种对主存的抽象概念，叫做虚拟内存<code>(VM)</code>。虚拟内存是硬件异常、硬件地址翻译、主存、磁盘文件和内核软件的完美交互，它为每个进程提供了一个大的、一致的和私有的地址空间。虚拟内存是计算机系统最重要的概念之一。它是沉默地、自动地工作的，不需要应用程序员的任何干涉。</p>
+          Here's something encrypted, password is required to continue reading.
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/posts/vir-mem6/#more" rel="contents">
+              <a class="btn" href="/posts/htb-epsilon/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -938,7 +938,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://lu0k.github.io/posts/vir-mem5/">
+    <link itemprop="mainEntityOfPage" href="https://lu0k.github.io/posts/htb-paper/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">
@@ -951,7 +951,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/vir-mem5/" class="post-title-link" itemprop="url">虚拟内存(五)</a>
+          <a href="/posts/htb-paper/" class="post-title-link" itemprop="url">HTB Paper</a>
         </h2>
 
         <div class="post-meta-container">
@@ -962,7 +962,7 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2022-03-26 00:00:00" itemprop="dateCreated datePublished" datetime="2022-03-26T00:00:00+08:00">2022-03-26</time>
+      <time title="创建时间：2022-02-07 00:00:00" itemprop="dateCreated datePublished" datetime="2022-02-07T00:00:00+08:00">2022-02-07</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -970,7 +970,7 @@
       </span>
       <span class="post-meta-item-text">分类于</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/Read-Notes/" itemprop="url" rel="index"><span itemprop="name">Read Notes</span></a>
+          <a href="/categories/HTB-Machines/" itemprop="url" rel="index"><span itemprop="name">HTB Machines</span></a>
         </span>
     </span>
 
@@ -984,10 +984,10 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <h1 id="内容简介"><a href="#内容简介" class="headerlink" title="内容简介"></a>内容简介</h1><p>为了更加有效地管理内存并且少出错，现代系统提供了一种对主存的抽象概念，叫做虚拟内存<code>(VM)</code>。虚拟内存是硬件异常、硬件地址翻译、主存、磁盘文件和内核软件的完美交互，它为每个进程提供了一个大的、一致的和私有的地址空间。虚拟内存是计算机系统最重要的概念之一。它是沉默地、自动地工作的，不需要应用程序员的任何干涉。</p>
+          Here's something encrypted, password is required to continue reading.
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/posts/vir-mem5/#more" rel="contents">
+              <a class="btn" href="/posts/htb-paper/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -1011,7 +1011,7 @@
 
 
   <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/17/">17</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/14/">14</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 </div>
@@ -1023,7 +1023,7 @@
 
 <div class="copyright">
   &copy; 
-  <span itemprop="copyrightYear">2022</span>
+  <span itemprop="copyrightYear">2023</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
